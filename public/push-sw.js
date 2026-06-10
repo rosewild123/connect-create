@@ -1,0 +1,32 @@
+// Push notification service worker (no offline caching)
+self.addEventListener('install', (e) => self.skipWaiting());
+self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+
+self.addEventListener('push', (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch (_) { data = { title: 'New notification', body: event.data ? event.data.text() : '' }; }
+  const title = data.title || 'New notification';
+  const options = {
+    body: data.body || '',
+    icon: data.icon || '/favicon.ico',
+    badge: data.badge || '/favicon.ico',
+    data: { url: data.url || '/', ...data.data },
+    tag: data.tag,
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/';
+  event.waitUntil((async () => {
+    const allClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of allClients) {
+      if ('focus' in client) {
+        client.navigate(url).catch(() => {});
+        return client.focus();
+      }
+    }
+    if (self.clients.openWindow) return self.clients.openWindow(url);
+  })());
+});
