@@ -76,6 +76,8 @@ function Discover() {
   const [swipesToday, setSwipesToday] = useState(0);
   const [swipedIds, setSwipedIds] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const [lastSwipe, setLastSwipe] = useState<{ id: string; dir: "like" | "pass"; profile: Profile } | null>(null);
+  const [likesYouCount, setLikesYouCount] = useState(0);
   const { isActive: isPlus } = useSubscription(me);
 
   const limitReached = !isPlus && swipesToday >= FREE_DAILY_SWIPES;
