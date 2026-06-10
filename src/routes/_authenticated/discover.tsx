@@ -344,6 +344,14 @@ function FiltersSheet({ filters, setFilters, activeCount }: {
             <Switch checked={draft.travelOnly} onCheckedChange={(v) => setDraft({ ...draft, travelOnly: v })} />
           </section>
 
+          <section className="flex items-center justify-between">
+            <div>
+              <div className="font-semibold flex items-center gap-1">Verified only <VerifiedBadge className="h-4 w-4" /></div>
+              <p className="text-xs text-muted-foreground">Show only photo-verified creators</p>
+            </div>
+            <Switch checked={draft.verifiedOnly} onCheckedChange={(v) => setDraft({ ...draft, verifiedOnly: v })} />
+          </section>
+
           <section>
             <div className="flex items-center justify-between">
               <Label className="text-xs uppercase tracking-widest text-muted-foreground">Age range</Label>
