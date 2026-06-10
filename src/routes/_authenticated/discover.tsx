@@ -106,6 +106,12 @@ function Discover() {
       .from("profiles").select("*").eq("is_onboarded", true).limit(200);
     if (error) toast.error(error.message);
     setAllProfiles((profs || []) as unknown as Profile[]);
+
+    const { count: likesCount } = await supabase.from("swipes")
+      .select("id", { count: "exact", head: true })
+      .eq("swipee_id", u.user.id).eq("direction", "like");
+    setLikesYouCount(likesCount ?? 0);
+
     setLoading(false);
   })(); }, [navigate]);
 
