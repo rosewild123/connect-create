@@ -62,7 +62,11 @@ function Landing() {
       </section>
 
       <footer className="border-t border-border/50 px-6 py-8 text-center text-xs text-muted-foreground md:px-12">
-        © {new Date().getFullYear()} Senda. Creators only. 18+.
+        <p>© {new Date().getFullYear()} Senda. Creators only. 18+.</p>
+        <div className="mt-3 flex items-center justify-center gap-4">
+          <Link to="/terms" className="hover:text-foreground">Terms</Link>
+          <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+        </div>
       </footer>
     </main>
   );
