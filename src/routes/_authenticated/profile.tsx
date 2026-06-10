@@ -1,0 +1,119 @@
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { AppShell } from "@/components/AppShell";
+import { Button } from "@/components/ui/button";
+import { ShieldCheck, ShieldAlert, LogOut, Pencil } from "lucide-react";
+import { ageFromDob, type Platform } from "@/lib/senda";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/_authenticated/profile")({
+  head: () => ({ meta: [{ title: "Profile — Senda" }] }),
+  component: ProfilePage,
+});
+
+function ProfilePage() {
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState<{
+    id: string; display_name: string | null; bio: string | null; date_of_birth: string | null;
+    location_city: string | null; location_country: string | null;
+    niches: string[]; looking_for: string[]; platforms: Platform[]; photos: string[];
+    age_verified: boolean; id_verified: boolean; experience_years: number | null; completed_collabs: number;
+  } | null>(null);
+  const [photoUrl, setPhotoUrl] = useState("");
+
+  useEffect(() => { (async () => {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) return;
+    const { data } = await supabase.from("profiles").select("*").eq("id", u.user.id).maybeSingle();
+    if (data) {
+      setProfile(data as unknown as typeof profile);
+      if (data.photos?.[0]) {
+        const { data: s } = await supabase.storage.from("profile-photos").createSignedUrl(data.photos[0], 3600);
+        if (s) setPhotoUrl(s.signedUrl);
+      }
+    }
+  })(); }, []);
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    navigate({ to: "/" });
+    toast.success("Signed out");
+  }
+
+  if (!profile) return <AppShell><div className="p-6 text-muted-foreground">Loading...</div></AppShell>;
+  const age = ageFromDob(profile.date_of_birth);
+
+  return (
+    <AppShell>
+      <header className="flex items-center justify-between px-5 py-4">
+        <h1 className="font-display text-3xl font-bold">Profile</h1>
+        <button onClick={signOut} className="text-muted-foreground hover:text-foreground"><LogOut className="h-5 w-5" /></button>
+      </header>
+
+      <div className="px-5">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-muted">
+          {photoUrl && <img src={photoUrl} alt="" className="h-full w-full object-cover" />}
+          <Link to="/onboarding" className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-black/60 text-white backdrop-blur">
+            <Pencil className="h-4 w-4" />
+          </Link>
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent p-5 text-white">
+            <h2 className="font-display text-2xl font-bold">{profile.display_name}{age && `, ${age}`}</h2>
+            {[profile.location_city, profile.location_country].filter(Boolean).length > 0 && (
+              <p className="text-sm text-white/80">{[profile.location_city, profile.location_country].filter(Boolean).join(", ")}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-3">
+          <VerificationCard verified={profile.age_verified} title="Age verification" description="Confirm you're 18+ with a government ID." />
+          <VerificationCard verified={profile.id_verified} title="ID verification" description="Verify your identity to unlock matching." />
+        </div>
+
+        {profile.bio && <p className="mt-5 text-sm text-muted-foreground">{profile.bio}</p>}
+
+        {profile.niches.length > 0 && (
+          <div className="mt-5">
+            <h3 className="text-xs uppercase tracking-widest text-muted-foreground">Niches</h3>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {profile.niches.map((n) => <span key={n} className="rounded-full bg-card border border-border px-3 py-1 text-sm">{n}</span>)}
+            </div>
+          </div>
+        )}
+
+        {profile.platforms.length > 0 && (
+          <div className="mt-5">
+            <h3 className="text-xs uppercase tracking-widest text-muted-foreground">Platforms</h3>
+            <ul className="mt-2 space-y-2">
+              {profile.platforms.map((p, i) => (
+                <li key={i} className="rounded-xl border border-border bg-card px-3 py-2 text-sm">
+                  <div className="font-medium">{p.platform}</div>
+                  <a href={p.url} target="_blank" rel="noreferrer" className="text-xs text-primary">{p.url}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <Button asChild variant="outline" className="mt-6 w-full rounded-full">
+          <Link to="/onboarding">Edit profile</Link>
+        </Button>
+      </div>
+    </AppShell>
+  );
+}
+
+function VerificationCard({ verified, title, description }: { verified: boolean; title: string; description: string }) {
+  return (
+    <div className={`flex items-start gap-3 rounded-2xl border p-4 ${verified ? "border-primary/50 bg-primary/5" : "border-border bg-card"}`}>
+      <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${verified ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
+        {verified ? <ShieldCheck className="h-5 w-5" /> : <ShieldAlert className="h-5 w-5" />}
+      </div>
+      <div className="flex-1">
+        <div className="font-semibold">{title}{verified && <span className="ml-2 text-xs text-primary">Verified</span>}</div>
+        <p className="text-xs text-muted-foreground">{description}</p>
+        {!verified && <button className="mt-2 text-xs font-semibold text-primary">Verify now (coming soon)</button>}
+      </div>
+    </div>
+  );
+}
