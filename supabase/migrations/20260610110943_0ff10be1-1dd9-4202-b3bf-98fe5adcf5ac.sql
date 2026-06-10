@@ -1,0 +1,2 @@
+CREATE POLICY "Users view swipes on them" ON public.swipes FOR SELECT TO authenticated USING (swipee_id = auth.uid());
+CREATE POLICY "Users delete own swipes" ON public.swipes FOR DELETE TO authenticated USING (swiper_id = auth.uid());
