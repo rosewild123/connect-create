@@ -383,6 +383,10 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onB
           <div className="grid h-full place-items-center text-muted-foreground">No photo</div>
         )}
 
+        <div className="absolute right-3 top-3 z-10">
+          <ReportBlockMenu targetId={profile.id} targetName={profile.display_name} onBlocked={onBlocked} variant="overlay" />
+        </div>
+
         {photoUrls.length > 1 && (
           <>
             <div className="absolute left-3 right-3 top-3 flex gap-1">
