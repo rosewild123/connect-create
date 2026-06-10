@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { Heart, X, MapPin, Flame, Sparkles, Lock, SlidersHorizontal } from "lucide-react";
+import { Heart, X, MapPin, Flame, Sparkles, Lock, SlidersHorizontal, Undo2 } from "lucide-react";
 import { ageFromDob, type Platform, NICHES, LOOKING_FOR } from "@/lib/senda";
 import { useSubscription, FREE_DAILY_SWIPES } from "@/hooks/useSubscription";
 import { toast } from "sonner";
