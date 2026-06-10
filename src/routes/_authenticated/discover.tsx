@@ -116,14 +116,20 @@ function Discover() {
 
     const { count: likesCount } = await supabase.from("swipes")
       .select("id", { count: "exact", head: true })
-      .eq("swipee_id", u.user.id).eq("direction", "like");
+      .eq("swipee_id", u.user.id).in("direction", ["like", "super"]);
     setLikesYouCount(likesCount ?? 0);
+
+    const { data: sl } = await supabase.rpc("super_likes_today");
+    setSuperLikesUsed((sl as unknown as number) ?? 0);
+
+    const { data: boosted } = await supabase.rpc("boosted_user_ids");
+    setBoostedIds(new Set<string>((boosted as unknown as string[]) || []));
 
     setLoading(false);
   })(); }, [navigate]);
 
   const deck = useMemo(() => {
-    return allProfiles.filter((p) => {
+    const filtered = allProfiles.filter((p) => {
       if (swipedIds.has(p.id)) return false;
       if (hidden.has(p.id)) return false;
       const age = ageFromDob(p.date_of_birth);
@@ -135,7 +141,12 @@ function Discover() {
       if (filters.lookingFor.length && !filters.lookingFor.some((l) => p.looking_for?.includes(l))) return false;
       return true;
     });
-  }, [allProfiles, swipedIds, hidden, filters]);
+    return [...filtered].sort((a, b) => {
+      const ab = boostedIds.has(a.id) ? 1 : 0;
+      const bb = boostedIds.has(b.id) ? 1 : 0;
+      return bb - ab;
+    });
+  }, [allProfiles, swipedIds, hidden, filters, boostedIds]);
 
   const current = deck[0];
   const activeFilterCount = countActive(filters);
