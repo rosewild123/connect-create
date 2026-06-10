@@ -84,9 +84,9 @@ function Discover() {
   const [likesYouCount, setLikesYouCount] = useState(0);
   const [superLikesUsed, setSuperLikesUsed] = useState(0);
   const [boostedIds, setBoostedIds] = useState<Set<string>>(new Set());
-  const { isActive: isPlus } = useSubscription(me);
+  const { isActive: isPlus, isPremium } = useSubscription(me);
   const { hidden, refresh: refreshHidden } = useHiddenUserIds(me);
-  const superLikeQuota = isPlus ? SUPER_LIKES_PLUS_DAILY : SUPER_LIKES_FREE_DAILY;
+  const superLikeQuota = isPremium ? SUPER_LIKES_PREMIUM_DAILY : isPlus ? SUPER_LIKES_PLUS_DAILY : SUPER_LIKES_FREE_DAILY;
   const superLikesLeft = Math.max(0, superLikeQuota - superLikesUsed);
 
   const limitReached = !isPlus && swipesToday >= FREE_DAILY_SWIPES;
