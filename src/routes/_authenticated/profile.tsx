@@ -80,6 +80,7 @@ function ProfilePage() {
         </Link>
 
         <div className="mt-4 space-y-3">
+          <BoostCard userId={profile.id} />
           <VerificationCard
             ageVerified={profile.age_verified}
             idVerified={profile.id_verified}
