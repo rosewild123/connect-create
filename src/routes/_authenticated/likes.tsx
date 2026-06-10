@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Heart, X, Lock, ArrowLeft, Star } from "lucide-react";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { ageFromDob } from "@/lib/senda";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ type LikerProfile = {
   location_country: string | null;
   niches: string[];
   photos: string[];
+  photo_verified?: boolean;
   isSuper?: boolean;
 };
 
@@ -52,7 +54,7 @@ function LikesPage() {
       .filter((id) => !swipedIds.has(id) && !hiddenSet.has(id));
     if (ids.length === 0) { setLikers([]); setLoading(false); return; }
     const { data: profs } = await supabase.from("profiles")
-      .select("id, display_name, date_of_birth, location_city, location_country, niches, photos")
+      .select("id, display_name, date_of_birth, location_city, location_country, niches, photos, photo_verified")
       .in("id", ids);
     const merged = (profs || []).map((p) => ({ ...p, isSuper: superSet.has(p.id) })) as LikerProfile[];
     // Super likes first
@@ -134,8 +136,9 @@ function LikerCard({ profile, onAct }: { profile: LikerProfile; onAct: (id: stri
         </div>
       )}
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent p-3 text-white">
-        <div className="font-display text-base font-bold leading-tight">
+        <div className="flex items-center gap-1 font-display text-base font-bold leading-tight">
           {profile.display_name}{age && <span className="font-sans text-sm font-normal">, {age}</span>}
+          {profile.photo_verified && <VerifiedBadge className="h-3.5 w-3.5" />}
         </div>
         {loc && <div className="text-[11px] text-white/80 line-clamp-1">{loc}</div>}
         <div className="mt-2 flex gap-1.5">
