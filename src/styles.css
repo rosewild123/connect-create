@@ -60,12 +60,12 @@
 }
 
 .dark {
-  --background: oklch(0.16 0 0);
-  --foreground: oklch(0.97 0 0);
+  --background: oklch(0.14 0.03 25);
+  --foreground: oklch(0.95 0.01 55);
 }
 
 body {
-  background: radial-gradient(ellipse at top, oklch(0.22 0 0) 0%, var(--background) 60%);
+  background: radial-gradient(ellipse at top, oklch(0.22 0.05 25) 0%, var(--background) 60%);
   color: var(--foreground);
   font-family: var(--font-sans);
   min-height: 100vh;
@@ -74,5 +74,5 @@ body {
 .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
 
 .swipe-card-shadow {
-  box-shadow: 0 30px 60px -20px oklch(0 0 0 / 0.6), 0 0 0 1px oklch(1 0 0 / 0.05);
+  box-shadow: 0 30px 60px -20px oklch(0.1 0.05 20 / 0.6), 0 0 0 1px oklch(0.95 0.01 55 / 0.06);
 }
