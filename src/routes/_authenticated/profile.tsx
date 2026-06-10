@@ -1,11 +1,14 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles } from "lucide-react";
+import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2 } from "lucide-react";
 import { ageFromDob, type Platform } from "@/lib/senda";
 import { toast } from "sonner";
+import { startIdentityVerification } from "@/lib/verification.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({ meta: [{ title: "Profile — Senda" }] }),
@@ -77,8 +80,10 @@ function ProfilePage() {
         </Link>
 
         <div className="mt-4 space-y-3">
-          <VerificationCard verified={profile.age_verified} title="Age verification" description="Confirm you're 18+ with a government ID." />
-          <VerificationCard verified={profile.id_verified} title="ID verification" description="Verify your identity to unlock matching." />
+          <VerificationCard
+            ageVerified={profile.age_verified}
+            idVerified={profile.id_verified}
+          />
         </div>
 
         {profile.bio && <p className="mt-5 text-sm text-muted-foreground">{profile.bio}</p>}
@@ -114,16 +119,55 @@ function ProfilePage() {
   );
 }
 
-function VerificationCard({ verified, title, description }: { verified: boolean; title: string; description: string }) {
+function VerificationCard({ ageVerified, idVerified }: { ageVerified: boolean; idVerified: boolean }) {
+  const startVerify = useServerFn(startIdentityVerification);
+  const [loading, setLoading] = useState(false);
+  const verified = ageVerified || idVerified;
+
+  async function handleVerify() {
+    setLoading(true);
+    try {
+      const result = await startVerify({
+        data: {
+          returnUrl: `${window.location.origin}/profile`,
+          environment: getStripeEnvironment(),
+        },
+      });
+      if ("error" in result) {
+        toast.error(result.error);
+        setLoading(false);
+        return;
+      }
+      window.location.href = result.url;
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not start verification");
+      setLoading(false);
+    }
+  }
+
   return (
     <div className={`flex items-start gap-3 rounded-2xl border p-4 ${verified ? "border-primary/50 bg-primary/5" : "border-border bg-card"}`}>
       <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${verified ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
         {verified ? <ShieldCheck className="h-5 w-5" /> : <ShieldAlert className="h-5 w-5" />}
       </div>
       <div className="flex-1">
-        <div className="font-semibold">{title}{verified && <span className="ml-2 text-xs text-primary">Verified</span>}</div>
-        <p className="text-xs text-muted-foreground">{description}</p>
-        {!verified && <button className="mt-2 text-xs font-semibold text-primary">Verify now (coming soon)</button>}
+        <div className="font-semibold">
+          Identity & age verification
+          {idVerified && <span className="ml-2 text-xs text-primary">Verified</span>}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Confirm you're 18+ with a government ID and a selfie. Takes about a minute.
+        </p>
+        {!idVerified && (
+          <button
+            onClick={handleVerify}
+            disabled={loading}
+            className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary disabled:opacity-60"
+          >
+            {loading && <Loader2 className="h-3 w-3 animate-spin" />}
+            {loading ? "Opening…" : "Verify now →"}
+          </button>
+        )}
       </div>
     </div>
   );

@@ -45,6 +45,27 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
               }
               break;
             }
+            case "identity.verification_session.verified": {
+              const vs = event.data.object as Stripe.Identity.VerificationSession;
+              const userId = vs.metadata?.userId;
+              if (!userId) {
+                console.warn("Identity session has no userId metadata", vs.id);
+                break;
+              }
+              const dob = vs.verified_outputs?.dob;
+              let ageVerified = true;
+              if (dob && typeof dob.year === "number" && typeof dob.month === "number" && typeof dob.day === "number") {
+                const birth = new Date(dob.year, dob.month - 1, dob.day);
+                const age = (Date.now() - birth.getTime()) / (365.25 * 24 * 3600 * 1000);
+                ageVerified = age >= 18;
+              }
+              const { error } = await supabaseAdmin
+                .from("profiles")
+                .update({ id_verified: true, age_verified: ageVerified })
+                .eq("id", userId);
+              if (error) console.error("Failed to mark profile verified", error);
+              break;
+            }
             default:
               break;
           }
