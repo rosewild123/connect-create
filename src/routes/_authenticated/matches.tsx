@@ -22,6 +22,8 @@ function Matches() {
   const [rows, setRows] = useState<MatchRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [photoMap, setPhotoMap] = useState<Record<string, string>>({});
+  const { hidden } = useHiddenUserIds(me);
+  const visibleRows = rows.filter((r) => !hidden.has(r.other.id));
 
   useEffect(() => { (async () => {
     const { data: u } = await supabase.auth.getUser();
@@ -61,7 +63,7 @@ function Matches() {
 
       <div className="px-5">
         {loading && <div className="text-sm text-muted-foreground">Loading...</div>}
-        {!loading && rows.length === 0 && (
+        {!loading && visibleRows.length === 0 && (
           <div className="mt-12 text-center">
             <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-primary/15 text-primary"><MessageCircle className="h-7 w-7" /></div>
             <h2 className="font-display text-2xl font-bold">No matches yet</h2>
@@ -69,7 +71,7 @@ function Matches() {
           </div>
         )}
         <ul className="space-y-2">
-          {rows.map((r) => (
+          {visibleRows.map((r) => (
             <li key={r.id}>
               <Link to="/matches/$id" params={{ id: r.id }} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 transition hover:border-primary">
                 <div className="h-14 w-14 overflow-hidden rounded-full bg-muted">
