@@ -20,6 +20,7 @@ import { Route as AuthenticatedMatchesRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedLikesRouteImport } from './routes/_authenticated/likes'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedBlockedRouteImport } from './routes/_authenticated/blocked'
+import { Route as AuthenticatedMatchesIndexRouteImport } from './routes/_authenticated/matches.index'
 import { Route as AuthenticatedMatchesIdRouteImport } from './routes/_authenticated/matches.$id'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
@@ -77,6 +78,12 @@ const AuthenticatedBlockedRoute = AuthenticatedBlockedRouteImport.update({
   path: '/blocked',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMatchesIndexRoute =
+  AuthenticatedMatchesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedMatchesRoute,
+  } as any)
 const AuthenticatedMatchesIdRoute = AuthenticatedMatchesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -101,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/safety': typeof AuthenticatedSafetyRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
+  '/matches/': typeof AuthenticatedMatchesIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -109,12 +117,12 @@ export interface FileRoutesByTo {
   '/blocked': typeof AuthenticatedBlockedRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/likes': typeof AuthenticatedLikesRoute
-  '/matches': typeof AuthenticatedMatchesRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/safety': typeof AuthenticatedSafetyRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
+  '/matches': typeof AuthenticatedMatchesIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/_authenticated/safety': typeof AuthenticatedSafetyRoute
   '/_authenticated/upgrade': typeof AuthenticatedUpgradeRoute
   '/_authenticated/matches/$id': typeof AuthenticatedMatchesIdRoute
+  '/_authenticated/matches/': typeof AuthenticatedMatchesIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/safety'
     | '/upgrade'
     | '/matches/$id'
+    | '/matches/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -155,12 +165,12 @@ export interface FileRouteTypes {
     | '/blocked'
     | '/discover'
     | '/likes'
-    | '/matches'
     | '/onboarding'
     | '/profile'
     | '/safety'
     | '/upgrade'
     | '/matches/$id'
+    | '/matches'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/_authenticated/safety'
     | '/_authenticated/upgrade'
     | '/_authenticated/matches/$id'
+    | '/_authenticated/matches/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -265,6 +276,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBlockedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/matches/': {
+      id: '/_authenticated/matches/'
+      path: '/'
+      fullPath: '/matches/'
+      preLoaderRoute: typeof AuthenticatedMatchesIndexRouteImport
+      parentRoute: typeof AuthenticatedMatchesRoute
+    }
     '/_authenticated/matches/$id': {
       id: '/_authenticated/matches/$id'
       path: '/$id'
@@ -284,10 +302,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedMatchesRouteChildren {
   AuthenticatedMatchesIdRoute: typeof AuthenticatedMatchesIdRoute
+  AuthenticatedMatchesIndexRoute: typeof AuthenticatedMatchesIndexRoute
 }
 
 const AuthenticatedMatchesRouteChildren: AuthenticatedMatchesRouteChildren = {
   AuthenticatedMatchesIdRoute: AuthenticatedMatchesIdRoute,
+  AuthenticatedMatchesIndexRoute: AuthenticatedMatchesIndexRoute,
 }
 
 const AuthenticatedMatchesRouteWithChildren =
