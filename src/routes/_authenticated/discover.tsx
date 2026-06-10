@@ -1,9 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { Heart, X, MapPin, Flame, Sparkles } from "lucide-react";
+import { Heart, X, MapPin, Flame, Sparkles, Lock } from "lucide-react";
 import { ageFromDob, type Platform } from "@/lib/senda";
+import { useSubscription, FREE_DAILY_SWIPES } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/discover")({
@@ -33,6 +34,11 @@ function Discover() {
   const [deck, setDeck] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [photoIdx, setPhotoIdx] = useState(0);
+  const [swipesToday, setSwipesToday] = useState(0);
+  const { isActive: isPlus } = useSubscription(me);
+
+  const limitReached = !isPlus && swipesToday >= FREE_DAILY_SWIPES;
+  const remaining = Math.max(0, FREE_DAILY_SWIPES - swipesToday);
 
   useEffect(() => { (async () => {
     const { data: u } = await supabase.auth.getUser();
@@ -40,6 +46,12 @@ function Discover() {
     setMe(u.user.id);
     const { data: mine } = await supabase.from("profiles").select("is_onboarded").eq("id", u.user.id).maybeSingle();
     if (!mine?.is_onboarded) { navigate({ to: "/onboarding" }); return; }
+
+    const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+    const { count } = await supabase.from("swipes").select("id", { count: "exact", head: true })
+      .eq("swiper_id", u.user.id).gte("created_at", startOfDay.toISOString());
+    setSwipesToday(count ?? 0);
+
     const { data: swipes } = await supabase.from("swipes").select("swipee_id").eq("swiper_id", u.user.id);
     const excluded = new Set([u.user.id, ...(swipes?.map((s) => s.swipee_id) || [])]);
     const { data: profs, error } = await supabase
@@ -54,9 +66,11 @@ function Discover() {
 
   async function swipe(dir: "like" | "pass") {
     if (!current || !me) return;
+    if (limitReached) { navigate({ to: "/upgrade" }); return; }
     const target = current;
     setDeck(deck.slice(1));
     setPhotoIdx(0);
+    setSwipesToday((n) => n + 1);
     const { error } = await supabase.from("swipes").insert({ swiper_id: me, swipee_id: target.id, direction: dir });
     if (error) { toast.error(error.message); return; }
     if (dir === "like") {
@@ -78,17 +92,37 @@ function Discover() {
           <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground font-display text-lg font-bold">s</div>
           <span className="font-display text-xl font-bold">senda</span>
         </div>
-        <Flame className="h-5 w-5 text-primary" />
+        {isPlus ? (
+          <span className="rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">PLUS</span>
+        ) : (
+          <Link to="/upgrade" className="text-xs text-muted-foreground hover:text-primary">
+            {remaining} swipes left
+          </Link>
+        )}
       </header>
 
       <div className="px-5">
         {loading && <SkeletonCard />}
-        {!loading && !current && <EmptyDeck />}
-        {current && (
+        {!loading && limitReached && <LimitReached />}
+        {!loading && !limitReached && !current && <EmptyDeck />}
+        {!limitReached && current && (
           <CardView profile={current} photoIdx={photoIdx} setPhotoIdx={setPhotoIdx} onSwipe={swipe} />
         )}
       </div>
     </AppShell>
+  );
+}
+
+function LimitReached() {
+  return (
+    <div className="mt-12 text-center">
+      <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-primary/15 text-primary"><Lock className="h-7 w-7" /></div>
+      <h2 className="font-display text-2xl font-bold">Out of swipes today</h2>
+      <p className="mt-2 text-sm text-muted-foreground">Upgrade to Senda Plus for unlimited swipes.</p>
+      <Link to="/upgrade" className="mt-5 inline-block rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/30">
+        Get Senda Plus
+      </Link>
+    </div>
   );
 }
 
