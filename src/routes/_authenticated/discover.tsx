@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { Heart, X, MapPin, Flame, Sparkles, Lock, SlidersHorizontal } from "lucide-react";
+import { Heart, X, MapPin, Flame, Sparkles, Lock, SlidersHorizontal, Undo2 } from "lucide-react";
 import { ageFromDob, type Platform, NICHES, LOOKING_FOR } from "@/lib/senda";
 import { useSubscription, FREE_DAILY_SWIPES } from "@/hooks/useSubscription";
 import { toast } from "sonner";
@@ -76,6 +76,8 @@ function Discover() {
   const [swipesToday, setSwipesToday] = useState(0);
   const [swipedIds, setSwipedIds] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const [lastSwipe, setLastSwipe] = useState<{ id: string; dir: "like" | "pass"; profile: Profile } | null>(null);
+  const [likesYouCount, setLikesYouCount] = useState(0);
   const { isActive: isPlus } = useSubscription(me);
 
   const limitReached = !isPlus && swipesToday >= FREE_DAILY_SWIPES;
@@ -104,6 +106,12 @@ function Discover() {
       .from("profiles").select("*").eq("is_onboarded", true).limit(200);
     if (error) toast.error(error.message);
     setAllProfiles((profs || []) as unknown as Profile[]);
+
+    const { count: likesCount } = await supabase.from("swipes")
+      .select("id", { count: "exact", head: true })
+      .eq("swipee_id", u.user.id).eq("direction", "like");
+    setLikesYouCount(likesCount ?? 0);
+
     setLoading(false);
   })(); }, [navigate]);
 
@@ -131,6 +139,7 @@ function Discover() {
     setSwipedIds((prev) => { const next = new Set(prev); next.add(target.id); return next; });
     setPhotoIdx(0);
     setSwipesToday((n) => n + 1);
+    setLastSwipe({ id: target.id, dir, profile: target });
     const { error } = await supabase.from("swipes").insert({ swiper_id: me, swipee_id: target.id, direction: dir });
     if (error) { toast.error(error.message); return; }
     if (dir === "like") {
@@ -145,6 +154,19 @@ function Discover() {
     }
   }
 
+  async function undo() {
+    if (!lastSwipe || !me) return;
+    if (!isPlus) { navigate({ to: "/upgrade" }); return; }
+    const { id } = lastSwipe;
+    const { error } = await supabase.from("swipes").delete()
+      .eq("swiper_id", me).eq("swipee_id", id);
+    if (error) { toast.error(error.message); return; }
+    setSwipedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
+    setSwipesToday((n) => Math.max(0, n - 1));
+    setLastSwipe(null);
+    toast.success("Swipe undone");
+  }
+
   return (
     <AppShell>
       <header className="flex items-center justify-between px-5 py-4">
@@ -152,17 +174,31 @@ function Discover() {
           <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground font-display text-lg font-bold">s</div>
           <span className="font-display text-xl font-bold">senda</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <Link to="/likes" className="relative grid h-9 w-9 place-items-center rounded-full border border-border bg-card text-foreground hover:bg-accent" aria-label="Likes you">
+            <Heart className="h-4 w-4" />
+            {isPlus && likesYouCount > 0 && (
+              <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                {likesYouCount > 99 ? "99+" : likesYouCount}
+              </span>
+            )}
+            {!isPlus && (
+              <span className="absolute -right-1 -top-1 grid h-3.5 w-3.5 place-items-center rounded-full bg-primary text-primary-foreground">
+                <Lock className="h-2 w-2" />
+              </span>
+            )}
+          </Link>
           <FiltersSheet filters={filters} setFilters={setFilters} activeCount={activeFilterCount} />
           {isPlus ? (
             <span className="rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">PLUS</span>
           ) : (
             <Link to="/upgrade" className="text-xs text-muted-foreground hover:text-primary">
-              {remaining} swipes left
+              {remaining} left
             </Link>
           )}
         </div>
       </header>
+
 
       <div className="px-5">
         {loading && <SkeletonCard />}
@@ -173,7 +209,8 @@ function Discover() {
             : <EmptyDeck title="You're all caught up" subtitle="New creators join every day. Check back soon." />
         )}
         {!limitReached && current && (
-          <CardView profile={current} photoIdx={photoIdx} setPhotoIdx={setPhotoIdx} onSwipe={swipe} />
+          <CardView profile={current} photoIdx={photoIdx} setPhotoIdx={setPhotoIdx} onSwipe={swipe}
+            onUndo={lastSwipe ? undo : undefined} isPlus={isPlus} />
         )}
       </div>
     </AppShell>
@@ -313,8 +350,9 @@ function LimitReached() {
   );
 }
 
-function CardView({ profile, photoIdx, setPhotoIdx, onSwipe }: {
-  profile: Profile; photoIdx: number; setPhotoIdx: (n: number) => void; onSwipe: (d: "like" | "pass") => void;
+function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus }: {
+  profile: Profile; photoIdx: number; setPhotoIdx: (n: number) => void;
+  onSwipe: (d: "like" | "pass") => void; onUndo?: () => void; isPlus: boolean;
 }) {
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   useEffect(() => {
@@ -372,7 +410,13 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe }: {
         <Stat icon={<Flame className="h-3 w-3" />} label={`${profile.completed_collabs} collabs`} />
       </div>
 
-      <div className="mt-6 flex items-center justify-center gap-6">
+      <div className="mt-6 flex items-center justify-center gap-5">
+        <button onClick={onUndo} disabled={!onUndo}
+          className="grid h-12 w-12 place-items-center rounded-full border-2 border-border bg-card text-muted-foreground transition hover:scale-105 hover:text-foreground disabled:opacity-40 disabled:hover:scale-100 relative"
+          aria-label="Undo last swipe">
+          <Undo2 className="h-5 w-5" />
+          {!isPlus && <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-primary text-primary-foreground"><Lock className="h-2.5 w-2.5" /></span>}
+        </button>
         <button onClick={() => onSwipe("pass")} className="grid h-16 w-16 place-items-center rounded-full border-2 border-border bg-card text-muted-foreground transition hover:scale-105 hover:border-destructive hover:text-destructive">
           <X className="h-7 w-7" />
         </button>
