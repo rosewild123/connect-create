@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { startIdentityVerification } from "@/lib/verification.functions";
 import { submitPhotoVerification, VERIFICATION_POSES } from "@/lib/photo-verification.functions";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { getStripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -87,6 +88,7 @@ function ProfilePage() {
 
         <div className="mt-4 space-y-3">
           <BoostCard userId={profile.id} />
+          <NotificationsToggle />
           <PhotoVerifyCard
             verified={profile.photo_verified}
             hasPhoto={!!profile.photos?.[0]}
