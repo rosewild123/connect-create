@@ -52,7 +52,7 @@ const DEFAULT_FILTERS: Filters = {
   country: "",
   travelOnly: false,
   ageMin: 18,
-  ageMax: 65,
+  ageMax: 88,
   minExperience: 0,
 };
 
