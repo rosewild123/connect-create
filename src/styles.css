@@ -37,35 +37,35 @@
 
 :root {
   --radius: 1rem;
-  /* Senda — dark burgundy */
-  --background: oklch(0.14 0.03 25);
-  --foreground: oklch(0.95 0.01 55);
-  --card: oklch(0.18 0.04 25);
-  --card-foreground: oklch(0.95 0.01 55);
-  --popover: oklch(0.18 0.04 25);
-  --popover-foreground: oklch(0.95 0.01 55);
-  --primary: oklch(0.35 0.1 20);
-  --primary-foreground: oklch(0.98 0.01 55);
-  --secondary: oklch(0.22 0.06 25);
-  --secondary-foreground: oklch(0.98 0.01 55);
-  --muted: oklch(0.24 0.05 25);
-  --muted-foreground: oklch(0.65 0.03 30);
-  --accent: oklch(0.4 0.12 20);
-  --accent-foreground: oklch(0.98 0.01 55);
-  --destructive: oklch(0.55 0.2 25);
+  /* Senda — deep red */
+  --background: oklch(0.14 0.03 15);
+  --foreground: oklch(0.95 0.01 20);
+  --card: oklch(0.18 0.04 15);
+  --card-foreground: oklch(0.95 0.01 20);
+  --popover: oklch(0.18 0.04 15);
+  --popover-foreground: oklch(0.95 0.01 20);
+  --primary: oklch(0.35 0.12 10);
+  --primary-foreground: oklch(0.98 0.01 20);
+  --secondary: oklch(0.22 0.08 12);
+  --secondary-foreground: oklch(0.98 0.01 20);
+  --muted: oklch(0.24 0.06 15);
+  --muted-foreground: oklch(0.65 0.03 20);
+  --accent: oklch(0.4 0.14 10);
+  --accent-foreground: oklch(0.98 0.01 20);
+  --destructive: oklch(0.55 0.22 15);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.3 0.06 25);
-  --input: oklch(0.26 0.05 25);
-  --ring: oklch(0.35 0.1 20);
+  --border: oklch(0.3 0.08 12);
+  --input: oklch(0.26 0.07 12);
+  --ring: oklch(0.35 0.12 10);
 }
 
 .dark {
-  --background: oklch(0.14 0.03 25);
-  --foreground: oklch(0.95 0.01 55);
+  --background: oklch(0.14 0.03 15);
+  --foreground: oklch(0.95 0.01 20);
 }
 
 body {
-  background: radial-gradient(ellipse at top, oklch(0.22 0.05 25) 0%, var(--background) 60%);
+  background: radial-gradient(ellipse at top, oklch(0.22 0.07 12) 0%, var(--background) 60%);
   color: var(--foreground);
   font-family: var(--font-sans);
   min-height: 100vh;
@@ -74,5 +74,5 @@ body {
 .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
 
 .swipe-card-shadow {
-  box-shadow: 0 30px 60px -20px oklch(0.1 0.05 20 / 0.6), 0 0 0 1px oklch(0.95 0.01 55 / 0.06);
+  box-shadow: 0 30px 60px -20px oklch(0.1 0.06 12 / 0.6), 0 0 0 1px oklch(0.95 0.01 20 / 0.06);
 }
