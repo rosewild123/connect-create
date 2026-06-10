@@ -192,6 +192,7 @@ export type Database = {
           id: string
           id_verified: boolean
           is_onboarded: boolean
+          last_active_at: string
           location_city: string | null
           location_country: string | null
           looking_for: string[]
@@ -215,6 +216,7 @@ export type Database = {
           id: string
           id_verified?: boolean
           is_onboarded?: boolean
+          last_active_at?: string
           location_city?: string | null
           location_country?: string | null
           looking_for?: string[]
@@ -238,6 +240,7 @@ export type Database = {
           id?: string
           id_verified?: boolean
           is_onboarded?: boolean
+          last_active_at?: string
           location_city?: string | null
           location_country?: string | null
           looking_for?: string[]
