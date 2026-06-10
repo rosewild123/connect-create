@@ -140,17 +140,24 @@ function Discover() {
   const current = deck[0];
   const activeFilterCount = countActive(filters);
 
-  async function swipe(dir: "like" | "pass") {
+  async function swipe(dir: "like" | "pass" | "super") {
     if (!current || !me) return;
-    if (limitReached) { navigate({ to: "/upgrade" }); return; }
+    if (dir === "super") {
+      if (superLikesLeft <= 0) {
+        if (!isPlus) { toast.info("Out of super likes today. Upgrade for more."); navigate({ to: "/upgrade" }); return; }
+        toast.info("You've used all your super likes today.");
+        return;
+      }
+    } else if (limitReached) { navigate({ to: "/upgrade" }); return; }
     const target = current;
     setSwipedIds((prev) => { const next = new Set(prev); next.add(target.id); return next; });
     setPhotoIdx(0);
     setSwipesToday((n) => n + 1);
-    setLastSwipe({ id: target.id, dir, profile: target });
+    if (dir === "super") setSuperLikesUsed((n) => n + 1);
+    setLastSwipe({ id: target.id, dir: dir === "super" ? "like" : dir, profile: target });
     const { error } = await supabase.from("swipes").insert({ swiper_id: me, swipee_id: target.id, direction: dir });
     if (error) { toast.error(error.message); return; }
-    if (dir === "like") {
+    if (dir === "like" || dir === "super") {
       const { data: m } = await supabase.from("matches").select("id")
         .or(`and(user_a.eq.${me},user_b.eq.${target.id}),and(user_a.eq.${target.id},user_b.eq.${me})`)
         .maybeSingle();
@@ -158,6 +165,8 @@ function Discover() {
         toast.success(`It's a match with ${target.display_name}! 🔥`, {
           action: { label: "Message", onClick: () => navigate({ to: "/matches/$id", params: { id: m.id } }) },
         });
+      } else if (dir === "super") {
+        toast.success(`⭐ Super liked ${target.display_name}`);
       }
     }
   }
