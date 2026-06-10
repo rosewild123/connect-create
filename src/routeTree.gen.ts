@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedUpgradeRouteImport } from './routes/_authenticated/upgrade'
+import { Route as AuthenticatedSafetyRouteImport } from './routes/_authenticated/safety'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedMatchesRouteImport } from './routes/_authenticated/matches'
@@ -39,6 +40,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedUpgradeRoute = AuthenticatedUpgradeRouteImport.update({
   id: '/upgrade',
   path: '/upgrade',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSafetyRoute = AuthenticatedSafetyRouteImport.update({
+  id: '/safety',
+  path: '/safety',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/matches': typeof AuthenticatedMatchesRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/safety': typeof AuthenticatedSafetyRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/matches': typeof AuthenticatedMatchesRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/safety': typeof AuthenticatedSafetyRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/_authenticated/matches': typeof AuthenticatedMatchesRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/safety': typeof AuthenticatedSafetyRoute
   '/_authenticated/upgrade': typeof AuthenticatedUpgradeRoute
   '/_authenticated/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/onboarding'
     | '/profile'
+    | '/safety'
     | '/upgrade'
     | '/matches/$id'
     | '/api/public/payments/webhook'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/onboarding'
     | '/profile'
+    | '/safety'
     | '/upgrade'
     | '/matches/$id'
     | '/api/public/payments/webhook'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/_authenticated/matches'
     | '/_authenticated/onboarding'
     | '/_authenticated/profile'
+    | '/_authenticated/safety'
     | '/_authenticated/upgrade'
     | '/_authenticated/matches/$id'
     | '/api/public/payments/webhook'
@@ -202,6 +214,13 @@ declare module '@tanstack/react-router' {
       path: '/upgrade'
       fullPath: '/upgrade'
       preLoaderRoute: typeof AuthenticatedUpgradeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/safety': {
+      id: '/_authenticated/safety'
+      path: '/safety'
+      fullPath: '/safety'
+      preLoaderRoute: typeof AuthenticatedSafetyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/profile': {
@@ -281,6 +300,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMatchesRoute: typeof AuthenticatedMatchesRouteWithChildren
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedSafetyRoute: typeof AuthenticatedSafetyRoute
   AuthenticatedUpgradeRoute: typeof AuthenticatedUpgradeRoute
 }
 
@@ -291,6 +311,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMatchesRoute: AuthenticatedMatchesRouteWithChildren,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedSafetyRoute: AuthenticatedSafetyRoute,
   AuthenticatedUpgradeRoute: AuthenticatedUpgradeRoute,
 }
 
