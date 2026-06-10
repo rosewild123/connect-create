@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ShieldAlert, LogOut, Pencil } from "lucide-react";
+import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles } from "lucide-react";
 import { ageFromDob, type Platform } from "@/lib/senda";
 import { toast } from "sonner";
 
@@ -64,6 +64,17 @@ function ProfilePage() {
             )}
           </div>
         </div>
+
+        <Link to="/upgrade" className="mt-4 flex items-center gap-3 rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/15 to-transparent p-4">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div className="flex-1">
+            <div className="font-display font-bold">Senda Plus</div>
+            <p className="text-xs text-muted-foreground">Unlimited swipes, see who liked you, undo</p>
+          </div>
+          <span className="text-xs font-semibold text-primary">Upgrade →</span>
+        </Link>
 
         <div className="mt-4 space-y-3">
           <VerificationCard verified={profile.age_verified} title="Age verification" description="Confirm you're 18+ with a government ID." />
