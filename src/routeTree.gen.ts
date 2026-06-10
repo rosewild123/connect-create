@@ -16,10 +16,10 @@ import { Route as AuthenticatedUpgradeRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSafetyRouteImport } from './routes/_authenticated/safety'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
-import { Route as AuthenticatedMatchesRouteImport } from './routes/_authenticated/matches'
 import { Route as AuthenticatedLikesRouteImport } from './routes/_authenticated/likes'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedBlockedRouteImport } from './routes/_authenticated/blocked'
+import { Route as AuthenticatedMatchesIndexRouteImport } from './routes/_authenticated/matches.index'
 import { Route as AuthenticatedMatchesIdRouteImport } from './routes/_authenticated/matches.$id'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
@@ -57,11 +57,6 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedMatchesRoute = AuthenticatedMatchesRouteImport.update({
-  id: '/matches',
-  path: '/matches',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedLikesRoute = AuthenticatedLikesRouteImport.update({
   id: '/likes',
   path: '/likes',
@@ -77,10 +72,16 @@ const AuthenticatedBlockedRoute = AuthenticatedBlockedRouteImport.update({
   path: '/blocked',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMatchesIndexRoute =
+  AuthenticatedMatchesIndexRouteImport.update({
+    id: '/matches/',
+    path: '/matches/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMatchesIdRoute = AuthenticatedMatchesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AuthenticatedMatchesRoute,
+  id: '/matches/$id',
+  path: '/matches/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
@@ -95,12 +96,12 @@ export interface FileRoutesByFullPath {
   '/blocked': typeof AuthenticatedBlockedRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/likes': typeof AuthenticatedLikesRoute
-  '/matches': typeof AuthenticatedMatchesRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/safety': typeof AuthenticatedSafetyRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
+  '/matches/': typeof AuthenticatedMatchesIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -109,12 +110,12 @@ export interface FileRoutesByTo {
   '/blocked': typeof AuthenticatedBlockedRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/likes': typeof AuthenticatedLikesRoute
-  '/matches': typeof AuthenticatedMatchesRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/safety': typeof AuthenticatedSafetyRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
+  '/matches': typeof AuthenticatedMatchesIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -125,12 +126,12 @@ export interface FileRoutesById {
   '/_authenticated/blocked': typeof AuthenticatedBlockedRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
   '/_authenticated/likes': typeof AuthenticatedLikesRoute
-  '/_authenticated/matches': typeof AuthenticatedMatchesRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/safety': typeof AuthenticatedSafetyRoute
   '/_authenticated/upgrade': typeof AuthenticatedUpgradeRoute
   '/_authenticated/matches/$id': typeof AuthenticatedMatchesIdRoute
+  '/_authenticated/matches/': typeof AuthenticatedMatchesIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -141,12 +142,12 @@ export interface FileRouteTypes {
     | '/blocked'
     | '/discover'
     | '/likes'
-    | '/matches'
     | '/onboarding'
     | '/profile'
     | '/safety'
     | '/upgrade'
     | '/matches/$id'
+    | '/matches/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -155,12 +156,12 @@ export interface FileRouteTypes {
     | '/blocked'
     | '/discover'
     | '/likes'
-    | '/matches'
     | '/onboarding'
     | '/profile'
     | '/safety'
     | '/upgrade'
     | '/matches/$id'
+    | '/matches'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -170,12 +171,12 @@ export interface FileRouteTypes {
     | '/_authenticated/blocked'
     | '/_authenticated/discover'
     | '/_authenticated/likes'
-    | '/_authenticated/matches'
     | '/_authenticated/onboarding'
     | '/_authenticated/profile'
     | '/_authenticated/safety'
     | '/_authenticated/upgrade'
     | '/_authenticated/matches/$id'
+    | '/_authenticated/matches/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -237,13 +238,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/matches': {
-      id: '/_authenticated/matches'
-      path: '/matches'
-      fullPath: '/matches'
-      preLoaderRoute: typeof AuthenticatedMatchesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/likes': {
       id: '/_authenticated/likes'
       path: '/likes'
@@ -265,12 +259,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBlockedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/matches/': {
+      id: '/_authenticated/matches/'
+      path: '/matches'
+      fullPath: '/matches/'
+      preLoaderRoute: typeof AuthenticatedMatchesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/matches/$id': {
       id: '/_authenticated/matches/$id'
-      path: '/$id'
+      path: '/matches/$id'
       fullPath: '/matches/$id'
       preLoaderRoute: typeof AuthenticatedMatchesIdRouteImport
-      parentRoute: typeof AuthenticatedMatchesRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
@@ -282,37 +283,28 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedMatchesRouteChildren {
-  AuthenticatedMatchesIdRoute: typeof AuthenticatedMatchesIdRoute
-}
-
-const AuthenticatedMatchesRouteChildren: AuthenticatedMatchesRouteChildren = {
-  AuthenticatedMatchesIdRoute: AuthenticatedMatchesIdRoute,
-}
-
-const AuthenticatedMatchesRouteWithChildren =
-  AuthenticatedMatchesRoute._addFileChildren(AuthenticatedMatchesRouteChildren)
-
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBlockedRoute: typeof AuthenticatedBlockedRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
   AuthenticatedLikesRoute: typeof AuthenticatedLikesRoute
-  AuthenticatedMatchesRoute: typeof AuthenticatedMatchesRouteWithChildren
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSafetyRoute: typeof AuthenticatedSafetyRoute
   AuthenticatedUpgradeRoute: typeof AuthenticatedUpgradeRoute
+  AuthenticatedMatchesIdRoute: typeof AuthenticatedMatchesIdRoute
+  AuthenticatedMatchesIndexRoute: typeof AuthenticatedMatchesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBlockedRoute: AuthenticatedBlockedRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
   AuthenticatedLikesRoute: AuthenticatedLikesRoute,
-  AuthenticatedMatchesRoute: AuthenticatedMatchesRouteWithChildren,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSafetyRoute: AuthenticatedSafetyRoute,
   AuthenticatedUpgradeRoute: AuthenticatedUpgradeRoute,
+  AuthenticatedMatchesIdRoute: AuthenticatedMatchesIdRoute,
+  AuthenticatedMatchesIndexRoute: AuthenticatedMatchesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -327,3 +319,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
