@@ -20,3 +20,8 @@ export function ageFromDob(dob: string | null | undefined): number | null {
 }
 
 export type Platform = { platform: string; url: string };
+
+export const SUPER_LIKES_FREE_DAILY = 1;
+export const SUPER_LIKES_PLUS_DAILY = 5;
+export const BOOSTS_PLUS_MONTHLY = 1;
+export const BOOST_DURATION_MIN = 30;
