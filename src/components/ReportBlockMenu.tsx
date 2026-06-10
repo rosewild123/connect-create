@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { MoreVertical, Flag, Ban } from "lucide-react";
+import { MoreVertical, Flag, Ban, UserMinus } from "lucide-react";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
@@ -28,18 +28,30 @@ const REASONS = [
 type Reason = typeof REASONS[number]["id"];
 
 export function ReportBlockMenu({
-  targetId, targetName, onBlocked, variant = "ghost",
+  targetId, targetName, onBlocked, variant = "ghost", matchId, onUnmatched,
 }: {
   targetId: string;
   targetName?: string | null;
   onBlocked?: () => void;
   variant?: "ghost" | "overlay";
+  matchId?: string;
+  onUnmatched?: () => void;
 }) {
   const [reportOpen, setReportOpen] = useState(false);
   const [blockOpen, setBlockOpen] = useState(false);
+  const [unmatchOpen, setUnmatchOpen] = useState(false);
   const [reason, setReason] = useState<Reason>("spam");
   const [details, setDetails] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  async function confirmUnmatch() {
+    if (!matchId) return;
+    const { error } = await supabase.from("matches").delete().eq("id", matchId);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Unmatched");
+    setUnmatchOpen(false);
+    onUnmatched?.();
+  }
 
   async function submitReport() {
     setSubmitting(true);
@@ -82,10 +94,16 @@ export function ReportBlockMenu({
             <MoreVertical className="h-4 w-4" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44">
+        <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuItem onSelect={() => setReportOpen(true)}>
             <Flag className="mr-2 h-4 w-4" /> Report
           </DropdownMenuItem>
+          {matchId && (
+            <DropdownMenuItem onSelect={() => setUnmatchOpen(true)}>
+              <UserMinus className="mr-2 h-4 w-4" /> Unmatch
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => setBlockOpen(true)} className="text-destructive focus:text-destructive">
             <Ban className="mr-2 h-4 w-4" /> Block
           </DropdownMenuItem>
@@ -138,6 +156,23 @@ export function ReportBlockMenu({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmBlock} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Block
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={unmatchOpen} onOpenChange={setUnmatchOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unmatch {targetName || "this user"}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your conversation and match will be removed for both of you. This can't be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmUnmatch} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Unmatch
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

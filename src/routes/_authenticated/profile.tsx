@@ -127,6 +127,9 @@ function ProfilePage() {
           <Link to="/onboarding">Edit profile</Link>
         </Button>
         <Button asChild variant="ghost" className="mt-2 w-full rounded-full">
+          <Link to="/safety">Safety center</Link>
+        </Button>
+        <Button asChild variant="ghost" className="mt-2 w-full rounded-full">
           <Link to="/blocked">Blocked users</Link>
         </Button>
       </div>
