@@ -1,11 +1,19 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { Heart, X, MapPin, Flame, Sparkles, Lock } from "lucide-react";
-import { ageFromDob, type Platform } from "@/lib/senda";
+import { Heart, X, MapPin, Flame, Sparkles, Lock, SlidersHorizontal } from "lucide-react";
+import { ageFromDob, type Platform, NICHES, LOOKING_FOR } from "@/lib/senda";
 import { useSubscription, FREE_DAILY_SWIPES } from "@/hooks/useSubscription";
 import { toast } from "sonner";
+import {
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 
 export const Route = createFileRoute("/_authenticated/discover")({
   head: () => ({ meta: [{ title: "Discover — Senda" }] }),
@@ -28,17 +36,52 @@ type Profile = {
   photos: string[];
 };
 
+type Filters = {
+  niches: string[];
+  lookingFor: string[];
+  country: string;
+  travelOnly: boolean;
+  ageMin: number;
+  ageMax: number;
+  minExperience: number;
+};
+
+const DEFAULT_FILTERS: Filters = {
+  niches: [],
+  lookingFor: [],
+  country: "",
+  travelOnly: false,
+  ageMin: 18,
+  ageMax: 65,
+  minExperience: 0,
+};
+
+const STORAGE_KEY = "senda.discover.filters";
+
+function loadFilters(): Filters {
+  if (typeof window === "undefined") return DEFAULT_FILTERS;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return DEFAULT_FILTERS;
+    return { ...DEFAULT_FILTERS, ...JSON.parse(raw) };
+  } catch { return DEFAULT_FILTERS; }
+}
+
 function Discover() {
   const navigate = useNavigate();
   const [me, setMe] = useState<string | null>(null);
-  const [deck, setDeck] = useState<Profile[]>([]);
+  const [allProfiles, setAllProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [photoIdx, setPhotoIdx] = useState(0);
   const [swipesToday, setSwipesToday] = useState(0);
+  const [swipedIds, setSwipedIds] = useState<Set<string>>(new Set());
+  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const { isActive: isPlus } = useSubscription(me);
 
   const limitReached = !isPlus && swipesToday >= FREE_DAILY_SWIPES;
   const remaining = Math.max(0, FREE_DAILY_SWIPES - swipesToday);
+
+  useEffect(() => { setFilters(loadFilters()); }, []);
 
   useEffect(() => { (async () => {
     const { data: u } = await supabase.auth.getUser();
@@ -53,22 +96,39 @@ function Discover() {
     setSwipesToday(count ?? 0);
 
     const { data: swipes } = await supabase.from("swipes").select("swipee_id").eq("swiper_id", u.user.id);
-    const excluded = new Set([u.user.id, ...(swipes?.map((s) => s.swipee_id) || [])]);
+    const swiped = new Set(swipes?.map((s) => s.swipee_id) || []);
+    swiped.add(u.user.id);
+    setSwipedIds(swiped);
+
     const { data: profs, error } = await supabase
-      .from("profiles").select("*").eq("is_onboarded", true).limit(50);
+      .from("profiles").select("*").eq("is_onboarded", true).limit(200);
     if (error) toast.error(error.message);
-    const filtered = (profs || []).filter((p) => !excluded.has(p.id)) as unknown as Profile[];
-    setDeck(filtered);
+    setAllProfiles((profs || []) as unknown as Profile[]);
     setLoading(false);
   })(); }, [navigate]);
 
+  const deck = useMemo(() => {
+    return allProfiles.filter((p) => {
+      if (swipedIds.has(p.id)) return false;
+      const age = ageFromDob(p.date_of_birth);
+      if (age != null && (age < filters.ageMin || age > filters.ageMax)) return false;
+      if (filters.country.trim() && !(p.location_country || "").toLowerCase().includes(filters.country.trim().toLowerCase())) return false;
+      if (filters.travelOnly && !p.willing_to_travel) return false;
+      if (filters.minExperience > 0 && (p.experience_years ?? 0) < filters.minExperience) return false;
+      if (filters.niches.length && !filters.niches.some((n) => p.niches?.includes(n))) return false;
+      if (filters.lookingFor.length && !filters.lookingFor.some((l) => p.looking_for?.includes(l))) return false;
+      return true;
+    });
+  }, [allProfiles, swipedIds, filters]);
+
   const current = deck[0];
+  const activeFilterCount = countActive(filters);
 
   async function swipe(dir: "like" | "pass") {
     if (!current || !me) return;
     if (limitReached) { navigate({ to: "/upgrade" }); return; }
     const target = current;
-    setDeck(deck.slice(1));
+    setSwipedIds((prev) => { const next = new Set(prev); next.add(target.id); return next; });
     setPhotoIdx(0);
     setSwipesToday((n) => n + 1);
     const { error } = await supabase.from("swipes").insert({ swiper_id: me, swipee_id: target.id, direction: dir });
@@ -92,24 +152,151 @@ function Discover() {
           <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground font-display text-lg font-bold">s</div>
           <span className="font-display text-xl font-bold">senda</span>
         </div>
-        {isPlus ? (
-          <span className="rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">PLUS</span>
-        ) : (
-          <Link to="/upgrade" className="text-xs text-muted-foreground hover:text-primary">
-            {remaining} swipes left
-          </Link>
-        )}
+        <div className="flex items-center gap-3">
+          <FiltersSheet filters={filters} setFilters={setFilters} activeCount={activeFilterCount} />
+          {isPlus ? (
+            <span className="rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">PLUS</span>
+          ) : (
+            <Link to="/upgrade" className="text-xs text-muted-foreground hover:text-primary">
+              {remaining} swipes left
+            </Link>
+          )}
+        </div>
       </header>
 
       <div className="px-5">
         {loading && <SkeletonCard />}
         {!loading && limitReached && <LimitReached />}
-        {!loading && !limitReached && !current && <EmptyDeck />}
+        {!loading && !limitReached && !current && (
+          activeFilterCount > 0
+            ? <EmptyDeck title="No matches with these filters" subtitle="Try loosening your filters to see more creators." onReset={() => { setFilters(DEFAULT_FILTERS); localStorage.removeItem(STORAGE_KEY); }} />
+            : <EmptyDeck title="You're all caught up" subtitle="New creators join every day. Check back soon." />
+        )}
         {!limitReached && current && (
           <CardView profile={current} photoIdx={photoIdx} setPhotoIdx={setPhotoIdx} onSwipe={swipe} />
         )}
       </div>
     </AppShell>
+  );
+}
+
+function countActive(f: Filters): number {
+  let n = 0;
+  if (f.niches.length) n++;
+  if (f.lookingFor.length) n++;
+  if (f.country.trim()) n++;
+  if (f.travelOnly) n++;
+  if (f.ageMin !== 18 || f.ageMax !== 65) n++;
+  if (f.minExperience > 0) n++;
+  return n;
+}
+
+function FiltersSheet({ filters, setFilters, activeCount }: {
+  filters: Filters; setFilters: (f: Filters) => void; activeCount: number;
+}) {
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<Filters>(filters);
+  useEffect(() => { if (open) setDraft(filters); }, [open, filters]);
+
+  function apply() {
+    setFilters(draft);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+    setOpen(false);
+  }
+  function reset() {
+    setDraft(DEFAULT_FILTERS);
+  }
+  function toggle(arr: string[], v: string): string[] {
+    return arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
+  }
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <button className="relative grid h-9 w-9 place-items-center rounded-full border border-border bg-card text-foreground hover:bg-accent">
+          <SlidersHorizontal className="h-4 w-4" />
+          {activeCount > 0 && (
+            <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+              {activeCount}
+            </span>
+          )}
+        </button>
+      </SheetTrigger>
+      <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-3xl">
+        <SheetHeader>
+          <SheetTitle className="font-display text-2xl">Filters</SheetTitle>
+        </SheetHeader>
+
+        <div className="mt-4 space-y-6 pb-4">
+          <section>
+            <Label className="text-xs uppercase tracking-widest text-muted-foreground">Niches</Label>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {NICHES.map((n) => {
+                const active = draft.niches.includes(n);
+                return (
+                  <button key={n} type="button" onClick={() => setDraft({ ...draft, niches: toggle(draft.niches, n) })}
+                    className={`rounded-full border px-3 py-1.5 text-xs transition ${active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"}`}>
+                    {n}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          <section>
+            <Label className="text-xs uppercase tracking-widest text-muted-foreground">Looking for</Label>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {LOOKING_FOR.map((l) => {
+                const active = draft.lookingFor.includes(l.id);
+                return (
+                  <button key={l.id} type="button" onClick={() => setDraft({ ...draft, lookingFor: toggle(draft.lookingFor, l.id) })}
+                    className={`rounded-full border px-3 py-1.5 text-xs transition ${active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"}`}>
+                    {l.label}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          <section>
+            <Label htmlFor="country" className="text-xs uppercase tracking-widest text-muted-foreground">Country</Label>
+            <Input id="country" value={draft.country} onChange={(e) => setDraft({ ...draft, country: e.target.value })}
+              placeholder="e.g. United States" className="mt-2" />
+          </section>
+
+          <section className="flex items-center justify-between">
+            <div>
+              <div className="font-semibold">Willing to travel only</div>
+              <p className="text-xs text-muted-foreground">Hide creators not open to travel</p>
+            </div>
+            <Switch checked={draft.travelOnly} onCheckedChange={(v) => setDraft({ ...draft, travelOnly: v })} />
+          </section>
+
+          <section>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs uppercase tracking-widest text-muted-foreground">Age range</Label>
+              <span className="text-sm font-medium">{draft.ageMin} – {draft.ageMax}</span>
+            </div>
+            <Slider min={18} max={65} step={1} value={[draft.ageMin, draft.ageMax]}
+              onValueChange={(v) => setDraft({ ...draft, ageMin: v[0], ageMax: v[1] })} className="mt-3" />
+          </section>
+
+          <section>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs uppercase tracking-widest text-muted-foreground">Min experience</Label>
+              <span className="text-sm font-medium">{draft.minExperience === 0 ? "Any" : `${draft.minExperience}y+`}</span>
+            </div>
+            <Slider min={0} max={15} step={1} value={[draft.minExperience]}
+              onValueChange={(v) => setDraft({ ...draft, minExperience: v[0] })} className="mt-3" />
+          </section>
+        </div>
+
+        <SheetFooter className="flex-row gap-2 sm:justify-stretch">
+          <Button variant="outline" onClick={reset} className="flex-1 rounded-full">Reset</Button>
+          <Button onClick={apply} className="flex-1 rounded-full">Apply</Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -201,12 +388,15 @@ function Stat({ icon, label }: { icon: React.ReactNode; label: string }) {
   return <span className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1">{icon}{label}</span>;
 }
 
-function EmptyDeck() {
+function EmptyDeck({ title, subtitle, onReset }: { title: string; subtitle: string; onReset?: () => void }) {
   return (
     <div className="mt-12 text-center">
       <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-primary/15 text-primary"><Flame className="h-7 w-7" /></div>
-      <h2 className="font-display text-2xl font-bold">You're all caught up</h2>
-      <p className="mt-2 text-sm text-muted-foreground">New creators join every day. Check back soon.</p>
+      <h2 className="font-display text-2xl font-bold">{title}</h2>
+      <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>
+      {onReset && (
+        <Button variant="outline" className="mt-5 rounded-full" onClick={onReset}>Clear filters</Button>
+      )}
     </div>
   );
 }
