@@ -171,6 +171,16 @@ function SettingsPage() {
             </div>
           </div>
         </section>
+
+        <section className="rounded-2xl border border-border bg-card p-4">
+          <div className="text-xs text-muted-foreground">
+            <p>Read our legal documents:</p>
+            <div className="mt-2 flex items-center gap-4">
+              <Link to="/terms" className="text-primary underline">Terms of Service</Link>
+              <Link to="/privacy" className="text-primary underline">Privacy Policy</Link>
+            </div>
+          </div>
+        </section>
       </div>
     </AppShell>
   );

@@ -141,6 +141,10 @@ function ProfilePage() {
         <Button asChild variant="ghost" className="mt-2 w-full rounded-full">
           <Link to="/settings">Settings & account</Link>
         </Button>
+        <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+          <Link to="/terms" className="hover:text-foreground">Terms</Link>
+          <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+        </div>
       </div>
     </AppShell>
   );

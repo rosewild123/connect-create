@@ -98,6 +98,14 @@ function AuthPage() {
           </Button>
         </form>
 
+        {mode === "signup" && (
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            By creating an account, you agree to our{" "}
+            <Link to="/terms" className="text-primary underline">Terms of Service</Link>{" "}
+            and{" "}
+            <Link to="/privacy" className="text-primary underline">Privacy Policy</Link>.
+          </p>
+        )}
         <button
           onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
           className="mt-5 w-full text-center text-sm text-muted-foreground hover:text-foreground"
