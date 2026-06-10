@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Send, ImagePlus, Mic, Square, X, Play, Pause, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ReportBlockMenu } from "@/components/ReportBlockMenu";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 
 export const Route = createFileRoute("/_authenticated/matches/$id")({
   head: () => ({ meta: [{ title: "Chat — Senda" }] }),
@@ -31,8 +32,13 @@ function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [otherLastReadAt, setOtherLastReadAt] = useState<Date | null>(null);
+  const [otherTyping, setOtherTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const typingChannelRef = useRef<RealtimeChannel | null>(null);
+  const typingClearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTypingSentRef = useRef<number>(0);
 
   useEffect(() => { (async () => {
     const { data: u } = await supabase.auth.getUser();
@@ -51,22 +57,72 @@ function Chat() {
     }
     const { data: msgs } = await supabase.from("messages").select("*").eq("match_id", id).order("created_at");
     setMessages((msgs || []) as Message[]);
+    // Initial read receipt for the other user
+    const { data: reads } = await supabase.from("match_reads").select("user_id,last_read_at").eq("match_id", id);
+    const otherRead = reads?.find((r) => r.user_id === otherId);
+    if (otherRead) setOtherLastReadAt(new Date(otherRead.last_read_at));
   })(); }, [id, navigate]);
 
+  // Mark this match as read for me, both on entry and whenever a new message arrives.
   useEffect(() => {
-    const ch = supabase.channel(`match:${id}`).on(
-      "postgres_changes",
-      { event: "INSERT", schema: "public", table: "messages", filter: `match_id=eq.${id}` },
-      (payload) => setMessages((prev) => {
-        const next = payload.new as Message;
-        if (prev.some((p) => p.id === next.id)) return prev;
-        return [...prev, next];
-      }),
-    ).subscribe();
-    return () => { supabase.removeChannel(ch); };
-  }, [id]);
+    if (!me) return;
+    supabase.from("match_reads").upsert({ match_id: id, user_id: me, last_read_at: new Date().toISOString() }).then();
+  }, [id, me, messages.length]);
 
-  useEffect(() => { scrollRef.current?.scrollTo({ top: 9e9, behavior: "smooth" }); }, [messages]);
+  // Realtime: messages + read receipts
+  useEffect(() => {
+    const ch = supabase.channel(`match:${id}`)
+      .on("postgres_changes",
+        { event: "INSERT", schema: "public", table: "messages", filter: `match_id=eq.${id}` },
+        (payload) => setMessages((prev) => {
+          const next = payload.new as Message;
+          if (prev.some((p) => p.id === next.id)) return prev;
+          return [...prev, next];
+        }))
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "match_reads", filter: `match_id=eq.${id}` },
+        (payload) => {
+          const row = (payload.new ?? payload.old) as { user_id: string; last_read_at: string } | null;
+          if (!row || !other || row.user_id !== other.id) return;
+          setOtherLastReadAt(new Date(row.last_read_at));
+        })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [id, other]);
+
+  // Realtime broadcast channel for typing indicator
+  useEffect(() => {
+    if (!me) return;
+    const ch = supabase.channel(`typing:${id}`, { config: { broadcast: { self: false } } });
+    ch.on("broadcast", { event: "typing" }, ({ payload }) => {
+      if (!payload || payload.user === me) return;
+      setOtherTyping(true);
+      if (typingClearRef.current) clearTimeout(typingClearRef.current);
+      typingClearRef.current = setTimeout(() => setOtherTyping(false), 3000);
+    });
+    ch.subscribe();
+    typingChannelRef.current = ch;
+    return () => {
+      if (typingClearRef.current) clearTimeout(typingClearRef.current);
+      supabase.removeChannel(ch);
+      typingChannelRef.current = null;
+    };
+  }, [id, me]);
+
+  useEffect(() => { scrollRef.current?.scrollTo({ top: 9e9, behavior: "smooth" }); }, [messages, otherTyping]);
+
+  function broadcastTyping() {
+    if (!me || !typingChannelRef.current) return;
+    const now = Date.now();
+    if (now - lastTypingSentRef.current < 1500) return;
+    lastTypingSentRef.current = now;
+    typingChannelRef.current.send({ type: "broadcast", event: "typing", payload: { user: me } });
+  }
+
+  const lastMineId = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) if (messages[i].sender_id === me) return messages[i].id;
+    return null;
+  }, [messages, me]);
 
   async function send(e: React.FormEvent) {
     e.preventDefault();
@@ -117,7 +173,10 @@ function Chat() {
         <div className="h-9 w-9 overflow-hidden rounded-full bg-muted">
           {photoUrl && <img src={photoUrl} alt="" className="h-full w-full object-cover" />}
         </div>
-        <div className="flex flex-1 items-center gap-1 font-semibold">{other?.display_name || "Creator"}{other?.photo_verified && <VerifiedBadge className="h-4 w-4" />}</div>
+        <div className="flex flex-1 flex-col">
+          <div className="flex items-center gap-1 font-semibold">{other?.display_name || "Creator"}{other?.photo_verified && <VerifiedBadge className="h-4 w-4" />}</div>
+          {otherTyping && <span className="text-[11px] text-primary">typing…</span>}
+        </div>
         {other && (
           <ReportBlockMenu targetId={other.id} targetName={other.display_name}
             matchId={id}
@@ -127,17 +186,25 @@ function Chat() {
       </header>
 
       <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-4">
-        {messages.length === 0 && (
+        {messages.length === 0 && !otherTyping && (
           <div className="mt-8 text-center text-sm text-muted-foreground">You matched! Start the conversation.</div>
         )}
         {messages.map((m) => {
           const mine = m.sender_id === me;
+          const isLastMine = mine && m.id === lastMineId;
+          const seen = isLastMine && !!otherLastReadAt && otherLastReadAt >= new Date(m.created_at);
           return (
-            <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+            <div key={m.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
               <MessageBubble msg={m} mine={mine} />
+              {seen && <span className="mt-0.5 mr-1 text-[10px] text-muted-foreground">Seen</span>}
             </div>
           );
         })}
+        {otherTyping && (
+          <div className="flex justify-start">
+            <TypingBubble />
+          </div>
+        )}
       </div>
 
       <form onSubmit={send} className="flex items-center gap-2 border-t border-border bg-card/80 px-3 py-3 backdrop-blur">
@@ -148,11 +215,23 @@ function Chat() {
           {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
         </button>
         <VoiceRecorder onRecorded={(blob, ms) => uploadAndInsert(blob, "audio", "webm", ms)} disabled={uploading} />
-        <Input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Message..." className="rounded-full" maxLength={2000} />
+        <Input value={draft}
+          onChange={(e) => { setDraft(e.target.value); if (e.target.value) broadcastTyping(); }}
+          placeholder="Message..." className="rounded-full" maxLength={2000} />
         <button type="submit" disabled={!draft.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground disabled:opacity-40">
           <Send className="h-4 w-4" />
         </button>
       </form>
+    </div>
+  );
+}
+
+function TypingBubble() {
+  return (
+    <div className="flex items-center gap-1 rounded-2xl border border-border bg-card px-3 py-2.5">
+      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/70 [animation-delay:-0.3s]" />
+      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/70 [animation-delay:-0.15s]" />
+      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/70" />
     </div>
   );
 }
