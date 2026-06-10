@@ -1,5 +1,5 @@
 export const NICHES = [
-  "Cosplay", "Fitness", "Glamour", "BDSM", "Feet", "Latina", "Asian", "Ebony",
+  "Cosplay", "Fitness", "Glamour", "BDSM", "Dom", "Sub", "Feet", "Latina", "Asian", "Ebony",
   "Goth/Alt", "MILF", "Trans", "Couple", "Solo", "Fetish", "Roleplay", "ASMR",
 ];
 
