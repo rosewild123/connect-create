@@ -138,6 +138,9 @@ function ProfilePage() {
         <Button asChild variant="ghost" className="mt-2 w-full rounded-full">
           <Link to="/blocked">Blocked users</Link>
         </Button>
+        <Button asChild variant="ghost" className="mt-2 w-full rounded-full">
+          <Link to="/settings">Settings & account</Link>
+        </Button>
       </div>
     </AppShell>
   );
