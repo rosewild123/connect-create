@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { useSubscription } from "@/hooks/useSubscription";
-import { Heart, X, Lock, ArrowLeft } from "lucide-react";
+import { Heart, X, Lock, ArrowLeft, Star } from "lucide-react";
 import { ageFromDob } from "@/lib/senda";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -127,6 +127,11 @@ function LikerCard({ profile, onAct }: { profile: LikerProfile; onAct: (id: stri
         <img src={url} alt={profile.display_name || ""} className="h-full w-full object-cover" />
       ) : (
         <div className="grid h-full place-items-center text-xs text-muted-foreground">No photo</div>
+      )}
+      {profile.isSuper && (
+        <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-sky-500 px-2 py-0.5 text-[10px] font-bold text-white shadow">
+          <Star className="h-3 w-3 fill-current" /> SUPER
+        </div>
       )}
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent p-3 text-white">
         <div className="font-display text-base font-bold leading-tight">
