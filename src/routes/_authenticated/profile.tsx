@@ -192,7 +192,7 @@ function VerificationCard({ ageVerified, idVerified }: { ageVerified: boolean; i
 }
 
 function BoostCard({ userId }: { userId: string }) {
-  const { isActive: isPlus } = useSubscription(userId);
+  const { isActive: isPlus, isPremium } = useSubscription(userId);
   const [used, setUsed] = useState(0);
   const [endsAt, setEndsAt] = useState<Date | null>(null);
   const [activating, setActivating] = useState(false);
@@ -214,7 +214,8 @@ function BoostCard({ userId }: { userId: string }) {
   }, [endsAt]);
 
   const active = !!endsAt && endsAt.getTime() > Date.now();
-  const remaining = Math.max(0, BOOSTS_PLUS_MONTHLY - used);
+  const quota = isPremium ? BOOSTS_PREMIUM_MONTHLY : BOOSTS_PLUS_MONTHLY;
+  const remaining = Math.max(0, quota - used);
 
   async function activate() {
     if (!isPlus) { toast.info("Boosts are a Plus feature."); return; }
