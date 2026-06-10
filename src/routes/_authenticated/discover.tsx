@@ -410,7 +410,13 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus }: {
         <Stat icon={<Flame className="h-3 w-3" />} label={`${profile.completed_collabs} collabs`} />
       </div>
 
-      <div className="mt-6 flex items-center justify-center gap-6">
+      <div className="mt-6 flex items-center justify-center gap-5">
+        <button onClick={onUndo} disabled={!onUndo}
+          className="grid h-12 w-12 place-items-center rounded-full border-2 border-border bg-card text-muted-foreground transition hover:scale-105 hover:text-foreground disabled:opacity-40 disabled:hover:scale-100 relative"
+          aria-label="Undo last swipe">
+          <Undo2 className="h-5 w-5" />
+          {!isPlus && <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-primary text-primary-foreground"><Lock className="h-2.5 w-2.5" /></span>}
+        </button>
         <button onClick={() => onSwipe("pass")} className="grid h-16 w-16 place-items-center rounded-full border-2 border-border bg-card text-muted-foreground transition hover:scale-105 hover:border-destructive hover:text-destructive">
           <X className="h-7 w-7" />
         </button>
