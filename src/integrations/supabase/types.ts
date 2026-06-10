@@ -255,6 +255,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_hidden_user_ids: { Args: never; Returns: string[] }
       has_active_subscription: {
         Args: { _environment: string; _user_id: string }
         Returns: boolean
