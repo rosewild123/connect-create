@@ -1,0 +1,1 @@
+CREATE POLICY "Users can unmatch" ON public.matches FOR DELETE TO authenticated USING (auth.uid() = user_a OR auth.uid() = user_b);
