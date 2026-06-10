@@ -48,6 +48,7 @@ type Filters = {
   ageMin: number;
   ageMax: number;
   minExperience: number;
+  verifiedOnly: boolean;
 };
 
 const DEFAULT_FILTERS: Filters = {
@@ -58,6 +59,7 @@ const DEFAULT_FILTERS: Filters = {
   ageMin: 18,
   ageMax: 88,
   minExperience: 0,
+  verifiedOnly: false,
 };
 
 const STORAGE_KEY = "senda.discover.filters";
@@ -141,6 +143,7 @@ function Discover() {
       if (filters.minExperience > 0 && (p.experience_years ?? 0) < filters.minExperience) return false;
       if (filters.niches.length && !filters.niches.some((n) => p.niches?.includes(n))) return false;
       if (filters.lookingFor.length && !filters.lookingFor.some((l) => p.looking_for?.includes(l))) return false;
+      if (filters.verifiedOnly && !p.photo_verified) return false;
       return true;
     });
     return [...filtered].sort((a, b) => {
@@ -256,6 +259,7 @@ function countActive(f: Filters): number {
   if (f.travelOnly) n++;
   if (f.ageMin !== 18 || f.ageMax !== 88) n++;
   if (f.minExperience > 0) n++;
+  if (f.verifiedOnly) n++;
   return n;
 }
 
@@ -338,6 +342,14 @@ function FiltersSheet({ filters, setFilters, activeCount }: {
               <p className="text-xs text-muted-foreground">Hide creators not open to travel</p>
             </div>
             <Switch checked={draft.travelOnly} onCheckedChange={(v) => setDraft({ ...draft, travelOnly: v })} />
+          </section>
+
+          <section className="flex items-center justify-between">
+            <div>
+              <div className="font-semibold flex items-center gap-1">Verified only <VerifiedBadge className="h-4 w-4" /></div>
+              <p className="text-xs text-muted-foreground">Show only photo-verified creators</p>
+            </div>
+            <Switch checked={draft.verifiedOnly} onCheckedChange={(v) => setDraft({ ...draft, verifiedOnly: v })} />
           </section>
 
           <section>
