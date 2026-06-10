@@ -2,8 +2,8 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { Heart, X, MapPin, Flame, Sparkles, Lock, SlidersHorizontal, Undo2 } from "lucide-react";
-import { ageFromDob, type Platform, NICHES, LOOKING_FOR } from "@/lib/senda";
+import { Heart, X, MapPin, Flame, Sparkles, Lock, SlidersHorizontal, Undo2, Star, Zap } from "lucide-react";
+import { ageFromDob, type Platform, NICHES, LOOKING_FOR, SUPER_LIKES_FREE_DAILY, SUPER_LIKES_PLUS_DAILY } from "@/lib/senda";
 import { useSubscription, FREE_DAILY_SWIPES } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import {
@@ -80,8 +80,12 @@ function Discover() {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [lastSwipe, setLastSwipe] = useState<{ id: string; dir: "like" | "pass"; profile: Profile } | null>(null);
   const [likesYouCount, setLikesYouCount] = useState(0);
+  const [superLikesUsed, setSuperLikesUsed] = useState(0);
+  const [boostedIds, setBoostedIds] = useState<Set<string>>(new Set());
   const { isActive: isPlus } = useSubscription(me);
   const { hidden, refresh: refreshHidden } = useHiddenUserIds(me);
+  const superLikeQuota = isPlus ? SUPER_LIKES_PLUS_DAILY : SUPER_LIKES_FREE_DAILY;
+  const superLikesLeft = Math.max(0, superLikeQuota - superLikesUsed);
 
   const limitReached = !isPlus && swipesToday >= FREE_DAILY_SWIPES;
   const remaining = Math.max(0, FREE_DAILY_SWIPES - swipesToday);
