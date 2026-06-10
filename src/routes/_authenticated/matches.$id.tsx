@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { ReportBlockMenu } from "@/components/ReportBlockMenu";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { notifyNewMessage } from "@/lib/push.functions";
+import { PresenceIndicator } from "@/components/PresenceIndicator";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 export const Route = createFileRoute("/_authenticated/matches/$id")({
@@ -28,7 +29,7 @@ function Chat() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const [me, setMe] = useState<string | null>(null);
-  const [other, setOther] = useState<{ id: string; display_name: string | null; photos: string[]; photo_verified?: boolean } | null>(null);
+  const [other, setOther] = useState<{ id: string; display_name: string | null; photos: string[]; photo_verified?: boolean; last_active_at?: string | null } | null>(null);
   const [photoUrl, setPhotoUrl] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
@@ -48,7 +49,7 @@ function Chat() {
     const { data: m, error } = await supabase.from("matches").select("*").eq("id", id).maybeSingle();
     if (error || !m) { toast.error("Match not found"); navigate({ to: "/matches" }); return; }
     const otherId = m.user_a === u.user.id ? m.user_b : m.user_a;
-    const { data: prof } = await supabase.from("profiles").select("id,display_name,photos,photo_verified").eq("id", otherId).maybeSingle();
+    const { data: prof } = await supabase.from("profiles").select("id,display_name,photos,photo_verified,last_active_at").eq("id", otherId).maybeSingle();
     if (prof) {
       setOther(prof);
       if (prof.photos?.[0]) {
@@ -178,7 +179,9 @@ function Chat() {
         </div>
         <div className="flex flex-1 flex-col">
           <div className="flex items-center gap-1 font-semibold">{other?.display_name || "Creator"}{other?.photo_verified && <VerifiedBadge className="h-4 w-4" />}</div>
-          {otherTyping && <span className="text-[11px] text-primary">typing…</span>}
+          {otherTyping
+            ? <span className="text-[11px] text-primary">typing…</span>
+            : <PresenceIndicator lastActiveAt={other?.last_active_at} variant="inline" />}
         </div>
         {other && (
           <ReportBlockMenu targetId={other.id} targetName={other.display_name}
