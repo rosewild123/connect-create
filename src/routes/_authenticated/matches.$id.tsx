@@ -7,8 +7,7 @@ import { toast } from "sonner";
 import { ReportBlockMenu } from "@/components/ReportBlockMenu";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { notifyNewMessage } from "@/lib/push.functions";
-import { PresenceIndicator, presenceLabel } from "@/lib/presence";
-import { PresenceIndicator as PresenceBadge } from "@/components/PresenceIndicator";
+import { PresenceIndicator } from "@/components/PresenceIndicator";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 export const Route = createFileRoute("/_authenticated/matches/$id")({
