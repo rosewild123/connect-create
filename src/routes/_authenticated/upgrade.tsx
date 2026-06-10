@@ -77,7 +77,7 @@ function UpgradePage() {
           <div className="text-xs font-semibold uppercase tracking-widest opacity-80">Senda Plus</div>
           <h1 className="mt-1 font-display text-4xl font-bold">Match faster.<br />Collab more.</h1>
           <div className="mt-4 flex items-baseline gap-1">
-            <span className="font-display text-5xl font-bold">$14.99</span>
+            <span className="font-display text-5xl font-bold">£11.99</span>
             <span className="opacity-80">/month</span>
           </div>
         </div>
