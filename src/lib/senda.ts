@@ -23,5 +23,18 @@ export type Platform = { platform: string; url: string };
 
 export const SUPER_LIKES_FREE_DAILY = 1;
 export const SUPER_LIKES_PLUS_DAILY = 5;
+export const SUPER_LIKES_PREMIUM_DAILY = 999;
 export const BOOSTS_PLUS_MONTHLY = 1;
+export const BOOSTS_PREMIUM_MONTHLY = 4;
 export const BOOST_DURATION_MIN = 30;
+
+export const PRICE_PLUS = "senda_plus_monthly_gbp";
+export const PRICE_PREMIUM = "senda_premium_monthly_gbp";
+
+export type Tier = "free" | "plus" | "premium";
+
+export function tierFromPriceId(priceId: string | null | undefined): Tier {
+  if (priceId === PRICE_PREMIUM) return "premium";
+  if (priceId === PRICE_PLUS) return "plus";
+  return "free";
+}
