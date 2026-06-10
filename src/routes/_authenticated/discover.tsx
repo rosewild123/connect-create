@@ -14,6 +14,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import { ReportBlockMenu } from "@/components/ReportBlockMenu";
+import { useHiddenUserIds } from "@/hooks/useBlocks";
 
 export const Route = createFileRoute("/_authenticated/discover")({
   head: () => ({ meta: [{ title: "Discover — Senda" }] }),
@@ -79,6 +81,7 @@ function Discover() {
   const [lastSwipe, setLastSwipe] = useState<{ id: string; dir: "like" | "pass"; profile: Profile } | null>(null);
   const [likesYouCount, setLikesYouCount] = useState(0);
   const { isActive: isPlus } = useSubscription(me);
+  const { hidden, refresh: refreshHidden } = useHiddenUserIds(me);
 
   const limitReached = !isPlus && swipesToday >= FREE_DAILY_SWIPES;
   const remaining = Math.max(0, FREE_DAILY_SWIPES - swipesToday);
@@ -118,6 +121,7 @@ function Discover() {
   const deck = useMemo(() => {
     return allProfiles.filter((p) => {
       if (swipedIds.has(p.id)) return false;
+      if (hidden.has(p.id)) return false;
       const age = ageFromDob(p.date_of_birth);
       if (age != null && (age < filters.ageMin || age > filters.ageMax)) return false;
       if (filters.country.trim() && !(p.location_country || "").toLowerCase().includes(filters.country.trim().toLowerCase())) return false;
@@ -127,7 +131,7 @@ function Discover() {
       if (filters.lookingFor.length && !filters.lookingFor.some((l) => p.looking_for?.includes(l))) return false;
       return true;
     });
-  }, [allProfiles, swipedIds, filters]);
+  }, [allProfiles, swipedIds, hidden, filters]);
 
   const current = deck[0];
   const activeFilterCount = countActive(filters);
@@ -210,7 +214,7 @@ function Discover() {
         )}
         {!limitReached && current && (
           <CardView profile={current} photoIdx={photoIdx} setPhotoIdx={setPhotoIdx} onSwipe={swipe}
-            onUndo={lastSwipe ? undo : undefined} isPlus={isPlus} />
+            onUndo={lastSwipe ? undo : undefined} isPlus={isPlus} onBlocked={refreshHidden} />
         )}
       </div>
     </AppShell>
@@ -350,9 +354,10 @@ function LimitReached() {
   );
 }
 
-function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus }: {
+function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onBlocked }: {
   profile: Profile; photoIdx: number; setPhotoIdx: (n: number) => void;
   onSwipe: (d: "like" | "pass") => void; onUndo?: () => void; isPlus: boolean;
+  onBlocked?: () => void;
 }) {
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   useEffect(() => {
@@ -377,6 +382,10 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus }: {
         ) : (
           <div className="grid h-full place-items-center text-muted-foreground">No photo</div>
         )}
+
+        <div className="absolute right-3 top-3 z-10">
+          <ReportBlockMenu targetId={profile.id} targetName={profile.display_name} onBlocked={onBlocked} variant="overlay" />
+        </div>
 
         {photoUrls.length > 1 && (
           <>

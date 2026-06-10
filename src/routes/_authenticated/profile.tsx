@@ -114,6 +114,9 @@ function ProfilePage() {
         <Button asChild variant="outline" className="mt-6 w-full rounded-full">
           <Link to="/onboarding">Edit profile</Link>
         </Button>
+        <Button asChild variant="ghost" className="mt-2 w-full rounded-full">
+          <Link to="/blocked">Blocked users</Link>
+        </Button>
       </div>
     </AppShell>
   );

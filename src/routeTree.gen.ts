@@ -18,6 +18,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedMatchesRouteImport } from './routes/_authenticated/matches'
 import { Route as AuthenticatedLikesRouteImport } from './routes/_authenticated/likes'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
+import { Route as AuthenticatedBlockedRouteImport } from './routes/_authenticated/blocked'
 import { Route as AuthenticatedMatchesIdRouteImport } from './routes/_authenticated/matches.$id'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
@@ -65,6 +66,11 @@ const AuthenticatedDiscoverRoute = AuthenticatedDiscoverRouteImport.update({
   path: '/discover',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBlockedRoute = AuthenticatedBlockedRouteImport.update({
+  id: '/blocked',
+  path: '/blocked',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMatchesIdRoute = AuthenticatedMatchesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -80,6 +86,7 @@ const ApiPublicPaymentsWebhookRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/blocked': typeof AuthenticatedBlockedRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/likes': typeof AuthenticatedLikesRoute
   '/matches': typeof AuthenticatedMatchesRouteWithChildren
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/blocked': typeof AuthenticatedBlockedRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/likes': typeof AuthenticatedLikesRoute
   '/matches': typeof AuthenticatedMatchesRouteWithChildren
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/blocked': typeof AuthenticatedBlockedRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
   '/_authenticated/likes': typeof AuthenticatedLikesRoute
   '/_authenticated/matches': typeof AuthenticatedMatchesRouteWithChildren
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/blocked'
     | '/discover'
     | '/likes'
     | '/matches'
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/blocked'
     | '/discover'
     | '/likes'
     | '/matches'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/blocked'
     | '/_authenticated/discover'
     | '/_authenticated/likes'
     | '/_authenticated/matches'
@@ -227,6 +239,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiscoverRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/blocked': {
+      id: '/_authenticated/blocked'
+      path: '/blocked'
+      fullPath: '/blocked'
+      preLoaderRoute: typeof AuthenticatedBlockedRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/matches/$id': {
       id: '/_authenticated/matches/$id'
       path: '/$id'
@@ -256,6 +275,7 @@ const AuthenticatedMatchesRouteWithChildren =
   AuthenticatedMatchesRoute._addFileChildren(AuthenticatedMatchesRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBlockedRoute: typeof AuthenticatedBlockedRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
   AuthenticatedLikesRoute: typeof AuthenticatedLikesRoute
   AuthenticatedMatchesRoute: typeof AuthenticatedMatchesRouteWithChildren
@@ -265,6 +285,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBlockedRoute: AuthenticatedBlockedRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
   AuthenticatedLikesRoute: AuthenticatedLikesRoute,
   AuthenticatedMatchesRoute: AuthenticatedMatchesRouteWithChildren,

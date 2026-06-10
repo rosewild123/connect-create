@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { ReportBlockMenu } from "@/components/ReportBlockMenu";
 
 export const Route = createFileRoute("/_authenticated/matches/$id")({
   head: () => ({ meta: [{ title: "Chat — Senda" }] }),
@@ -68,7 +69,11 @@ function Chat() {
         <div className="h-9 w-9 overflow-hidden rounded-full bg-muted">
           {photoUrl && <img src={photoUrl} alt="" className="h-full w-full object-cover" />}
         </div>
-        <div className="font-semibold">{other?.display_name || "Creator"}</div>
+        <div className="flex-1 font-semibold">{other?.display_name || "Creator"}</div>
+        {other && (
+          <ReportBlockMenu targetId={other.id} targetName={other.display_name}
+            onBlocked={() => navigate({ to: "/matches" })} />
+        )}
       </header>
 
       <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-4">
