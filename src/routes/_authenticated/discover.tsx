@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { ReportBlockMenu } from "@/components/ReportBlockMenu";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { useHiddenUserIds } from "@/hooks/useBlocks";
 
 export const Route = createFileRoute("/_authenticated/discover")({
@@ -36,6 +37,7 @@ type Profile = {
   niches: string[];
   platforms: Platform[];
   photos: string[];
+  photo_verified: boolean;
 };
 
 type Filters = {
@@ -425,8 +427,9 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onB
         )}
 
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent p-5 text-white">
-          <h2 className="font-display text-3xl font-bold">
+          <h2 className="flex items-center gap-1.5 font-display text-3xl font-bold">
             {profile.display_name}{age && <span className="font-sans text-2xl font-normal">, {age}</span>}
+            {profile.photo_verified && <VerifiedBadge className="h-6 w-6" />}
           </h2>
           {loc && <p className="mt-1 flex items-center gap-1 text-sm text-white/80"><MapPin className="h-3.5 w-3.5" />{loc}{profile.willing_to_travel && " · ✈️ travels"}</p>}
           {profile.niches.length > 0 && (
