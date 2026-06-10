@@ -444,20 +444,34 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onB
         <Stat icon={<Flame className="h-3 w-3" />} label={`${profile.completed_collabs} collabs`} />
       </div>
 
-      <div className="mt-6 flex items-center justify-center gap-5">
+      <div className="mt-6 flex items-center justify-center gap-4">
         <button onClick={onUndo} disabled={!onUndo}
           className="grid h-12 w-12 place-items-center rounded-full border-2 border-border bg-card text-muted-foreground transition hover:scale-105 hover:text-foreground disabled:opacity-40 disabled:hover:scale-100 relative"
           aria-label="Undo last swipe">
           <Undo2 className="h-5 w-5" />
           {!isPlus && <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-primary text-primary-foreground"><Lock className="h-2.5 w-2.5" /></span>}
         </button>
-        <button onClick={() => onSwipe("pass")} className="grid h-16 w-16 place-items-center rounded-full border-2 border-border bg-card text-muted-foreground transition hover:scale-105 hover:border-destructive hover:text-destructive">
-          <X className="h-7 w-7" />
+        <button onClick={() => onSwipe("pass")} aria-label="Pass" className="grid h-14 w-14 place-items-center rounded-full border-2 border-border bg-card text-muted-foreground transition hover:scale-105 hover:border-destructive hover:text-destructive">
+          <X className="h-6 w-6" />
         </button>
-        <button onClick={() => onSwipe("like")} className="grid h-20 w-20 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/40 transition hover:scale-105">
-          <Heart className="h-9 w-9 fill-current" />
+        <button onClick={() => onSwipe("super")} aria-label="Super like"
+          className="relative grid h-14 w-14 place-items-center rounded-full border-2 border-sky-400 bg-card text-sky-500 transition hover:scale-105 disabled:opacity-40"
+          disabled={superLikesLeft <= 0}>
+          <Star className="h-6 w-6 fill-current" />
+          <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-sky-500 px-1 text-[10px] font-bold text-white">
+            {superLikesLeft}
+          </span>
+        </button>
+        <button onClick={() => onSwipe("like")} aria-label="Like" className="grid h-16 w-16 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/40 transition hover:scale-105">
+          <Heart className="h-7 w-7 fill-current" />
         </button>
       </div>
+
+      {isBoosted && (
+        <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-primary">
+          <Zap className="h-3.5 w-3.5 fill-current" /> Boosted profile
+        </div>
+      )}
     </div>
   );
 }
