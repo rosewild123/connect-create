@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { useSubscription } from "@/hooks/useSubscription";
-import { Heart, X, Lock, ArrowLeft } from "lucide-react";
+import { Heart, X, Lock, ArrowLeft, Star } from "lucide-react";
 import { ageFromDob } from "@/lib/senda";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ type LikerProfile = {
   location_country: string | null;
   niches: string[];
   photos: string[];
+  isSuper?: boolean;
 };
 
 function LikesPage() {
@@ -39,20 +40,24 @@ function LikesPage() {
   useEffect(() => { (async () => {
     if (!me || !isPlus) { setLoading(false); return; }
     const { data: incoming, error } = await supabase.from("swipes")
-      .select("swiper_id").eq("swipee_id", me).eq("direction", "like");
+      .select("swiper_id, direction").eq("swipee_id", me).in("direction", ["like", "super"]);
     if (error) { toast.error(error.message); setLoading(false); return; }
     const { data: mine } = await supabase.from("swipes")
       .select("swipee_id").eq("swiper_id", me);
     const { data: hiddenIds } = await supabase.rpc("get_hidden_user_ids");
     const hiddenSet = new Set<string>((hiddenIds as unknown as string[]) || []);
     const swipedIds = new Set((mine || []).map((r) => r.swipee_id));
+    const superSet = new Set((incoming || []).filter((r) => r.direction === "super").map((r) => r.swiper_id));
     const ids = Array.from(new Set((incoming || []).map((r) => r.swiper_id)))
       .filter((id) => !swipedIds.has(id) && !hiddenSet.has(id));
     if (ids.length === 0) { setLikers([]); setLoading(false); return; }
     const { data: profs } = await supabase.from("profiles")
       .select("id, display_name, date_of_birth, location_city, location_country, niches, photos")
       .in("id", ids);
-    setLikers((profs || []) as LikerProfile[]);
+    const merged = (profs || []).map((p) => ({ ...p, isSuper: superSet.has(p.id) })) as LikerProfile[];
+    // Super likes first
+    merged.sort((a, b) => Number(b.isSuper) - Number(a.isSuper));
+    setLikers(merged);
     setLoading(false);
   })(); }, [me, isPlus]);
 
@@ -122,6 +127,11 @@ function LikerCard({ profile, onAct }: { profile: LikerProfile; onAct: (id: stri
         <img src={url} alt={profile.display_name || ""} className="h-full w-full object-cover" />
       ) : (
         <div className="grid h-full place-items-center text-xs text-muted-foreground">No photo</div>
+      )}
+      {profile.isSuper && (
+        <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-sky-500 px-2 py-0.5 text-[10px] font-bold text-white shadow">
+          <Star className="h-3 w-3 fill-current" /> SUPER
+        </div>
       )}
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent p-3 text-white">
         <div className="font-display text-base font-bold leading-tight">

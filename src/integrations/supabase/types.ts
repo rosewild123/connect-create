@@ -35,6 +35,33 @@ export type Database = {
         }
         Relationships: []
       }
+      boosts: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          source: string
+          starts_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          source?: string
+          starts_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          source?: string
+          starts_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       matches: {
         Row: {
           created_at: string
@@ -255,11 +282,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      active_boost_ends_at: { Args: { _user_id: string }; Returns: string }
+      boosted_user_ids: { Args: never; Returns: string[] }
+      boosts_this_month: { Args: never; Returns: number }
       get_hidden_user_ids: { Args: never; Returns: string[] }
       has_active_subscription: {
         Args: { _environment: string; _user_id: string }
         Returns: boolean
       }
+      super_likes_today: { Args: never; Returns: number }
     }
     Enums: {
       report_reason:

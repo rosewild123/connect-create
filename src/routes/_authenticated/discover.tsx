@@ -2,8 +2,8 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { Heart, X, MapPin, Flame, Sparkles, Lock, SlidersHorizontal, Undo2 } from "lucide-react";
-import { ageFromDob, type Platform, NICHES, LOOKING_FOR } from "@/lib/senda";
+import { Heart, X, MapPin, Flame, Sparkles, Lock, SlidersHorizontal, Undo2, Star, Zap } from "lucide-react";
+import { ageFromDob, type Platform, NICHES, LOOKING_FOR, SUPER_LIKES_FREE_DAILY, SUPER_LIKES_PLUS_DAILY } from "@/lib/senda";
 import { useSubscription, FREE_DAILY_SWIPES } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import {
@@ -80,8 +80,12 @@ function Discover() {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [lastSwipe, setLastSwipe] = useState<{ id: string; dir: "like" | "pass"; profile: Profile } | null>(null);
   const [likesYouCount, setLikesYouCount] = useState(0);
+  const [superLikesUsed, setSuperLikesUsed] = useState(0);
+  const [boostedIds, setBoostedIds] = useState<Set<string>>(new Set());
   const { isActive: isPlus } = useSubscription(me);
   const { hidden, refresh: refreshHidden } = useHiddenUserIds(me);
+  const superLikeQuota = isPlus ? SUPER_LIKES_PLUS_DAILY : SUPER_LIKES_FREE_DAILY;
+  const superLikesLeft = Math.max(0, superLikeQuota - superLikesUsed);
 
   const limitReached = !isPlus && swipesToday >= FREE_DAILY_SWIPES;
   const remaining = Math.max(0, FREE_DAILY_SWIPES - swipesToday);
@@ -112,14 +116,20 @@ function Discover() {
 
     const { count: likesCount } = await supabase.from("swipes")
       .select("id", { count: "exact", head: true })
-      .eq("swipee_id", u.user.id).eq("direction", "like");
+      .eq("swipee_id", u.user.id).in("direction", ["like", "super"]);
     setLikesYouCount(likesCount ?? 0);
+
+    const { data: sl } = await supabase.rpc("super_likes_today");
+    setSuperLikesUsed((sl as unknown as number) ?? 0);
+
+    const { data: boosted } = await supabase.rpc("boosted_user_ids");
+    setBoostedIds(new Set<string>((boosted as unknown as string[]) || []));
 
     setLoading(false);
   })(); }, [navigate]);
 
   const deck = useMemo(() => {
-    return allProfiles.filter((p) => {
+    const filtered = allProfiles.filter((p) => {
       if (swipedIds.has(p.id)) return false;
       if (hidden.has(p.id)) return false;
       const age = ageFromDob(p.date_of_birth);
@@ -131,22 +141,34 @@ function Discover() {
       if (filters.lookingFor.length && !filters.lookingFor.some((l) => p.looking_for?.includes(l))) return false;
       return true;
     });
-  }, [allProfiles, swipedIds, hidden, filters]);
+    return [...filtered].sort((a, b) => {
+      const ab = boostedIds.has(a.id) ? 1 : 0;
+      const bb = boostedIds.has(b.id) ? 1 : 0;
+      return bb - ab;
+    });
+  }, [allProfiles, swipedIds, hidden, filters, boostedIds]);
 
   const current = deck[0];
   const activeFilterCount = countActive(filters);
 
-  async function swipe(dir: "like" | "pass") {
+  async function swipe(dir: "like" | "pass" | "super") {
     if (!current || !me) return;
-    if (limitReached) { navigate({ to: "/upgrade" }); return; }
+    if (dir === "super") {
+      if (superLikesLeft <= 0) {
+        if (!isPlus) { toast.info("Out of super likes today. Upgrade for more."); navigate({ to: "/upgrade" }); return; }
+        toast.info("You've used all your super likes today.");
+        return;
+      }
+    } else if (limitReached) { navigate({ to: "/upgrade" }); return; }
     const target = current;
     setSwipedIds((prev) => { const next = new Set(prev); next.add(target.id); return next; });
     setPhotoIdx(0);
     setSwipesToday((n) => n + 1);
-    setLastSwipe({ id: target.id, dir, profile: target });
+    if (dir === "super") setSuperLikesUsed((n) => n + 1);
+    setLastSwipe({ id: target.id, dir: dir === "super" ? "like" : dir, profile: target });
     const { error } = await supabase.from("swipes").insert({ swiper_id: me, swipee_id: target.id, direction: dir });
     if (error) { toast.error(error.message); return; }
-    if (dir === "like") {
+    if (dir === "like" || dir === "super") {
       const { data: m } = await supabase.from("matches").select("id")
         .or(`and(user_a.eq.${me},user_b.eq.${target.id}),and(user_a.eq.${target.id},user_b.eq.${me})`)
         .maybeSingle();
@@ -154,6 +176,8 @@ function Discover() {
         toast.success(`It's a match with ${target.display_name}! 🔥`, {
           action: { label: "Message", onClick: () => navigate({ to: "/matches/$id", params: { id: m.id } }) },
         });
+      } else if (dir === "super") {
+        toast.success(`⭐ Super liked ${target.display_name}`);
       }
     }
   }
@@ -214,7 +238,8 @@ function Discover() {
         )}
         {!limitReached && current && (
           <CardView profile={current} photoIdx={photoIdx} setPhotoIdx={setPhotoIdx} onSwipe={swipe}
-            onUndo={lastSwipe ? undo : undefined} isPlus={isPlus} onBlocked={refreshHidden} />
+            onUndo={lastSwipe ? undo : undefined} isPlus={isPlus} onBlocked={refreshHidden}
+            isBoosted={boostedIds.has(current.id)} superLikesLeft={superLikesLeft} />
         )}
       </div>
     </AppShell>
@@ -354,10 +379,10 @@ function LimitReached() {
   );
 }
 
-function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onBlocked }: {
+function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onBlocked, isBoosted, superLikesLeft }: {
   profile: Profile; photoIdx: number; setPhotoIdx: (n: number) => void;
-  onSwipe: (d: "like" | "pass") => void; onUndo?: () => void; isPlus: boolean;
-  onBlocked?: () => void;
+  onSwipe: (d: "like" | "pass" | "super") => void; onUndo?: () => void; isPlus: boolean;
+  onBlocked?: () => void; isBoosted?: boolean; superLikesLeft: number;
 }) {
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   useEffect(() => {
@@ -419,20 +444,34 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onB
         <Stat icon={<Flame className="h-3 w-3" />} label={`${profile.completed_collabs} collabs`} />
       </div>
 
-      <div className="mt-6 flex items-center justify-center gap-5">
+      <div className="mt-6 flex items-center justify-center gap-4">
         <button onClick={onUndo} disabled={!onUndo}
           className="grid h-12 w-12 place-items-center rounded-full border-2 border-border bg-card text-muted-foreground transition hover:scale-105 hover:text-foreground disabled:opacity-40 disabled:hover:scale-100 relative"
           aria-label="Undo last swipe">
           <Undo2 className="h-5 w-5" />
           {!isPlus && <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-primary text-primary-foreground"><Lock className="h-2.5 w-2.5" /></span>}
         </button>
-        <button onClick={() => onSwipe("pass")} className="grid h-16 w-16 place-items-center rounded-full border-2 border-border bg-card text-muted-foreground transition hover:scale-105 hover:border-destructive hover:text-destructive">
-          <X className="h-7 w-7" />
+        <button onClick={() => onSwipe("pass")} aria-label="Pass" className="grid h-14 w-14 place-items-center rounded-full border-2 border-border bg-card text-muted-foreground transition hover:scale-105 hover:border-destructive hover:text-destructive">
+          <X className="h-6 w-6" />
         </button>
-        <button onClick={() => onSwipe("like")} className="grid h-20 w-20 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/40 transition hover:scale-105">
-          <Heart className="h-9 w-9 fill-current" />
+        <button onClick={() => onSwipe("super")} aria-label="Super like"
+          className="relative grid h-14 w-14 place-items-center rounded-full border-2 border-sky-400 bg-card text-sky-500 transition hover:scale-105 disabled:opacity-40"
+          disabled={superLikesLeft <= 0}>
+          <Star className="h-6 w-6 fill-current" />
+          <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-sky-500 px-1 text-[10px] font-bold text-white">
+            {superLikesLeft}
+          </span>
+        </button>
+        <button onClick={() => onSwipe("like")} aria-label="Like" className="grid h-16 w-16 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/40 transition hover:scale-105">
+          <Heart className="h-7 w-7 fill-current" />
         </button>
       </div>
+
+      {isBoosted && (
+        <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-primary">
+          <Zap className="h-3.5 w-3.5 fill-current" /> Boosted profile
+        </div>
+      )}
     </div>
   );
 }
