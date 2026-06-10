@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { ReportBlockMenu } from "@/components/ReportBlockMenu";
 
 export const Route = createFileRoute("/_authenticated/matches/$id")({
   head: () => ({ meta: [{ title: "Chat — Senda" }] }),
