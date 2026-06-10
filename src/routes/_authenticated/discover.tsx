@@ -350,8 +350,9 @@ function LimitReached() {
   );
 }
 
-function CardView({ profile, photoIdx, setPhotoIdx, onSwipe }: {
-  profile: Profile; photoIdx: number; setPhotoIdx: (n: number) => void; onSwipe: (d: "like" | "pass") => void;
+function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus }: {
+  profile: Profile; photoIdx: number; setPhotoIdx: (n: number) => void;
+  onSwipe: (d: "like" | "pass") => void; onUndo?: () => void; isPlus: boolean;
 }) {
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   useEffect(() => {
