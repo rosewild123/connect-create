@@ -48,6 +48,7 @@ type Filters = {
   ageMin: number;
   ageMax: number;
   minExperience: number;
+  verifiedOnly: boolean;
 };
 
 const DEFAULT_FILTERS: Filters = {
