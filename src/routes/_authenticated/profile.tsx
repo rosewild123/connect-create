@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2 } from "lucide-react";
-import { ageFromDob, type Platform } from "@/lib/senda";
+import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock } from "lucide-react";
+import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOST_DURATION_MIN } from "@/lib/senda";
+import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import { startIdentityVerification } from "@/lib/verification.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
@@ -171,6 +172,80 @@ function VerificationCard({ ageVerified, idVerified }: { ageVerified: boolean; i
             {loading && <Loader2 className="h-3 w-3 animate-spin" />}
             {loading ? "Opening…" : "Verify now →"}
           </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function BoostCard({ userId }: { userId: string }) {
+  const { isActive: isPlus } = useSubscription(userId);
+  const [used, setUsed] = useState(0);
+  const [endsAt, setEndsAt] = useState<Date | null>(null);
+  const [activating, setActivating] = useState(false);
+  const [, setTick] = useState(0);
+
+  async function refresh() {
+    const [b, e] = await Promise.all([
+      supabase.rpc("boosts_this_month"),
+      supabase.rpc("active_boost_ends_at", { _user_id: userId }),
+    ]);
+    setUsed((b.data as unknown as number) ?? 0);
+    setEndsAt(e.data ? new Date(e.data as unknown as string) : null);
+  }
+  useEffect(() => { refresh(); }, [userId]);
+  useEffect(() => {
+    if (!endsAt) return;
+    const i = setInterval(() => setTick((n) => n + 1), 1000);
+    return () => clearInterval(i);
+  }, [endsAt]);
+
+  const active = !!endsAt && endsAt.getTime() > Date.now();
+  const remaining = Math.max(0, BOOSTS_PLUS_MONTHLY - used);
+
+  async function activate() {
+    if (!isPlus) { toast.info("Boosts are a Plus feature."); return; }
+    if (remaining <= 0) { toast.info("You've used this month's boost."); return; }
+    setActivating(true);
+    const ends = new Date(Date.now() + BOOST_DURATION_MIN * 60_000);
+    const { error } = await supabase.from("boosts").insert({
+      user_id: userId, ends_at: ends.toISOString(), source: "plus_monthly",
+    });
+    setActivating(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`Boosted for ${BOOST_DURATION_MIN} minutes ⚡`);
+    refresh();
+  }
+
+  function fmt(d: Date) {
+    const s = Math.max(0, Math.floor((d.getTime() - Date.now()) / 1000));
+    const m = Math.floor(s / 60); const sec = s % 60;
+    return `${m}:${sec.toString().padStart(2, "0")}`;
+  }
+
+  return (
+    <div className={`flex items-start gap-3 rounded-2xl border p-4 ${active ? "border-primary/50 bg-primary/5" : "border-border bg-card"}`}>
+      <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+        <Zap className="h-5 w-5" />
+      </div>
+      <div className="flex-1">
+        <div className="font-semibold">
+          Boost {active && <span className="ml-2 text-xs text-primary">Active · {endsAt && fmt(endsAt)}</span>}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {isPlus
+            ? `Move to the front of the deck for ${BOOST_DURATION_MIN} min. ${remaining} of ${BOOSTS_PLUS_MONTHLY} left this month.`
+            : "Plus members get 1 boost per month. Upgrade to unlock."}
+        </p>
+        {isPlus ? (
+          <button onClick={activate} disabled={activating || active || remaining <= 0}
+            className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary disabled:opacity-50">
+            {active ? "Already boosted" : remaining <= 0 ? "No boosts left" : activating ? "Activating…" : "Activate now →"}
+          </button>
+        ) : (
+          <Link to="/upgrade" className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">
+            <Lock className="h-3 w-3" /> Unlock with Plus →
+          </Link>
         )}
       </div>
     </div>
