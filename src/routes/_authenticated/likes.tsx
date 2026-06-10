@@ -21,6 +21,7 @@ type LikerProfile = {
   location_country: string | null;
   niches: string[];
   photos: string[];
+  isSuper?: boolean;
 };
 
 function LikesPage() {
