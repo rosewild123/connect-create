@@ -14,7 +14,146 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      matches: {
+        Row: {
+          created_at: string
+          id: string
+          user_a: string
+          user_b: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_a: string
+          user_b: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_a?: string
+          user_b?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          match_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          match_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          age_verified: boolean
+          bio: string | null
+          completed_collabs: number
+          created_at: string
+          date_of_birth: string | null
+          display_name: string | null
+          experience_years: number | null
+          id: string
+          id_verified: boolean
+          is_onboarded: boolean
+          location_city: string | null
+          location_country: string | null
+          looking_for: string[]
+          niches: string[]
+          photos: string[]
+          platforms: Json
+          updated_at: string
+          willing_to_travel: boolean
+        }
+        Insert: {
+          age_verified?: boolean
+          bio?: string | null
+          completed_collabs?: number
+          created_at?: string
+          date_of_birth?: string | null
+          display_name?: string | null
+          experience_years?: number | null
+          id: string
+          id_verified?: boolean
+          is_onboarded?: boolean
+          location_city?: string | null
+          location_country?: string | null
+          looking_for?: string[]
+          niches?: string[]
+          photos?: string[]
+          platforms?: Json
+          updated_at?: string
+          willing_to_travel?: boolean
+        }
+        Update: {
+          age_verified?: boolean
+          bio?: string | null
+          completed_collabs?: number
+          created_at?: string
+          date_of_birth?: string | null
+          display_name?: string | null
+          experience_years?: number | null
+          id?: string
+          id_verified?: boolean
+          is_onboarded?: boolean
+          location_city?: string | null
+          location_country?: string | null
+          looking_for?: string[]
+          niches?: string[]
+          photos?: string[]
+          platforms?: Json
+          updated_at?: string
+          willing_to_travel?: boolean
+        }
+        Relationships: []
+      }
+      swipes: {
+        Row: {
+          created_at: string
+          direction: string
+          id: string
+          swipee_id: string
+          swiper_id: string
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          id?: string
+          swipee_id: string
+          swiper_id: string
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          id?: string
+          swipee_id?: string
+          swiper_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
