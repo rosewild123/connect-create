@@ -86,7 +86,7 @@ function Onboarding() {
     if (!userId) return;
     setLoading(true);
     try {
-      const payload: Record<string, unknown> = {
+      const payload = {
         id: userId,
         display_name: displayName.trim(),
         bio: bio.trim(),
@@ -98,10 +98,10 @@ function Onboarding() {
         completed_collabs: completed === "" ? 0 : Number(completed),
         looking_for: lookingFor,
         niches,
-        platforms,
+        platforms: platforms as never,
         photos,
+        ...(finish ? { is_onboarded: true } : {}),
       };
-      if (finish) payload.is_onboarded = true;
       const { error } = await supabase.from("profiles").upsert(payload);
       if (error) throw error;
       if (finish) {
