@@ -238,7 +238,8 @@ function Discover() {
         )}
         {!limitReached && current && (
           <CardView profile={current} photoIdx={photoIdx} setPhotoIdx={setPhotoIdx} onSwipe={swipe}
-            onUndo={lastSwipe ? undo : undefined} isPlus={isPlus} onBlocked={refreshHidden} />
+            onUndo={lastSwipe ? undo : undefined} isPlus={isPlus} onBlocked={refreshHidden}
+            isBoosted={boostedIds.has(current.id)} superLikesLeft={superLikesLeft} />
         )}
       </div>
     </AppShell>
