@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripeEnvironment, isPaymentsConfigured } from "@/lib/stripe";
+import { tierFromPriceId, type Tier } from "@/lib/senda";
 
 export type SubscriptionRow = {
   id: string;
@@ -56,7 +57,11 @@ export function useSubscription(userId: string | null | undefined) {
     return false;
   })();
 
-  return { subscription, isActive, loading };
+  const tier: Tier = isActive ? tierFromPriceId(subscription?.price_id) : "free";
+  const isPlus = isActive && (tier === "plus" || tier === "premium");
+  const isPremium = isActive && tier === "premium";
+
+  return { subscription, isActive, loading, tier, isPlus, isPremium };
 }
 
 export const FREE_DAILY_SWIPES = 20;

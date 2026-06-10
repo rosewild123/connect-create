@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock, Camera, BadgeCheck, RefreshCw } from "lucide-react";
-import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOST_DURATION_MIN } from "@/lib/senda";
+import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOSTS_PREMIUM_MONTHLY, BOOST_DURATION_MIN } from "@/lib/senda";
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import { startIdentityVerification } from "@/lib/verification.functions";
@@ -192,7 +192,7 @@ function VerificationCard({ ageVerified, idVerified }: { ageVerified: boolean; i
 }
 
 function BoostCard({ userId }: { userId: string }) {
-  const { isActive: isPlus } = useSubscription(userId);
+  const { isActive: isPlus, isPremium } = useSubscription(userId);
   const [used, setUsed] = useState(0);
   const [endsAt, setEndsAt] = useState<Date | null>(null);
   const [activating, setActivating] = useState(false);
@@ -214,7 +214,8 @@ function BoostCard({ userId }: { userId: string }) {
   }, [endsAt]);
 
   const active = !!endsAt && endsAt.getTime() > Date.now();
-  const remaining = Math.max(0, BOOSTS_PLUS_MONTHLY - used);
+  const quota = isPremium ? BOOSTS_PREMIUM_MONTHLY : BOOSTS_PLUS_MONTHLY;
+  const remaining = Math.max(0, quota - used);
 
   async function activate() {
     if (!isPlus) { toast.info("Boosts are a Plus feature."); return; }
@@ -247,7 +248,7 @@ function BoostCard({ userId }: { userId: string }) {
         </div>
         <p className="text-xs text-muted-foreground">
           {isPlus
-            ? `Move to the front of the deck for ${BOOST_DURATION_MIN} min. ${remaining} of ${BOOSTS_PLUS_MONTHLY} left this month.`
+            ? `Move to the front of the deck for ${BOOST_DURATION_MIN} min. ${remaining} of ${quota} left this month.`
             : "Plus members get 1 boost per month. Upgrade to unlock."}
         </p>
         {isPlus ? (

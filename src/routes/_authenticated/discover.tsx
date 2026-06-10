@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Heart, X, MapPin, Flame, Sparkles, Lock, SlidersHorizontal, Undo2, Star, Zap } from "lucide-react";
-import { ageFromDob, type Platform, NICHES, LOOKING_FOR, SUPER_LIKES_FREE_DAILY, SUPER_LIKES_PLUS_DAILY } from "@/lib/senda";
+import { ageFromDob, type Platform, NICHES, LOOKING_FOR, SUPER_LIKES_FREE_DAILY, SUPER_LIKES_PLUS_DAILY, SUPER_LIKES_PREMIUM_DAILY } from "@/lib/senda";
 import { useSubscription, FREE_DAILY_SWIPES } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import {
@@ -84,9 +84,9 @@ function Discover() {
   const [likesYouCount, setLikesYouCount] = useState(0);
   const [superLikesUsed, setSuperLikesUsed] = useState(0);
   const [boostedIds, setBoostedIds] = useState<Set<string>>(new Set());
-  const { isActive: isPlus } = useSubscription(me);
+  const { isActive: isPlus, isPremium } = useSubscription(me);
   const { hidden, refresh: refreshHidden } = useHiddenUserIds(me);
-  const superLikeQuota = isPlus ? SUPER_LIKES_PLUS_DAILY : SUPER_LIKES_FREE_DAILY;
+  const superLikeQuota = isPremium ? SUPER_LIKES_PREMIUM_DAILY : isPlus ? SUPER_LIKES_PLUS_DAILY : SUPER_LIKES_FREE_DAILY;
   const superLikesLeft = Math.max(0, superLikeQuota - superLikesUsed);
 
   const limitReached = !isPlus && swipesToday >= FREE_DAILY_SWIPES;
