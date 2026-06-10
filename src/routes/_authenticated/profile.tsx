@@ -12,6 +12,8 @@ import { startIdentityVerification } from "@/lib/verification.functions";
 import { submitPhotoVerification, VERIFICATION_POSES } from "@/lib/photo-verification.functions";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
+import { PromptsEditor } from "@/components/PromptsEditor";
+import type { Prompt } from "@/lib/prompts";
 import { getStripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -26,6 +28,7 @@ function ProfilePage() {
     location_city: string | null; location_country: string | null;
     niches: string[]; looking_for: string[]; platforms: Platform[]; photos: string[];
     age_verified: boolean; id_verified: boolean; photo_verified: boolean; experience_years: number | null; completed_collabs: number;
+    prompts: Prompt[];
   } | null>(null);
   const [photoUrl, setPhotoUrl] = useState("");
 
@@ -89,6 +92,7 @@ function ProfilePage() {
         <div className="mt-4 space-y-3">
           <BoostCard userId={profile.id} />
           <NotificationsToggle />
+          <PromptsEditor userId={profile.id} initial={profile.prompts ?? []} />
           <PhotoVerifyCard
             verified={profile.photo_verified}
             hasPhoto={!!profile.photos?.[0]}

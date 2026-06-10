@@ -39,6 +39,7 @@ type Profile = {
   platforms: Platform[];
   photos: string[];
   photo_verified: boolean;
+  prompts: { q: string; a: string }[] | null;
 };
 
 type Filters = {
@@ -455,6 +456,17 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onB
       </div>
 
       {profile.bio && <p className="mt-4 text-sm text-muted-foreground">{profile.bio}</p>}
+
+      {profile.prompts && profile.prompts.length > 0 && (
+        <ul className="mt-4 space-y-2">
+          {profile.prompts.map((p, i) => (
+            <li key={i} className="rounded-2xl border border-border bg-card p-3">
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{p.q}</div>
+              <p className="mt-1 text-sm">{p.a}</p>
+            </li>
+          ))}
+        </ul>
+      )}
 
       <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
         {profile.experience_years != null && <Stat icon={<Sparkles className="h-3 w-3" />} label={`${profile.experience_years}y in industry`} />}

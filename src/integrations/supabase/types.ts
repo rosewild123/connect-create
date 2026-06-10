@@ -200,6 +200,7 @@ export type Database = {
           photo_verified_at: string | null
           photos: string[]
           platforms: Json
+          prompts: Json
           updated_at: string
           willing_to_travel: boolean
         }
@@ -222,6 +223,7 @@ export type Database = {
           photo_verified_at?: string | null
           photos?: string[]
           platforms?: Json
+          prompts?: Json
           updated_at?: string
           willing_to_travel?: boolean
         }
@@ -244,6 +246,7 @@ export type Database = {
           photo_verified_at?: string | null
           photos?: string[]
           platforms?: Json
+          prompts?: Json
           updated_at?: string
           willing_to_travel?: boolean
         }
