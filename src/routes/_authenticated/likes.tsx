@@ -39,20 +39,24 @@ function LikesPage() {
   useEffect(() => { (async () => {
     if (!me || !isPlus) { setLoading(false); return; }
     const { data: incoming, error } = await supabase.from("swipes")
-      .select("swiper_id").eq("swipee_id", me).eq("direction", "like");
+      .select("swiper_id, direction").eq("swipee_id", me).in("direction", ["like", "super"]);
     if (error) { toast.error(error.message); setLoading(false); return; }
     const { data: mine } = await supabase.from("swipes")
       .select("swipee_id").eq("swiper_id", me);
     const { data: hiddenIds } = await supabase.rpc("get_hidden_user_ids");
     const hiddenSet = new Set<string>((hiddenIds as unknown as string[]) || []);
     const swipedIds = new Set((mine || []).map((r) => r.swipee_id));
+    const superSet = new Set((incoming || []).filter((r) => r.direction === "super").map((r) => r.swiper_id));
     const ids = Array.from(new Set((incoming || []).map((r) => r.swiper_id)))
       .filter((id) => !swipedIds.has(id) && !hiddenSet.has(id));
     if (ids.length === 0) { setLikers([]); setLoading(false); return; }
     const { data: profs } = await supabase.from("profiles")
       .select("id, display_name, date_of_birth, location_city, location_country, niches, photos")
       .in("id", ids);
-    setLikers((profs || []) as LikerProfile[]);
+    const merged = (profs || []).map((p) => ({ ...p, isSuper: superSet.has(p.id) })) as LikerProfile[];
+    // Super likes first
+    merged.sort((a, b) => Number(b.isSuper) - Number(a.isSuper));
+    setLikers(merged);
     setLoading(false);
   })(); }, [me, isPlus]);
 
