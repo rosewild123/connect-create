@@ -85,24 +85,33 @@ export type Database = {
       }
       messages: {
         Row: {
-          content: string
+          content: string | null
           created_at: string
+          duration_ms: number | null
           id: string
           match_id: string
+          media_path: string | null
+          media_type: string | null
           sender_id: string
         }
         Insert: {
-          content: string
+          content?: string | null
           created_at?: string
+          duration_ms?: number | null
           id?: string
           match_id: string
+          media_path?: string | null
+          media_type?: string | null
           sender_id: string
         }
         Update: {
-          content?: string
+          content?: string | null
           created_at?: string
+          duration_ms?: number | null
           id?: string
           match_id?: string
+          media_path?: string | null
+          media_type?: string | null
           sender_id?: string
         }
         Relationships: [
