@@ -31,41 +31,41 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-display: "Fraunces", "Inter", serif;
+  --font-sans: "Jost", system-ui, sans-serif;
+  --font-display: "Playfair Display", "Jost", serif;
 }
 
 :root {
   --radius: 1rem;
-  /* Senda — warm dark, magenta + coral */
-  --background: oklch(0.16 0.02 20);
-  --foreground: oklch(0.97 0.01 60);
-  --card: oklch(0.21 0.025 20);
-  --card-foreground: oklch(0.97 0.01 60);
-  --popover: oklch(0.21 0.025 20);
-  --popover-foreground: oklch(0.97 0.01 60);
-  --primary: oklch(0.68 0.24 5);         /* hot magenta */
+  /* Senda — monochrome black */
+  --background: oklch(0.16 0 0);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.21 0 0);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.21 0 0);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.15 0 0);            /* black */
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.78 0.18 55);      /* coral */
-  --secondary-foreground: oklch(0.2 0.02 20);
-  --muted: oklch(0.26 0.02 20);
-  --muted-foreground: oklch(0.7 0.02 40);
-  --accent: oklch(0.78 0.18 55);
-  --accent-foreground: oklch(0.2 0.02 20);
+  --secondary: oklch(0.25 0 0);          /* near-black */
+  --secondary-foreground: oklch(0.99 0 0);
+  --muted: oklch(0.26 0 0);
+  --muted-foreground: oklch(0.7 0 0);
+  --accent: oklch(0.25 0 0);
+  --accent-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.62 0.22 28);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.28 0.02 20);
-  --input: oklch(0.24 0.02 20);
-  --ring: oklch(0.68 0.24 5);
+  --border: oklch(0.28 0 0);
+  --input: oklch(0.24 0 0);
+  --ring: oklch(0.15 0 0);
 }
 
 .dark {
-  --background: oklch(0.16 0.02 20);
-  --foreground: oklch(0.97 0.01 60);
+  --background: oklch(0.16 0 0);
+  --foreground: oklch(0.97 0 0);
 }
 
 body {
-  background: radial-gradient(ellipse at top, oklch(0.22 0.05 5) 0%, var(--background) 60%);
+  background: radial-gradient(ellipse at top, oklch(0.22 0 0) 0%, var(--background) 60%);
   color: var(--foreground);
   font-family: var(--font-sans);
   min-height: 100vh;
