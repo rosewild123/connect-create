@@ -186,7 +186,7 @@ function countActive(f: Filters): number {
   if (f.lookingFor.length) n++;
   if (f.country.trim()) n++;
   if (f.travelOnly) n++;
-  if (f.ageMin !== 18 || f.ageMax !== 65) n++;
+  if (f.ageMin !== 18 || f.ageMax !== 88) n++;
   if (f.minExperience > 0) n++;
   return n;
 }
@@ -277,7 +277,7 @@ function FiltersSheet({ filters, setFilters, activeCount }: {
               <Label className="text-xs uppercase tracking-widest text-muted-foreground">Age range</Label>
               <span className="text-sm font-medium">{draft.ageMin} – {draft.ageMax}</span>
             </div>
-            <Slider min={18} max={65} step={1} value={[draft.ageMin, draft.ageMax]}
+            <Slider min={18} max={88} step={1} value={[draft.ageMin, draft.ageMax]}
               onValueChange={(v) => setDraft({ ...draft, ageMin: v[0], ageMax: v[1] })} className="mt-3" />
           </section>
 
