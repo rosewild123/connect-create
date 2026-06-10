@@ -120,6 +120,8 @@ function Chat() {
         <div className="flex flex-1 items-center gap-1 font-semibold">{other?.display_name || "Creator"}{other?.photo_verified && <VerifiedBadge className="h-4 w-4" />}</div>
         {other && (
           <ReportBlockMenu targetId={other.id} targetName={other.display_name}
+            matchId={id}
+            onUnmatched={() => navigate({ to: "/matches" })}
             onBlocked={() => navigate({ to: "/matches" })} />
         )}
       </header>
