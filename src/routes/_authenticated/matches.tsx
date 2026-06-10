@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { MessageCircle } from "lucide-react";
+import { useHiddenUserIds } from "@/hooks/useBlocks";
 
 export const Route = createFileRoute("/_authenticated/matches")({
   head: () => ({ meta: [{ title: "Matches — Senda" }] }),
