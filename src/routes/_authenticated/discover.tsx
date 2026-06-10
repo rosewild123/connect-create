@@ -18,6 +18,7 @@ import { ReportBlockMenu } from "@/components/ReportBlockMenu";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { useHiddenUserIds } from "@/hooks/useBlocks";
 import { notifyPotentialMatch } from "@/lib/push.functions";
+import { PresenceIndicator } from "@/components/PresenceIndicator";
 
 export const Route = createFileRoute("/_authenticated/discover")({
   head: () => ({ meta: [{ title: "Discover — Senda" }] }),
@@ -40,6 +41,7 @@ type Profile = {
   photos: string[];
   photo_verified: boolean;
   prompts: { q: string; a: string }[] | null;
+  last_active_at: string | null;
 };
 
 type Filters = {
@@ -425,7 +427,8 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onB
           <div className="grid h-full place-items-center text-muted-foreground">No photo</div>
         )}
 
-        <div className="absolute right-3 top-3 z-10">
+        <div className="absolute right-3 top-3 z-10 flex items-center gap-2">
+          <PresenceIndicator lastActiveAt={profile.last_active_at} />
           <ReportBlockMenu targetId={profile.id} targetName={profile.display_name} onBlocked={onBlocked} variant="overlay" />
         </div>
 
