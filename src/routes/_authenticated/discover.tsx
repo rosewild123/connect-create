@@ -59,6 +59,7 @@ const DEFAULT_FILTERS: Filters = {
   ageMin: 18,
   ageMax: 88,
   minExperience: 0,
+  verifiedOnly: false,
 };
 
 const STORAGE_KEY = "senda.discover.filters";
@@ -142,6 +143,7 @@ function Discover() {
       if (filters.minExperience > 0 && (p.experience_years ?? 0) < filters.minExperience) return false;
       if (filters.niches.length && !filters.niches.some((n) => p.niches?.includes(n))) return false;
       if (filters.lookingFor.length && !filters.lookingFor.some((l) => p.looking_for?.includes(l))) return false;
+      if (filters.verifiedOnly && !p.photo_verified) return false;
       return true;
     });
     return [...filtered].sort((a, b) => {
@@ -257,6 +259,7 @@ function countActive(f: Filters): number {
   if (f.travelOnly) n++;
   if (f.ageMin !== 18 || f.ageMax !== 88) n++;
   if (f.minExperience > 0) n++;
+  if (f.verifiedOnly) n++;
   return n;
 }
 
