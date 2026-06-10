@@ -15,7 +15,7 @@ type MatchRow = {
   id: string;
   created_at: string;
   other: { id: string; display_name: string | null; photos: string[]; photo_verified?: boolean };
-  lastMessage?: { content: string; created_at: string } | null;
+  lastMessage?: { content: string | null; created_at: string; media_type: string | null } | null;
 };
 
 function Matches() {
@@ -39,7 +39,7 @@ function Matches() {
     const result: MatchRow[] = await Promise.all(matches.map(async (m) => {
       const otherId = m.user_a === u.user!.id ? m.user_b : m.user_a;
       const other = profMap.get(otherId) || { id: otherId, display_name: "Creator", photos: [] };
-      const { data: msgs } = await supabase.from("messages").select("content,created_at").eq("match_id", m.id).order("created_at", { ascending: false }).limit(1);
+      const { data: msgs } = await supabase.from("messages").select("content,created_at,media_type").eq("match_id", m.id).order("created_at", { ascending: false }).limit(1);
       return { id: m.id, created_at: m.created_at, other: other as MatchRow["other"], lastMessage: msgs?.[0] || null };
     }));
     setRows(result);
@@ -81,7 +81,11 @@ function Matches() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1 font-semibold">{r.other.display_name}{r.other.photo_verified && <VerifiedBadge className="h-3.5 w-3.5" />}</div>
                   <div className="truncate text-sm text-muted-foreground">
-                    {r.lastMessage ? r.lastMessage.content : "Say hi 👋"}
+                    {r.lastMessage
+                      ? (r.lastMessage.media_type === "image" ? "📷 Photo"
+                        : r.lastMessage.media_type === "audio" ? "🎤 Voice note"
+                        : r.lastMessage.content || "Say hi 👋")
+                      : "Say hi 👋"}
                   </div>
                 </div>
               </Link>
