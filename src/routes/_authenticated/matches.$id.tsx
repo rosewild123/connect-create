@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ReportBlockMenu } from "@/components/ReportBlockMenu";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { notifyNewMessage } from "@/lib/push.functions";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 export const Route = createFileRoute("/_authenticated/matches/$id")({
@@ -131,6 +132,7 @@ function Chat() {
     setDraft("");
     const { error } = await supabase.from("messages").insert({ match_id: id, sender_id: me, content: text });
     if (error) toast.error(error.message);
+    else notifyNewMessage({ data: { matchId: id, preview: text } }).catch(() => {});
   }
 
   async function uploadAndInsert(file: Blob, mediaType: "image" | "audio", ext: string, durationMs?: number) {
@@ -149,6 +151,7 @@ function Chat() {
         duration_ms: durationMs ?? null,
       });
       if (error) throw error;
+      notifyNewMessage({ data: { matchId: id, preview: mediaType === "image" ? "📷 Photo" : "🎤 Voice message" } }).catch(() => {});
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Upload failed");
     } finally {

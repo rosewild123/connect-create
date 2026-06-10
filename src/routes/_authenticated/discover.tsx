@@ -17,6 +17,7 @@ import { Slider } from "@/components/ui/slider";
 import { ReportBlockMenu } from "@/components/ReportBlockMenu";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { useHiddenUserIds } from "@/hooks/useBlocks";
+import { notifyPotentialMatch } from "@/lib/push.functions";
 
 export const Route = createFileRoute("/_authenticated/discover")({
   head: () => ({ meta: [{ title: "Discover — Senda" }] }),
@@ -181,6 +182,7 @@ function Discover() {
         toast.success(`It's a match with ${target.display_name}! 🔥`, {
           action: { label: "Message", onClick: () => navigate({ to: "/matches/$id", params: { id: m.id } }) },
         });
+        notifyPotentialMatch({ data: { swipeeId: target.id } }).catch(() => {});
       } else if (dir === "super") {
         toast.success(`⭐ Super liked ${target.display_name}`);
       }
