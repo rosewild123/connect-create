@@ -139,6 +139,7 @@ function Discover() {
     setSwipedIds((prev) => { const next = new Set(prev); next.add(target.id); return next; });
     setPhotoIdx(0);
     setSwipesToday((n) => n + 1);
+    setLastSwipe({ id: target.id, dir, profile: target });
     const { error } = await supabase.from("swipes").insert({ swiper_id: me, swipee_id: target.id, direction: dir });
     if (error) { toast.error(error.message); return; }
     if (dir === "like") {
@@ -153,6 +154,19 @@ function Discover() {
     }
   }
 
+  async function undo() {
+    if (!lastSwipe || !me) return;
+    if (!isPlus) { navigate({ to: "/upgrade" }); return; }
+    const { id } = lastSwipe;
+    const { error } = await supabase.from("swipes").delete()
+      .eq("swiper_id", me).eq("swipee_id", id);
+    if (error) { toast.error(error.message); return; }
+    setSwipedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
+    setSwipesToday((n) => Math.max(0, n - 1));
+    setLastSwipe(null);
+    toast.success("Swipe undone");
+  }
+
   return (
     <AppShell>
       <header className="flex items-center justify-between px-5 py-4">
@@ -160,17 +174,31 @@ function Discover() {
           <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground font-display text-lg font-bold">s</div>
           <span className="font-display text-xl font-bold">senda</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <Link to="/likes" className="relative grid h-9 w-9 place-items-center rounded-full border border-border bg-card text-foreground hover:bg-accent" aria-label="Likes you">
+            <Heart className="h-4 w-4" />
+            {isPlus && likesYouCount > 0 && (
+              <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                {likesYouCount > 99 ? "99+" : likesYouCount}
+              </span>
+            )}
+            {!isPlus && (
+              <span className="absolute -right-1 -top-1 grid h-3.5 w-3.5 place-items-center rounded-full bg-primary text-primary-foreground">
+                <Lock className="h-2 w-2" />
+              </span>
+            )}
+          </Link>
           <FiltersSheet filters={filters} setFilters={setFilters} activeCount={activeFilterCount} />
           {isPlus ? (
             <span className="rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">PLUS</span>
           ) : (
             <Link to="/upgrade" className="text-xs text-muted-foreground hover:text-primary">
-              {remaining} swipes left
+              {remaining} left
             </Link>
           )}
         </div>
       </header>
+
 
       <div className="px-5">
         {loading && <SkeletonCard />}
