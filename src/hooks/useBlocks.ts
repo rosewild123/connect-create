@@ -12,13 +12,9 @@ export function useHiddenUserIds(me: string | null | undefined) {
 
   const refresh = useCallback(async () => {
     if (!me) { setHidden(new Set()); setLoading(false); return; }
-    const [a, b] = await Promise.all([
-      supabase.from("blocks").select("blocked_id").eq("blocker_id", me),
-      supabase.from("blocks").select("blocker_id").eq("blocked_id", me),
-    ]);
-    const set = new Set<string>();
-    a.data?.forEach((r) => set.add(r.blocked_id));
-    b.data?.forEach((r) => set.add(r.blocker_id));
+    const { data, error } = await supabase.rpc("get_hidden_user_ids");
+    if (error) { setHidden(new Set()); setLoading(false); return; }
+    const set = new Set<string>((data as unknown as string[]) || []);
     setHidden(set);
     setLoading(false);
   }, [me]);
