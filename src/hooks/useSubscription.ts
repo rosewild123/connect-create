@@ -64,4 +64,4 @@ export function useSubscription(userId: string | null | undefined) {
   return { subscription, isActive, loading, tier, isPlus, isPremium };
 }
 
-export const FREE_DAILY_SWIPES = 20;
+export const FREE_DAILY_SWIPES = 10;
