@@ -1,14 +1,16 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock } from "lucide-react";
+import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock, Camera, BadgeCheck, RefreshCw } from "lucide-react";
 import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOST_DURATION_MIN } from "@/lib/senda";
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import { startIdentityVerification } from "@/lib/verification.functions";
+import { submitPhotoVerification, VERIFICATION_POSES } from "@/lib/photo-verification.functions";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { getStripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -22,7 +24,7 @@ function ProfilePage() {
     id: string; display_name: string | null; bio: string | null; date_of_birth: string | null;
     location_city: string | null; location_country: string | null;
     niches: string[]; looking_for: string[]; platforms: Platform[]; photos: string[];
-    age_verified: boolean; id_verified: boolean; experience_years: number | null; completed_collabs: number;
+    age_verified: boolean; id_verified: boolean; photo_verified: boolean; experience_years: number | null; completed_collabs: number;
   } | null>(null);
   const [photoUrl, setPhotoUrl] = useState("");
 
@@ -62,7 +64,10 @@ function ProfilePage() {
             <Pencil className="h-4 w-4" />
           </Link>
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent p-5 text-white">
-            <h2 className="font-display text-2xl font-bold">{profile.display_name}{age && `, ${age}`}</h2>
+            <h2 className="flex items-center gap-1.5 font-display text-2xl font-bold">
+              {profile.display_name}{age && `, ${age}`}
+              {profile.photo_verified && <VerifiedBadge className="h-5 w-5" />}
+            </h2>
             {[profile.location_city, profile.location_country].filter(Boolean).length > 0 && (
               <p className="text-sm text-white/80">{[profile.location_city, profile.location_country].filter(Boolean).join(", ")}</p>
             )}
@@ -82,6 +87,11 @@ function ProfilePage() {
 
         <div className="mt-4 space-y-3">
           <BoostCard userId={profile.id} />
+          <PhotoVerifyCard
+            verified={profile.photo_verified}
+            hasPhoto={!!profile.photos?.[0]}
+            onVerified={() => setProfile((p) => p ? { ...p, photo_verified: true } : p)}
+          />
           <VerificationCard
             ageVerified={profile.age_verified}
             idVerified={profile.id_verified}
