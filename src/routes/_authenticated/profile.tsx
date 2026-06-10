@@ -248,7 +248,7 @@ function BoostCard({ userId }: { userId: string }) {
         </div>
         <p className="text-xs text-muted-foreground">
           {isPlus
-            ? `Move to the front of the deck for ${BOOST_DURATION_MIN} min. ${remaining} of ${BOOSTS_PLUS_MONTHLY} left this month.`
+            ? `Move to the front of the deck for ${BOOST_DURATION_MIN} min. ${remaining} of ${quota} left this month.`
             : "Plus members get 1 boost per month. Upgrade to unlock."}
         </p>
         {isPlus ? (
