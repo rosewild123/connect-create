@@ -209,7 +209,8 @@ function Discover() {
             : <EmptyDeck title="You're all caught up" subtitle="New creators join every day. Check back soon." />
         )}
         {!limitReached && current && (
-          <CardView profile={current} photoIdx={photoIdx} setPhotoIdx={setPhotoIdx} onSwipe={swipe} />
+          <CardView profile={current} photoIdx={photoIdx} setPhotoIdx={setPhotoIdx} onSwipe={swipe}
+            onUndo={lastSwipe ? undo : undefined} isPlus={isPlus} />
         )}
       </div>
     </AppShell>
