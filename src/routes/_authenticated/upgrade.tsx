@@ -52,7 +52,7 @@ function UpgradePage() {
             <ArrowLeft className="h-4 w-4" />Back
           </button>
           <StripeEmbeddedCheckout
-            priceId="senda_plus_monthly"
+            priceId="senda_plus_monthly_gbp"
             userId={me.id}
             customerEmail={me.email}
             returnUrl={`${window.location.origin}/upgrade?status=success`}
