@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripeEnvironment, isPaymentsConfigured } from "@/lib/stripe";
+import { tierFromPriceId, type Tier } from "@/lib/senda";
 
 export type SubscriptionRow = {
   id: string;
