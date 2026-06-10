@@ -115,6 +115,36 @@ export type Database = {
           },
         ]
       }
+      photo_verifications: {
+        Row: {
+          ai_notes: string | null
+          created_at: string
+          id: string
+          pose: string
+          selfie_path: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          ai_notes?: string | null
+          created_at?: string
+          id?: string
+          pose: string
+          selfie_path: string
+          status: string
+          user_id: string
+        }
+        Update: {
+          ai_notes?: string | null
+          created_at?: string
+          id?: string
+          pose?: string
+          selfie_path?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age_verified: boolean
@@ -131,6 +161,8 @@ export type Database = {
           location_country: string | null
           looking_for: string[]
           niches: string[]
+          photo_verified: boolean
+          photo_verified_at: string | null
           photos: string[]
           platforms: Json
           updated_at: string
@@ -151,6 +183,8 @@ export type Database = {
           location_country?: string | null
           looking_for?: string[]
           niches?: string[]
+          photo_verified?: boolean
+          photo_verified_at?: string | null
           photos?: string[]
           platforms?: Json
           updated_at?: string
@@ -171,6 +205,8 @@ export type Database = {
           location_country?: string | null
           looking_for?: string[]
           niches?: string[]
+          photo_verified?: boolean
+          photo_verified_at?: string | null
           photos?: string[]
           platforms?: Json
           updated_at?: string

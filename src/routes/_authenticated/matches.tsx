@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { MessageCircle } from "lucide-react";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { useHiddenUserIds } from "@/hooks/useBlocks";
 
 export const Route = createFileRoute("/_authenticated/matches")({
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/matches")({
 type MatchRow = {
   id: string;
   created_at: string;
-  other: { id: string; display_name: string | null; photos: string[] };
+  other: { id: string; display_name: string | null; photos: string[]; photo_verified?: boolean };
   lastMessage?: { content: string; created_at: string } | null;
 };
 
@@ -32,7 +33,7 @@ function Matches() {
     const { data: matches } = await supabase.from("matches").select("*").order("created_at", { ascending: false });
     if (!matches) { setLoading(false); return; }
     const otherIds = matches.map((m) => m.user_a === u.user!.id ? m.user_b : m.user_a);
-    const { data: profs } = await supabase.from("profiles").select("id,display_name,photos").in("id", otherIds);
+    const { data: profs } = await supabase.from("profiles").select("id,display_name,photos,photo_verified").in("id", otherIds);
     const profMap = new Map(profs?.map((p) => [p.id, p]));
 
     const result: MatchRow[] = await Promise.all(matches.map(async (m) => {
@@ -78,7 +79,7 @@ function Matches() {
                   {photoMap[r.other.id] && <img src={photoMap[r.other.id]} alt="" className="h-full w-full object-cover" />}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-semibold">{r.other.display_name}</div>
+                  <div className="flex items-center gap-1 font-semibold">{r.other.display_name}{r.other.photo_verified && <VerifiedBadge className="h-3.5 w-3.5" />}</div>
                   <div className="truncate text-sm text-muted-foreground">
                     {r.lastMessage ? r.lastMessage.content : "Say hi 👋"}
                   </div>
