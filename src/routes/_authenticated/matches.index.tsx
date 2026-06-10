@@ -6,7 +6,7 @@ import { MessageCircle } from "lucide-react";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { useHiddenUserIds } from "@/hooks/useBlocks";
 
-export const Route = createFileRoute("/_authenticated/matches")({
+export const Route = createFileRoute("/_authenticated/matches/")({
   head: () => ({ meta: [{ title: "Matches — Senda" }] }),
   component: Matches,
 });
