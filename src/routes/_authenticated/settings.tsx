@@ -22,6 +22,7 @@ function SettingsPage() {
   const navigate = useNavigate();
   const doExport = useServerFn(exportUserData);
   const doDelete = useServerFn(deleteAccount);
+  const doPauseSub = useServerFn(setSubscriptionPause);
   const [exporting, setExporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
