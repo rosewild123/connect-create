@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { captureReferralFromUrl, getPendingReferral, clearPendingReferral } from "@/lib/referrals";
+import { toast } from "sonner";
 
 function NotFoundComponent() {
   return (
@@ -100,10 +102,30 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
+    captureReferralFromUrl();
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      if (event === "SIGNED_IN") {
+        const code = getPendingReferral();
+        if (code) {
+          supabase.rpc("claim_referral", { _code: code }).then(({ data, error }) => {
+            const result = data as { ok: boolean; error?: string; reward_days?: number } | null;
+            if (!error && result?.ok) {
+              toast.success(`Referral applied — ${result.reward_days ?? 30} days of Senda Plus unlocked 🎁`);
+              clearPendingReferral();
+            } else if (result?.error && result.error !== "Referral already claimed") {
+              // Keep code so they can retry; silently ignore "already claimed".
+              if (result.error === "Invalid code" || result.error === "You cannot refer yourself") {
+                clearPendingReferral();
+              }
+            } else if (result?.error === "Referral already claimed") {
+              clearPendingReferral();
+            }
+          });
+        }
+      }
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
