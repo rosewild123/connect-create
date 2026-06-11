@@ -52,7 +52,7 @@ function RedeemPage() {
   };
 
   return (
-    <AppShell title="Redeem code">
+    <AppShell>
       <div className="max-w-md mx-auto p-6">
         {success ? (
           <div className="text-center space-y-4 py-8">

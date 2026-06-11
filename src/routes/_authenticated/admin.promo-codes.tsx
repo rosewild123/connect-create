@@ -70,11 +70,11 @@ function AdminPromoCodes() {
   }, [me, roleLoading, isAdmin]);
 
   if (roleLoading) {
-    return <AppShell title="Promo Codes"><div className="p-6 flex justify-center"><Loader2 className="w-5 h-5 animate-spin" /></div></AppShell>;
+    return <AppShell><div className="p-6 flex justify-center"><Loader2 className="w-5 h-5 animate-spin" /></div></AppShell>;
   }
   if (!isAdmin) {
     return (
-      <AppShell title="Promo Codes">
+      <AppShell>
         <div className="p-6 text-center space-y-3">
           <ShieldAlert className="w-10 h-10 text-muted-foreground mx-auto" />
           <p className="text-muted-foreground">Admins only.</p>
@@ -122,7 +122,7 @@ function AdminPromoCodes() {
   };
 
   return (
-    <AppShell title="Promo Codes">
+    <AppShell>
       <div className="max-w-3xl mx-auto p-4 sm:p-6 space-y-6">
         <div className="rounded-lg border p-4 space-y-4">
           <h2 className="font-semibold flex items-center gap-2"><Plus className="w-4 h-4" /> New code</h2>
