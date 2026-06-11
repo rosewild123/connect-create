@@ -192,6 +192,7 @@ export type Database = {
           id: string
           id_verified: boolean
           is_onboarded: boolean
+          is_paused: boolean
           last_active_at: string
           location_city: string | null
           location_country: string | null
@@ -219,6 +220,7 @@ export type Database = {
           id: string
           id_verified?: boolean
           is_onboarded?: boolean
+          is_paused?: boolean
           last_active_at?: string
           location_city?: string | null
           location_country?: string | null
@@ -246,6 +248,7 @@ export type Database = {
           id?: string
           id_verified?: boolean
           is_onboarded?: boolean
+          is_paused?: boolean
           last_active_at?: string
           location_city?: string | null
           location_country?: string | null
