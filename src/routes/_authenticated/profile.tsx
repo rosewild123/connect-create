@@ -89,6 +89,17 @@ function ProfilePage() {
           <span className="text-xs font-semibold text-primary">Upgrade →</span>
         </Link>
 
+        <Link to="/referrals" className="mt-3 flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
+            <Gift className="h-5 w-5" />
+          </div>
+          <div className="flex-1">
+            <div className="font-display font-bold">Invite & earn</div>
+            <p className="text-xs text-muted-foreground">Give 1 month of Plus, get 1 month free.</p>
+          </div>
+          <span className="text-xs font-semibold text-primary">Share →</span>
+        </Link>
+
         <div className="mt-4 space-y-3">
           <BoostCard userId={profile.id} />
           <NotificationsToggle />
