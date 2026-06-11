@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck, Ban, ChevronRight, Gavel } from "lucide-react";
+import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck, Ban, ChevronRight, Gavel, Pause } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { deleteAccount, exportUserData } from "@/lib/account.functions";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -24,8 +25,33 @@ function SettingsPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [me, setMe] = useState<string | null>(null);
-  useEffect(() => { supabase.auth.getUser().then(({ data }) => setMe(data.user?.id ?? null)); }, []);
+  const [paused, setPaused] = useState(false);
+  const [pausing, setPausing] = useState(false);
+  useEffect(() => { (async () => {
+    const { data } = await supabase.auth.getUser();
+    const uid = data.user?.id ?? null;
+    setMe(uid);
+    if (uid) {
+      const { data: p } = await supabase.from("profiles").select("is_paused").eq("id", uid).maybeSingle();
+      setPaused(!!p?.is_paused);
+    }
+  })(); }, []);
   const { isAdmin } = useIsAdmin(me);
+
+  async function togglePause(next: boolean) {
+    if (!me) return;
+    setPausing(true);
+    const prev = paused;
+    setPaused(next);
+    const { error } = await supabase.from("profiles").update({ is_paused: next }).eq("id", me);
+    setPausing(false);
+    if (error) {
+      setPaused(prev);
+      toast.error(error.message);
+      return;
+    }
+    toast.success(next ? "Account paused — you're hidden from Discover" : "Welcome back — you're visible again");
+  }
 
   async function handleExport() {
     setExporting(true);
@@ -153,6 +179,23 @@ function SettingsPage() {
               >
                 {exporting ? <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> Preparing…</> : "Download export"}
               </Button>
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-border bg-card p-4">
+          <div className="flex items-start gap-3">
+            <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${paused ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+              <Pause className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center justify-between gap-3">
+                <div className="font-semibold">Pause account</div>
+                <Switch checked={paused} onCheckedChange={togglePause} disabled={pausing || !me} />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Take a break. You won't appear in Discover and won't get new likes. Your matches and messages stay safe — turn it back on anytime.
+              </p>
             </div>
           </div>
         </section>
