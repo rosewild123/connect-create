@@ -54,7 +54,7 @@ function Onboarding() {
         setNiches(p.niches || []);
         setPlatforms((p.platforms as Platform[]) || []);
         setPhotos(p.photos || []);
-        if (p.is_onboarded) navigate({ to: "/discover" });
+        
       }
     });
   }, [navigate]);
