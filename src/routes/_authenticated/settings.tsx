@@ -47,14 +47,31 @@ function SettingsPage() {
     const prev = paused;
     setPaused(next);
     const { error } = await supabase.from("profiles").update({ is_paused: next }).eq("id", me);
-    setPausing(false);
     if (error) {
       setPaused(prev);
+      setPausing(false);
       toast.error(error.message);
       return;
     }
-    toast.success(next ? "Account paused — you're hidden from Discover" : "Welcome back — you're visible again");
+    let subNote = "";
+    try {
+      const res = await doPauseSub({ data: { paused: next, environment: getStripeEnvironment() } });
+      if ("error" in res) {
+        subNote = next
+          ? " (couldn't pause your subscription — manage it from billing)"
+          : " (couldn't resume your subscription — manage it from billing)";
+      } else if (!("noSubscription" in res)) {
+        subNote = next
+          ? " — billing paused too"
+          : " — billing resumed";
+      }
+    } catch {
+      subNote = "";
+    }
+    setPausing(false);
+    toast.success((next ? "Account paused — you're hidden from Discover" : "Welcome back — you're visible again") + subNote);
   }
+
 
   async function handleExport() {
     setExporting(true);
