@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Heart, X, MapPin, Flame, Sparkles, Lock, SlidersHorizontal, Undo2, Star, Zap } from "lucide-react";
-import { ageFromDob, type Platform, NICHES, LOOKING_FOR, SUPER_LIKES_FREE_DAILY, SUPER_LIKES_PLUS_DAILY, SUPER_LIKES_PREMIUM_DAILY } from "@/lib/senda";
+import { type Platform, NICHES, LOOKING_FOR, SUPER_LIKES_FREE_DAILY, SUPER_LIKES_PLUS_DAILY, SUPER_LIKES_PREMIUM_DAILY } from "@/lib/senda";
 import { useSubscription, FREE_DAILY_SWIPES } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import {
@@ -29,7 +29,7 @@ type Profile = {
   id: string;
   display_name: string | null;
   bio: string | null;
-  date_of_birth: string | null;
+  age: number | null;
   location_city: string | null;
   location_country: string | null;
   willing_to_travel: boolean;
@@ -43,6 +43,7 @@ type Profile = {
   prompts: { q: string; a: string }[] | null;
   last_active_at: string | null;
 };
+
 
 type Filters = {
   niches: string[];
@@ -118,9 +119,13 @@ function Discover() {
     setSwipedIds(swiped);
 
     const { data: profs, error } = await supabase
-      .from("profiles").select("*").eq("is_onboarded", true).eq("is_paused", false).limit(200);
+      .from("profiles_public" as never)
+      .select("*")
+      .eq("is_onboarded", true)
+      .limit(200);
     if (error) toast.error(error.message);
     setAllProfiles((profs || []) as unknown as Profile[]);
+
 
     const { count: likesCount } = await supabase.from("swipes")
       .select("id", { count: "exact", head: true })
@@ -140,8 +145,9 @@ function Discover() {
     const filtered = allProfiles.filter((p) => {
       if (swipedIds.has(p.id)) return false;
       if (hidden.has(p.id)) return false;
-      const age = ageFromDob(p.date_of_birth);
+      const age = p.age;
       if (age != null && (age < filters.ageMin || age > filters.ageMax)) return false;
+
       if (filters.country.trim() && !(p.location_country || "").toLowerCase().includes(filters.country.trim().toLowerCase())) return false;
       if (filters.travelOnly && !p.willing_to_travel) return false;
       if (filters.minExperience > 0 && (p.experience_years ?? 0) < filters.minExperience) return false;
@@ -414,7 +420,7 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onB
     })();
   }, [profile.id]);
 
-  const age = ageFromDob(profile.date_of_birth);
+  const age = profile.age;
   const loc = [profile.location_city, profile.location_country].filter(Boolean).join(", ");
   const photoCount = photoUrls.length || 1;
 
