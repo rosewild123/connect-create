@@ -136,9 +136,7 @@ export const setSubscriptionPause = createServerFn({ method: "POST" })
     try {
       const stripe = createStripeClient(data.environment);
       await stripe.subscriptions.update(sub.stripe_subscription_id, {
-        pause_collection: data.paused
-          ? { behavior: "void" }
-          : "" as unknown as null,
+        pause_collection: data.paused ? { behavior: "void" } : null,
       } as unknown as Stripe.SubscriptionUpdateParams);
       return { ok: true, paused: data.paused };
     } catch (error) {
