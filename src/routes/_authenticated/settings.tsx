@@ -172,6 +172,17 @@ function SettingsPage() {
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </Link>
+            <div className="h-px bg-primary/20" />
+            <Link to="/admin/ambassadors" className="flex items-center gap-3 p-4 transition hover:bg-primary/10">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-amber-500/15 text-amber-500">
+                <Crown className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold">Ambassadors</div>
+                <p className="text-xs text-muted-foreground">Grant lifetime free Premium to ambassadors.</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
           </section>
         )}
 

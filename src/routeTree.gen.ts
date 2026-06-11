@@ -29,6 +29,7 @@ import { Route as AuthenticatedMatchesIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedMatchesIdRouteImport } from './routes/_authenticated/matches.$id'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminPromoCodesRouteImport } from './routes/_authenticated/admin.promo-codes'
+import { Route as AuthenticatedAdminAmbassadorsRouteImport } from './routes/_authenticated/admin.ambassadors'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const TermsRoute = TermsRouteImport.update({
@@ -133,6 +134,12 @@ const AuthenticatedAdminPromoCodesRoute =
     path: '/admin/promo-codes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminAmbassadorsRoute =
+  AuthenticatedAdminAmbassadorsRouteImport.update({
+    id: '/admin/ambassadors',
+    path: '/admin/ambassadors',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -156,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/safety': typeof AuthenticatedSafetyRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
+  '/admin/ambassadors': typeof AuthenticatedAdminAmbassadorsRoute
   '/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
@@ -177,6 +185,7 @@ export interface FileRoutesByTo {
   '/safety': typeof AuthenticatedSafetyRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
+  '/admin/ambassadors': typeof AuthenticatedAdminAmbassadorsRoute
   '/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
@@ -201,6 +210,7 @@ export interface FileRoutesById {
   '/_authenticated/safety': typeof AuthenticatedSafetyRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/upgrade': typeof AuthenticatedUpgradeRoute
+  '/_authenticated/admin/ambassadors': typeof AuthenticatedAdminAmbassadorsRoute
   '/_authenticated/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/matches/$id': typeof AuthenticatedMatchesIdRoute
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/safety'
     | '/settings'
     | '/upgrade'
+    | '/admin/ambassadors'
     | '/admin/promo-codes'
     | '/admin/reports'
     | '/matches/$id'
@@ -246,6 +257,7 @@ export interface FileRouteTypes {
     | '/safety'
     | '/settings'
     | '/upgrade'
+    | '/admin/ambassadors'
     | '/admin/promo-codes'
     | '/admin/reports'
     | '/matches/$id'
@@ -269,6 +281,7 @@ export interface FileRouteTypes {
     | '/_authenticated/safety'
     | '/_authenticated/settings'
     | '/_authenticated/upgrade'
+    | '/_authenticated/admin/ambassadors'
     | '/_authenticated/admin/promo-codes'
     | '/_authenticated/admin/reports'
     | '/_authenticated/matches/$id'
@@ -427,6 +440,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPromoCodesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/ambassadors': {
+      id: '/_authenticated/admin/ambassadors'
+      path: '/admin/ambassadors'
+      fullPath: '/admin/ambassadors'
+      preLoaderRoute: typeof AuthenticatedAdminAmbassadorsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -462,6 +482,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSafetyRoute: typeof AuthenticatedSafetyRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedUpgradeRoute: typeof AuthenticatedUpgradeRoute
+  AuthenticatedAdminAmbassadorsRoute: typeof AuthenticatedAdminAmbassadorsRoute
   AuthenticatedAdminPromoCodesRoute: typeof AuthenticatedAdminPromoCodesRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
 }
@@ -478,6 +499,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSafetyRoute: AuthenticatedSafetyRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedUpgradeRoute: AuthenticatedUpgradeRoute,
+  AuthenticatedAdminAmbassadorsRoute: AuthenticatedAdminAmbassadorsRoute,
   AuthenticatedAdminPromoCodesRoute: AuthenticatedAdminPromoCodesRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
 }
@@ -496,3 +518,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
