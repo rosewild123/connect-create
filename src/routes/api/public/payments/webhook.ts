@@ -61,9 +61,15 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
               }
               const { error } = await supabaseAdmin
                 .from("profiles")
-                .update({ id_verified: true, age_verified: ageVerified })
+                .update({
+                  id_verified: true,
+                  age_verified: ageVerified,
+                  photo_verified: true,
+                  photo_verified_at: new Date().toISOString(),
+                })
                 .eq("id", userId);
               if (error) console.error("Failed to mark profile verified", error);
+
               break;
             }
             default:

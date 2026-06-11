@@ -1,20 +1,20 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock, Camera, BadgeCheck, RefreshCw } from "lucide-react";
+import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock } from "lucide-react";
 import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOSTS_PREMIUM_MONTHLY, BOOST_DURATION_MIN } from "@/lib/senda";
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import { startIdentityVerification } from "@/lib/verification.functions";
-import { submitPhotoVerification, VERIFICATION_POSES } from "@/lib/photo-verification.functions";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { PromptsEditor } from "@/components/PromptsEditor";
 import type { Prompt } from "@/lib/prompts";
 import { getStripeEnvironment } from "@/lib/stripe";
+
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({ meta: [{ title: "Profile — Senda" }] }),
@@ -93,15 +93,11 @@ function ProfilePage() {
           <BoostCard userId={profile.id} />
           <NotificationsToggle />
           <PromptsEditor userId={profile.id} initial={profile.prompts ?? []} />
-          <PhotoVerifyCard
-            verified={profile.photo_verified}
-            hasPhoto={!!profile.photos?.[0]}
-            onVerified={() => setProfile((p) => p ? { ...p, photo_verified: true } : p)}
-          />
           <VerificationCard
             ageVerified={profile.age_verified}
             idVerified={profile.id_verified}
           />
+
         </div>
 
         {profile.bio && <p className="mt-5 text-sm text-muted-foreground">{profile.bio}</p>}
@@ -275,92 +271,6 @@ function BoostCard({ userId }: { userId: string }) {
           </Link>
         )}
       </div>
-    </div>
-  );
-}
-
-function PhotoVerifyCard({ verified, hasPhoto, onVerified }: { verified: boolean; hasPhoto: boolean; onVerified: () => void }) {
-  const submit = useServerFn(submitPhotoVerification);
-  const [pose, setPose] = useState<string>(() => VERIFICATION_POSES[Math.floor(Math.random() * VERIFICATION_POSES.length)]);
-  const [busy, setBusy] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  function newPose() {
-    let next = pose;
-    while (next === pose) next = VERIFICATION_POSES[Math.floor(Math.random() * VERIFICATION_POSES.length)];
-    setPose(next);
-  }
-
-  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    if (!hasPhoto) { toast.error("Add a profile photo first"); return; }
-    setBusy(true);
-    try {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) throw new Error("Not signed in");
-      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-      const path = `${u.user.id}/${Date.now()}.${ext}`;
-      const up = await supabase.storage.from("verifications").upload(path, file, { contentType: file.type, upsert: false });
-      if (up.error) throw up.error;
-      const res = await submit({ data: { selfiePath: path, pose } });
-      if (!res.ok) { toast.error(res.error); return; }
-      if (res.passed) {
-        toast.success("You're verified! 💙");
-        onVerified();
-      } else {
-        toast.error(`Not verified: ${res.notes}`);
-        newPose();
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Verification failed");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className={`rounded-2xl border p-4 ${verified ? "border-sky-500/50 bg-sky-500/5" : "border-border bg-card"}`}>
-      <div className="flex items-start gap-3">
-        <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${verified ? "bg-sky-500/20 text-sky-500" : "bg-muted text-muted-foreground"}`}>
-          <BadgeCheck className="h-5 w-5" />
-        </div>
-        <div className="flex-1">
-          <div className="font-semibold">
-            Photo verification
-            {verified && <span className="ml-2 text-xs text-sky-500">Verified</span>}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            {verified
-              ? "A blue check appears on your profile across Senda."
-              : "Take a selfie matching the pose below. We'll match it to your profile photo."}
-          </p>
-        </div>
-      </div>
-
-      {!verified && (
-        <div className="mt-3 rounded-xl bg-background/50 p-3 text-sm">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Your pose</div>
-              <p className="mt-1 text-foreground">{pose}</p>
-            </div>
-            <button onClick={newPose} disabled={busy} className="text-muted-foreground hover:text-foreground" aria-label="Get a different pose">
-              <RefreshCw className="h-4 w-4" />
-            </button>
-          </div>
-          <input ref={fileRef} type="file" accept="image/*" capture="user" hidden onChange={onFile} />
-          <Button
-            onClick={() => fileRef.current?.click()}
-            disabled={busy || !hasPhoto}
-            className="mt-3 w-full rounded-full"
-          >
-            {busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Checking…</> : <><Camera className="mr-2 h-4 w-4" /> Take selfie</>}
-          </Button>
-          {!hasPhoto && <p className="mt-2 text-xs text-destructive">Add a profile photo first.</p>}
-        </div>
-      )}
     </div>
   );
 }
