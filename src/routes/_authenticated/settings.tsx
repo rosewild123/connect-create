@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck, Ban, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { deleteAccount, exportUserData } from "@/lib/account.functions";
 
@@ -75,6 +75,31 @@ function SettingsPage() {
       </header>
 
       <div className="space-y-3 px-5 pb-8">
+        <section className="overflow-hidden rounded-2xl border border-border bg-card">
+          <Link to="/safety" className="flex items-center gap-3 p-4 transition hover:bg-muted/40">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <div className="font-semibold">Safety center</div>
+              <p className="text-xs text-muted-foreground">Tips, tools, and what to do in an emergency.</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+          <div className="h-px bg-border" />
+          <Link to="/blocked" className="flex items-center gap-3 p-4 transition hover:bg-muted/40">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground">
+              <Ban className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <div className="font-semibold">Blocked users</div>
+              <p className="text-xs text-muted-foreground">Review and manage people you've blocked.</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+        </section>
+
+
         <section className="rounded-2xl border border-border bg-card p-4">
           <div className="flex items-start gap-3">
             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground">
