@@ -1,20 +1,20 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock, Camera, BadgeCheck, RefreshCw } from "lucide-react";
+import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock } from "lucide-react";
 import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOSTS_PREMIUM_MONTHLY, BOOST_DURATION_MIN } from "@/lib/senda";
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import { startIdentityVerification } from "@/lib/verification.functions";
-import { submitPhotoVerification, VERIFICATION_POSES } from "@/lib/photo-verification.functions";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { PromptsEditor } from "@/components/PromptsEditor";
 import type { Prompt } from "@/lib/prompts";
 import { getStripeEnvironment } from "@/lib/stripe";
+
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({ meta: [{ title: "Profile — Senda" }] }),
