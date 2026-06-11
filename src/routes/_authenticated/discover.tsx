@@ -118,7 +118,7 @@ function Discover() {
     setSwipedIds(swiped);
 
     const { data: profs, error } = await supabase
-      .from("profiles").select("*").eq("is_onboarded", true).limit(200);
+      .from("profiles").select("*").eq("is_onboarded", true).eq("is_paused", false).limit(200);
     if (error) toast.error(error.message);
     setAllProfiles((profs || []) as unknown as Profile[]);
 
