@@ -8,7 +8,7 @@ import { ArrowLeft, Copy, Gift, Share2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/referrals")({
-  head: () => ({ meta: [{ title: "Invite friends — Senda" }] }),
+  head: () => ({ meta: [{ title: "Invite & upgrade free — Senda" }] }),
   component: ReferralsPage,
 });
 
@@ -58,7 +58,7 @@ function ReferralsPage() {
     <AppShell>
       <header className="flex items-center gap-3 px-5 py-4">
         <Link to="/profile" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link>
-        <h1 className="font-display text-2xl font-bold">Invite friends</h1>
+        <h1 className="font-display text-2xl font-bold">Invite & upgrade free</h1>
       </header>
 
       <div className="space-y-4 px-5 pb-10">
