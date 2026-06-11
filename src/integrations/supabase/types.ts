@@ -523,7 +523,78 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      profiles_public: {
+        Row: {
+          age: number | null
+          age_verified: boolean | null
+          bio: string | null
+          completed_collabs: number | null
+          created_at: string | null
+          display_name: string | null
+          experience_years: number | null
+          id: string | null
+          id_verified: boolean | null
+          is_onboarded: boolean | null
+          last_active_at: string | null
+          location_city: string | null
+          location_country: string | null
+          looking_for: string[] | null
+          niches: string[] | null
+          photo_verified: boolean | null
+          photo_verified_at: string | null
+          photos: string[] | null
+          platforms: Json | null
+          prompts: Json | null
+          willing_to_travel: boolean | null
+        }
+        Insert: {
+          age?: never
+          age_verified?: boolean | null
+          bio?: string | null
+          completed_collabs?: number | null
+          created_at?: string | null
+          display_name?: string | null
+          experience_years?: number | null
+          id?: string | null
+          id_verified?: boolean | null
+          is_onboarded?: boolean | null
+          last_active_at?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          looking_for?: string[] | null
+          niches?: string[] | null
+          photo_verified?: boolean | null
+          photo_verified_at?: string | null
+          photos?: string[] | null
+          platforms?: Json | null
+          prompts?: Json | null
+          willing_to_travel?: boolean | null
+        }
+        Update: {
+          age?: never
+          age_verified?: boolean | null
+          bio?: string | null
+          completed_collabs?: number | null
+          created_at?: string | null
+          display_name?: string | null
+          experience_years?: number | null
+          id?: string | null
+          id_verified?: boolean | null
+          is_onboarded?: boolean | null
+          last_active_at?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          looking_for?: string[] | null
+          niches?: string[] | null
+          photo_verified?: boolean | null
+          photo_verified_at?: string | null
+          photos?: string[] | null
+          platforms?: Json | null
+          prompts?: Json | null
+          willing_to_travel?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       active_boost_ends_at: { Args: { _user_id: string }; Returns: string }
@@ -532,6 +603,43 @@ export type Database = {
       claim_referral: { Args: { _code: string }; Returns: Json }
       gen_referral_code: { Args: never; Returns: string }
       get_hidden_user_ids: { Args: never; Returns: string[] }
+      get_my_profile: {
+        Args: never
+        Returns: {
+          age_verified: boolean
+          bio: string | null
+          completed_collabs: number
+          created_at: string
+          date_of_birth: string | null
+          display_name: string | null
+          experience_years: number | null
+          id: string
+          id_verified: boolean
+          is_onboarded: boolean
+          is_paused: boolean
+          last_active_at: string
+          location_city: string | null
+          location_country: string | null
+          looking_for: string[]
+          niches: string[]
+          photo_verified: boolean
+          photo_verified_at: string | null
+          photos: string[]
+          platforms: Json
+          plus_until: string | null
+          premium_until: string | null
+          prompts: Json
+          referral_code: string | null
+          updated_at: string
+          willing_to_travel: boolean
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_active_subscription: {
         Args: { _environment: string; _user_id: string }
         Returns: boolean
