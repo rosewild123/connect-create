@@ -118,7 +118,12 @@ function SettingsPage() {
           </section>
         )}
 
-
+        <section className="rounded-2xl border border-border bg-card p-4">
+          <div className="text-xs text-muted-foreground">
+            <p className="font-semibold text-foreground">Your user ID</p>
+            <code className="mt-1 block rounded bg-muted px-2 py-1 text-xs text-muted-foreground">{me ?? "…"}</code>
+          </div>
+        </section>
 
         <section className="rounded-2xl border border-border bg-card p-4">
           <div className="flex items-start gap-3">
