@@ -26,6 +26,7 @@ import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedBlockedRouteImport } from './routes/_authenticated/blocked'
 import { Route as AuthenticatedMatchesIndexRouteImport } from './routes/_authenticated/matches.index'
 import { Route as AuthenticatedMatchesIdRouteImport } from './routes/_authenticated/matches.$id'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const TermsRoute = TermsRouteImport.update({
@@ -113,6 +114,12 @@ const AuthenticatedMatchesIdRoute = AuthenticatedMatchesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedMatchesRoute,
 } as any)
+const AuthenticatedAdminReportsRoute =
+  AuthenticatedAdminReportsRouteImport.update({
+    id: '/admin/reports',
+    path: '/admin/reports',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -135,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/safety': typeof AuthenticatedSafetyRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/matches/': typeof AuthenticatedMatchesIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -153,6 +161,7 @@ export interface FileRoutesByTo {
   '/safety': typeof AuthenticatedSafetyRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/matches': typeof AuthenticatedMatchesIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -174,6 +183,7 @@ export interface FileRoutesById {
   '/_authenticated/safety': typeof AuthenticatedSafetyRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/upgrade': typeof AuthenticatedUpgradeRoute
+  '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/_authenticated/matches/': typeof AuthenticatedMatchesIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/safety'
     | '/settings'
     | '/upgrade'
+    | '/admin/reports'
     | '/matches/$id'
     | '/matches/'
     | '/api/public/payments/webhook'
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/safety'
     | '/settings'
     | '/upgrade'
+    | '/admin/reports'
     | '/matches/$id'
     | '/matches'
     | '/api/public/payments/webhook'
@@ -233,6 +245,7 @@ export interface FileRouteTypes {
     | '/_authenticated/safety'
     | '/_authenticated/settings'
     | '/_authenticated/upgrade'
+    | '/_authenticated/admin/reports'
     | '/_authenticated/matches/$id'
     | '/_authenticated/matches/'
     | '/api/public/payments/webhook'
@@ -368,6 +381,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMatchesIdRouteImport
       parentRoute: typeof AuthenticatedMatchesRoute
     }
+    '/_authenticated/admin/reports': {
+      id: '/_authenticated/admin/reports'
+      path: '/admin/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -402,6 +422,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSafetyRoute: typeof AuthenticatedSafetyRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedUpgradeRoute: typeof AuthenticatedUpgradeRoute
+  AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -415,6 +436,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSafetyRoute: AuthenticatedSafetyRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedUpgradeRoute: AuthenticatedUpgradeRoute,
+  AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
