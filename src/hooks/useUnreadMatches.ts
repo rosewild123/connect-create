@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useId } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
  * Also returns the total number of matches with unread messages.
  */
 export function useUnreadMatches(me: string | null | undefined) {
+  const instanceId = useId();
   const [unread, setUnread] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
 
@@ -38,12 +39,12 @@ export function useUnreadMatches(me: string | null | undefined) {
   useEffect(() => {
     if (!me) return;
     const ch = supabase
-      .channel(`unread:${me}`)
+      .channel(`unread:${me}:${instanceId}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "match_reads", filter: `user_id=eq.${me}` }, () => refresh())
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [me, refresh]);
+  }, [me, refresh, instanceId]);
 
   const totalUnread = Object.values(unread).filter(Boolean).length;
   return { unread, totalUnread, loading, refresh };
