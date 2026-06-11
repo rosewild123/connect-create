@@ -272,9 +272,18 @@ function BoostCard({ userId }: { userId: string }) {
             : "Plus members get 1 boost per month. Upgrade to unlock."}
         </p>
         {isPlus ? (
-          <button onClick={activate} disabled={activating || active || remaining <= 0}
-            className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary disabled:opacity-50">
-            {active ? "Already boosted" : remaining <= 0 ? "No boosts left" : activating ? "Activating…" : "Activate now →"}
+          <button
+            onClick={activate}
+            disabled={activating || active || remaining <= 0}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
+          >
+            {active
+              ? <>Boost active · {endsAt && fmt(endsAt)}</>
+              : remaining <= 0
+                ? "No boosts left this month"
+                : activating
+                  ? <><Loader2 className="h-3 w-3 animate-spin" /> Activating…</>
+                  : <><Zap className="h-3 w-3" /> Boost now</>}
           </button>
         ) : (
           <Link to="/upgrade" className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">
