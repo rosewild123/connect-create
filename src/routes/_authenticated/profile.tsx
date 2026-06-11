@@ -93,15 +93,11 @@ function ProfilePage() {
           <BoostCard userId={profile.id} />
           <NotificationsToggle />
           <PromptsEditor userId={profile.id} initial={profile.prompts ?? []} />
-          <PhotoVerifyCard
-            verified={profile.photo_verified}
-            hasPhoto={!!profile.photos?.[0]}
-            onVerified={() => setProfile((p) => p ? { ...p, photo_verified: true } : p)}
-          />
           <VerificationCard
             ageVerified={profile.age_verified}
             idVerified={profile.id_verified}
           />
+
         </div>
 
         {profile.bio && <p className="mt-5 text-sm text-muted-foreground">{profile.bio}</p>}
