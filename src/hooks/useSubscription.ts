@@ -17,38 +17,44 @@ export type SubscriptionRow = {
 
 export function useSubscription(userId: string | null | undefined) {
   const [subscription, setSubscription] = useState<SubscriptionRow | null>(null);
+  const [plusUntil, setPlusUntil] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!userId || !isPaymentsConfigured()) { setLoading(false); return; }
+    if (!userId) { setLoading(false); return; }
     const env = getStripeEnvironment();
     let active = true;
 
-    const fetchSub = async () => {
-      const { data } = await supabase
-        .from("subscriptions")
-        .select("*")
-        .eq("user_id", userId)
-        .eq("environment", env)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (active) {
-        setSubscription((data as SubscriptionRow | null) ?? null);
-        setLoading(false);
-      }
+    const fetchAll = async () => {
+      const subPromise = isPaymentsConfigured()
+        ? supabase
+            .from("subscriptions")
+            .select("*")
+            .eq("user_id", userId)
+            .eq("environment", env)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle()
+        : Promise.resolve({ data: null });
+      const profPromise = supabase.from("profiles").select("plus_until").eq("id", userId).maybeSingle();
+      const [subRes, profRes] = await Promise.all([subPromise, profPromise]);
+      if (!active) return;
+      setSubscription((subRes.data as SubscriptionRow | null) ?? null);
+      setPlusUntil(((profRes.data as { plus_until: string | null } | null)?.plus_until) ?? null);
+      setLoading(false);
     };
 
-    fetchSub();
+    fetchAll();
     const channel = supabase
       .channel(`subs:${userId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "subscriptions", filter: `user_id=eq.${userId}` }, fetchSub)
+      .on("postgres_changes", { event: "*", schema: "public", table: "subscriptions", filter: `user_id=eq.${userId}` }, fetchAll)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${userId}` }, fetchAll)
       .subscribe();
 
     return () => { active = false; supabase.removeChannel(channel); };
   }, [userId]);
 
-  const isActive = (() => {
+  const subActive = (() => {
     if (!subscription) return false;
     const end = subscription.current_period_end ? new Date(subscription.current_period_end) : null;
     const future = !end || end > new Date();
@@ -57,11 +63,14 @@ export function useSubscription(userId: string | null | undefined) {
     return false;
   })();
 
-  const tier: Tier = isActive ? tierFromPriceId(subscription?.price_id) : "free";
+  const referralActive = !!plusUntil && new Date(plusUntil) > new Date();
+  const isActive = subActive || referralActive;
+  const subTier: Tier = subActive ? tierFromPriceId(subscription?.price_id) : "free";
+  const tier: Tier = subTier !== "free" ? subTier : (referralActive ? "plus" : "free");
   const isPlus = isActive && (tier === "plus" || tier === "premium");
   const isPremium = isActive && tier === "premium";
 
-  return { subscription, isActive, loading, tier, isPlus, isPremium };
+  return { subscription, isActive, loading, tier, isPlus, isPremium, plusUntil, referralActive };
 }
 
 export const FREE_DAILY_SWIPES = 10;

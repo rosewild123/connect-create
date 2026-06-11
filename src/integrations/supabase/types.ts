@@ -201,7 +201,9 @@ export type Database = {
           photo_verified_at: string | null
           photos: string[]
           platforms: Json
+          plus_until: string | null
           prompts: Json
+          referral_code: string | null
           updated_at: string
           willing_to_travel: boolean
         }
@@ -225,7 +227,9 @@ export type Database = {
           photo_verified_at?: string | null
           photos?: string[]
           platforms?: Json
+          plus_until?: string | null
           prompts?: Json
+          referral_code?: string | null
           updated_at?: string
           willing_to_travel?: boolean
         }
@@ -249,7 +253,9 @@ export type Database = {
           photo_verified_at?: string | null
           photos?: string[]
           platforms?: Json
+          plus_until?: string | null
           prompts?: Json
+          referral_code?: string | null
           updated_at?: string
           willing_to_travel?: boolean
         }
@@ -282,6 +288,33 @@ export type Database = {
           p256dh?: string
           user_agent?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          referred_user_id: string
+          referrer_id: string
+          reward_days: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          referred_user_id: string
+          referrer_id: string
+          reward_days?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          referred_user_id?: string
+          referrer_id?: string
+          reward_days?: number
         }
         Relationships: []
       }
@@ -392,6 +425,8 @@ export type Database = {
       active_boost_ends_at: { Args: { _user_id: string }; Returns: string }
       boosted_user_ids: { Args: never; Returns: string[] }
       boosts_this_month: { Args: never; Returns: number }
+      claim_referral: { Args: { _code: string }; Returns: Json }
+      gen_referral_code: { Args: never; Returns: string }
       get_hidden_user_ids: { Args: never; Returns: string[] }
       has_active_subscription: {
         Args: { _environment: string; _user_id: string }
