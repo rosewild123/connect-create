@@ -9,6 +9,7 @@ import {
 
 type CheckoutSessionResult = { clientSecret: string } | { error: string };
 type PortalSessionResult = { url: string } | { error: string };
+type PauseSubscriptionResult = { ok: true; paused: boolean } | { ok: true; noSubscription: true } | { error: string };
 
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
