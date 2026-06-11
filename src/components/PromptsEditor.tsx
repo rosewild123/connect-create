@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MessageCircleQuestion, Plus, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { MAX_PROMPTS, PROMPT_QUESTIONS, type Prompt } from "@/lib/prompts";
+import { scanContent } from "@/lib/contentFilter";
 
 export function PromptsEditor({ userId, initial }: { userId: string; initial: Prompt[] }) {
   const [prompts, setPrompts] = useState<Prompt[]>(initial ?? []);
@@ -31,6 +32,11 @@ export function PromptsEditor({ userId, initial }: { userId: string; initial: Pr
 
   async function saveDraft() {
     if (!draftQ || !draftA.trim()) return;
+    const scan = scanContent(draftA);
+    if (!scan.clean) {
+      toast.error("Please remove abusive or offensive language before saving.");
+      return;
+    }
     const next = [...prompts, { q: draftQ, a: draftA.trim().slice(0, 180) }];
     const ok = await persist(next);
     if (ok) {

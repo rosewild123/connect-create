@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { NICHES, PLATFORMS, LOOKING_FOR, type Platform } from "@/lib/senda";
 import { X, Plus, Upload } from "lucide-react";
+import { scanContent } from "@/lib/contentFilter";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({ meta: [{ title: "Set up your profile — Senda" }] }),
@@ -84,6 +85,12 @@ function Onboarding() {
 
   async function save(finish: boolean) {
     if (!userId) return;
+    const nameScan = scanContent(displayName);
+    const bioScan = scanContent(bio);
+    if (!nameScan.clean || !bioScan.clean) {
+      toast.error("Please remove abusive or offensive language from your name and bio.");
+      return;
+    }
     setLoading(true);
     try {
       const payload = {
