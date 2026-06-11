@@ -116,3 +116,32 @@ export const createPortalSession = createServerFn({ method: "POST" })
       return { error: getStripeErrorMessage(error) };
     }
   });
+
+export const setSubscriptionPause = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { paused: boolean; environment: StripeEnv }) => data)
+  .handler(async ({ data, context }): Promise<PauseSubscriptionResult> => {
+    const { supabase, userId } = context;
+    const { data: sub, error: subError } = await supabase
+      .from("subscriptions")
+      .select("stripe_subscription_id, status")
+      .eq("user_id", userId)
+      .eq("environment", data.environment)
+      .in("status", ["active", "trialing", "past_due", "paused"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (subError) return { error: subError.message };
+    if (!sub?.stripe_subscription_id) return { ok: true, noSubscription: true };
+    try {
+      const stripe = createStripeClient(data.environment);
+      await stripe.subscriptions.update(sub.stripe_subscription_id, {
+        pause_collection: data.paused
+          ? { behavior: "void" }
+          : "" as unknown as null,
+      } as unknown as Stripe.SubscriptionUpdateParams);
+      return { ok: true, paused: data.paused };
+    } catch (error) {
+      return { error: getStripeErrorMessage(error) };
+    }
+  });
