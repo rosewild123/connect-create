@@ -420,7 +420,7 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onB
     })();
   }, [profile.id]);
 
-  const age = ageFromDob(profile.date_of_birth);
+  const age = profile.age;
   const loc = [profile.location_city, profile.location_country].filter(Boolean).join(", ");
   const photoCount = photoUrls.length || 1;
 
