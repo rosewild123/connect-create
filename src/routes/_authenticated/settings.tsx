@@ -225,7 +225,7 @@ function SettingsPage() {
                 <Switch checked={paused} onCheckedChange={togglePause} disabled={pausing || !me} />
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                Take a break. You won't appear in Discover and won't get new likes. Your matches and messages stay safe — turn it back on anytime.
+                Take a break. You won't appear in Discover, won't get new likes, and any monthly subscription pauses billing until you're back. Matches and messages stay safe — turn it back on anytime.
               </p>
             </div>
           </div>
