@@ -8,6 +8,7 @@ import { ReportBlockMenu } from "@/components/ReportBlockMenu";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { notifyNewMessage } from "@/lib/push.functions";
 import { PresenceIndicator } from "@/components/PresenceIndicator";
+import { scanContent } from "@/lib/contentFilter";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 export const Route = createFileRoute("/_authenticated/matches/$id")({
