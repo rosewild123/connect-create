@@ -8,6 +8,7 @@ import { ReportBlockMenu } from "@/components/ReportBlockMenu";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { notifyNewMessage } from "@/lib/push.functions";
 import { PresenceIndicator } from "@/components/PresenceIndicator";
+import { scanContent } from "@/lib/contentFilter";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 export const Route = createFileRoute("/_authenticated/matches/$id")({
@@ -130,6 +131,19 @@ function Chat() {
     e.preventDefault();
     if (!draft.trim() || !me) return;
     const text = draft.trim();
+    const scan = scanContent(text);
+    if (!scan.clean) {
+      toast.error("Message blocked: abusive language detected. This has been flagged for review.");
+      if (other?.id) {
+        await supabase.from("reports").insert({
+          reporter_id: me,
+          reported_id: other.id,
+          reason: "harassment",
+          details: `[auto-flag] Blocked chat message contained banned terms: ${scan.matched.join(", ")}. Original (truncated): ${text.slice(0, 500)}`,
+        });
+      }
+      return;
+    }
     setDraft("");
     const { error } = await supabase.from("messages").insert({ match_id: id, sender_id: me, content: text });
     if (error) toast.error(error.message);
