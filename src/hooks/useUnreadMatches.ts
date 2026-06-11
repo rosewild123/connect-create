@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
  * Also returns the total number of matches with unread messages.
  */
 export function useUnreadMatches(me: string | null | undefined) {
+  const instanceId = useId();
   const [unread, setUnread] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
 
