@@ -39,7 +39,7 @@ export function useUnreadMatches(me: string | null | undefined) {
   useEffect(() => {
     if (!me) return;
     const ch = supabase
-      .channel(`unread:${me}`)
+      .channel(`unread:${me}:${instanceId}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "match_reads", filter: `user_id=eq.${me}` }, () => refresh())
       .subscribe();
