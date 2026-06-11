@@ -61,7 +61,7 @@ function UpgradePage() {
   const navigate = useNavigate();
   const [me, setMe] = useState<{ id: string; email?: string } | null>(null);
   const [checkoutPlan, setCheckoutPlan] = useState<PlanKey | null>(null);
-  const { subscription, isActive, tier } = useSubscription(me?.id);
+  const { subscription, isActive, tier, isAmbassador } = useSubscription(me?.id);
 
   useEffect(() => {
     (async () => {
@@ -112,6 +112,18 @@ function UpgradePage() {
       <div className="px-5 pb-10">
         <h1 className="font-display text-3xl font-bold">Choose your plan</h1>
         <p className="mt-1 text-sm text-muted-foreground">Match faster. Collab more.</p>
+
+        {isAmbassador && (
+          <div className="mt-4 rounded-2xl border border-amber-500/50 bg-gradient-to-br from-amber-500/15 to-pink-500/10 p-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-amber-500" />
+              <div className="font-display text-base font-bold">Senda Ambassador 👑</div>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              You have <span className="font-semibold text-foreground">Premium free for life</span>. Thanks for repping Senda.
+            </p>
+          </div>
+        )}
 
         {isActive && (
           <div className="mt-4 rounded-2xl border border-primary/40 bg-primary/10 p-4">

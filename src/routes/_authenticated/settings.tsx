@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck, Ban, ChevronRight, Gavel, Pause, Tag } from "lucide-react";
+import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck, Ban, ChevronRight, Gavel, Pause, Tag, Crown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { deleteAccount, exportUserData } from "@/lib/account.functions";
@@ -169,6 +169,17 @@ function SettingsPage() {
               <div className="flex-1">
                 <div className="font-semibold">Promo codes</div>
                 <p className="text-xs text-muted-foreground">Create and manage influencer invite codes.</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+            <div className="h-px bg-primary/20" />
+            <Link to="/admin/ambassadors" className="flex items-center gap-3 p-4 transition hover:bg-primary/10">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-amber-500/15 text-amber-500">
+                <Crown className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold">Ambassadors</div>
+                <p className="text-xs text-muted-foreground">Grant lifetime free Premium to ambassadors.</p>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </Link>

@@ -191,6 +191,7 @@ export type Database = {
           experience_years: number | null
           id: string
           id_verified: boolean
+          is_ambassador: boolean
           is_onboarded: boolean
           is_paused: boolean
           last_active_at: string
@@ -219,6 +220,7 @@ export type Database = {
           experience_years?: number | null
           id: string
           id_verified?: boolean
+          is_ambassador?: boolean
           is_onboarded?: boolean
           is_paused?: boolean
           last_active_at?: string
@@ -247,6 +249,7 @@ export type Database = {
           experience_years?: number | null
           id?: string
           id_verified?: boolean
+          is_ambassador?: boolean
           is_onboarded?: boolean
           is_paused?: boolean
           last_active_at?: string
@@ -615,6 +618,7 @@ export type Database = {
           experience_years: number | null
           id: string
           id_verified: boolean
+          is_ambassador: boolean
           is_onboarded: boolean
           is_paused: boolean
           last_active_at: string
@@ -651,7 +655,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      list_ambassadors: {
+        Args: never
+        Returns: {
+          created_at: string
+          display_name: string
+          id: string
+        }[]
+      }
       redeem_promo_code: { Args: { _code: string }; Returns: Json }
+      set_ambassador: {
+        Args: { _is: boolean; _user_id: string }
+        Returns: Json
+      }
       super_likes_today: { Args: never; Returns: number }
     }
     Enums: {

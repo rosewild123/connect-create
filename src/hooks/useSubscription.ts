@@ -16,6 +16,7 @@ export type SubscriptionRow = {
 };
 
 export function useSubscription(userId: string | null | undefined) {
+  const [isAmbassador, setIsAmbassador] = useState(false);
   const [subscription, setSubscription] = useState<SubscriptionRow | null>(null);
   const [plusUntil, setPlusUntil] = useState<string | null>(null);
   const [premiumUntil, setPremiumUntil] = useState<string | null>(null);
@@ -37,13 +38,14 @@ export function useSubscription(userId: string | null | undefined) {
             .limit(1)
             .maybeSingle()
         : Promise.resolve({ data: null });
-      const profPromise = supabase.from("profiles").select("plus_until, premium_until").eq("id", userId).maybeSingle();
+      const profPromise = supabase.from("profiles").select("plus_until, premium_until, is_ambassador").eq("id", userId).maybeSingle();
       const [subRes, profRes] = await Promise.all([subPromise, profPromise]);
       if (!active) return;
       setSubscription((subRes.data as SubscriptionRow | null) ?? null);
-      const prof = profRes.data as { plus_until: string | null; premium_until: string | null } | null;
+      const prof = profRes.data as { plus_until: string | null; premium_until: string | null; is_ambassador: boolean | null } | null;
       setPlusUntil(prof?.plus_until ?? null);
       setPremiumUntil(prof?.premium_until ?? null);
+      setIsAmbassador(!!prof?.is_ambassador);
       setLoading(false);
     };
 
@@ -68,16 +70,17 @@ export function useSubscription(userId: string | null | undefined) {
 
   const premiumGrantActive = !!premiumUntil && new Date(premiumUntil) > new Date();
   const referralActive = !!plusUntil && new Date(plusUntil) > new Date();
-  const isActive = subActive || referralActive || premiumGrantActive;
+  const isActive = isAmbassador || subActive || referralActive || premiumGrantActive;
   const subTier: Tier = subActive ? tierFromPriceId(subscription?.price_id) : "free";
   let tier: Tier = "free";
-  if (premiumGrantActive) tier = "premium";
+  if (isAmbassador) tier = "premium";
+  else if (premiumGrantActive) tier = "premium";
   else if (subTier !== "free") tier = subTier;
   else if (referralActive) tier = "plus";
   const isPlus = isActive && (tier === "plus" || tier === "premium");
   const isPremium = isActive && tier === "premium";
 
-  return { subscription, isActive, loading, tier, isPlus, isPremium, plusUntil, premiumUntil, referralActive };
+  return { subscription, isActive, loading, tier, isPlus, isPremium, plusUntil, premiumUntil, referralActive, isAmbassador };
 }
 
 export const FREE_DAILY_SWIPES = 10;
