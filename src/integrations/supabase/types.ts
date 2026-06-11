@@ -202,6 +202,7 @@ export type Database = {
           photos: string[]
           platforms: Json
           plus_until: string | null
+          premium_until: string | null
           prompts: Json
           referral_code: string | null
           updated_at: string
@@ -228,6 +229,7 @@ export type Database = {
           photos?: string[]
           platforms?: Json
           plus_until?: string | null
+          premium_until?: string | null
           prompts?: Json
           referral_code?: string | null
           updated_at?: string
@@ -254,12 +256,90 @@ export type Database = {
           photos?: string[]
           platforms?: Json
           plus_until?: string | null
+          premium_until?: string | null
           prompts?: Json
           referral_code?: string | null
           updated_at?: string
           willing_to_travel?: boolean
         }
         Relationships: []
+      }
+      promo_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          duration_days: number
+          expires_at: string | null
+          id: string
+          max_uses: number
+          note: string | null
+          tier: string
+          updated_at: string
+          uses: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          duration_days: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number
+          note?: string | null
+          tier: string
+          updated_at?: string
+          uses?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          duration_days?: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number
+          note?: string | null
+          tier?: string
+          updated_at?: string
+          uses?: number
+        }
+        Relationships: []
+      }
+      promo_redemptions: {
+        Row: {
+          code_id: string
+          duration_days: number
+          id: string
+          redeemed_at: string
+          tier: string
+          user_id: string
+        }
+        Insert: {
+          code_id: string
+          duration_days: number
+          id?: string
+          redeemed_at?: string
+          tier: string
+          user_id: string
+        }
+        Update: {
+          code_id?: string
+          duration_days?: number
+          id?: string
+          redeemed_at?: string
+          tier?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_redemptions_code_id_fkey"
+            columns: ["code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       push_subscriptions: {
         Row: {
@@ -460,6 +540,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      redeem_promo_code: { Args: { _code: string }; Returns: Json }
       super_likes_today: { Args: never; Returns: number }
     }
     Enums: {

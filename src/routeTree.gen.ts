@@ -18,6 +18,7 @@ import { Route as AuthenticatedUpgradeRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSafetyRouteImport } from './routes/_authenticated/safety'
 import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
+import { Route as AuthenticatedRedeemRouteImport } from './routes/_authenticated/redeem'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedMatchesRouteImport } from './routes/_authenticated/matches'
@@ -27,6 +28,7 @@ import { Route as AuthenticatedBlockedRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMatchesIndexRouteImport } from './routes/_authenticated/matches.index'
 import { Route as AuthenticatedMatchesIdRouteImport } from './routes/_authenticated/matches.$id'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
+import { Route as AuthenticatedAdminPromoCodesRouteImport } from './routes/_authenticated/admin.promo-codes'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const TermsRoute = TermsRouteImport.update({
@@ -71,6 +73,11 @@ const AuthenticatedSafetyRoute = AuthenticatedSafetyRouteImport.update({
 const AuthenticatedReferralsRoute = AuthenticatedReferralsRouteImport.update({
   id: '/referrals',
   path: '/referrals',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRedeemRoute = AuthenticatedRedeemRouteImport.update({
+  id: '/redeem',
+  path: '/redeem',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
@@ -120,6 +127,12 @@ const AuthenticatedAdminReportsRoute =
     path: '/admin/reports',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminPromoCodesRoute =
+  AuthenticatedAdminPromoCodesRouteImport.update({
+    id: '/admin/promo-codes',
+    path: '/admin/promo-codes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -138,10 +151,12 @@ export interface FileRoutesByFullPath {
   '/matches': typeof AuthenticatedMatchesRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/redeem': typeof AuthenticatedRedeemRoute
   '/referrals': typeof AuthenticatedReferralsRoute
   '/safety': typeof AuthenticatedSafetyRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
+  '/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/matches/': typeof AuthenticatedMatchesIndexRoute
@@ -157,10 +172,12 @@ export interface FileRoutesByTo {
   '/likes': typeof AuthenticatedLikesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/redeem': typeof AuthenticatedRedeemRoute
   '/referrals': typeof AuthenticatedReferralsRoute
   '/safety': typeof AuthenticatedSafetyRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
+  '/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/matches': typeof AuthenticatedMatchesIndexRoute
@@ -179,10 +196,12 @@ export interface FileRoutesById {
   '/_authenticated/matches': typeof AuthenticatedMatchesRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/redeem': typeof AuthenticatedRedeemRoute
   '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
   '/_authenticated/safety': typeof AuthenticatedSafetyRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/upgrade': typeof AuthenticatedUpgradeRoute
+  '/_authenticated/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/_authenticated/matches/': typeof AuthenticatedMatchesIndexRoute
@@ -201,10 +220,12 @@ export interface FileRouteTypes {
     | '/matches'
     | '/onboarding'
     | '/profile'
+    | '/redeem'
     | '/referrals'
     | '/safety'
     | '/settings'
     | '/upgrade'
+    | '/admin/promo-codes'
     | '/admin/reports'
     | '/matches/$id'
     | '/matches/'
@@ -220,10 +241,12 @@ export interface FileRouteTypes {
     | '/likes'
     | '/onboarding'
     | '/profile'
+    | '/redeem'
     | '/referrals'
     | '/safety'
     | '/settings'
     | '/upgrade'
+    | '/admin/promo-codes'
     | '/admin/reports'
     | '/matches/$id'
     | '/matches'
@@ -241,10 +264,12 @@ export interface FileRouteTypes {
     | '/_authenticated/matches'
     | '/_authenticated/onboarding'
     | '/_authenticated/profile'
+    | '/_authenticated/redeem'
     | '/_authenticated/referrals'
     | '/_authenticated/safety'
     | '/_authenticated/settings'
     | '/_authenticated/upgrade'
+    | '/_authenticated/admin/promo-codes'
     | '/_authenticated/admin/reports'
     | '/_authenticated/matches/$id'
     | '/_authenticated/matches/'
@@ -325,6 +350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReferralsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/redeem': {
+      id: '/_authenticated/redeem'
+      path: '/redeem'
+      fullPath: '/redeem'
+      preLoaderRoute: typeof AuthenticatedRedeemRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -388,6 +420,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/promo-codes': {
+      id: '/_authenticated/admin/promo-codes'
+      path: '/admin/promo-codes'
+      fullPath: '/admin/promo-codes'
+      preLoaderRoute: typeof AuthenticatedAdminPromoCodesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -418,10 +457,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMatchesRoute: typeof AuthenticatedMatchesRouteWithChildren
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedRedeemRoute: typeof AuthenticatedRedeemRoute
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
   AuthenticatedSafetyRoute: typeof AuthenticatedSafetyRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedUpgradeRoute: typeof AuthenticatedUpgradeRoute
+  AuthenticatedAdminPromoCodesRoute: typeof AuthenticatedAdminPromoCodesRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
 }
 
@@ -432,10 +473,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMatchesRoute: AuthenticatedMatchesRouteWithChildren,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedRedeemRoute: AuthenticatedRedeemRoute,
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
   AuthenticatedSafetyRoute: AuthenticatedSafetyRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedUpgradeRoute: AuthenticatedUpgradeRoute,
+  AuthenticatedAdminPromoCodesRoute: AuthenticatedAdminPromoCodesRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
 }
 
@@ -453,13 +496,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
