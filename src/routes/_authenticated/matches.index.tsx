@@ -6,6 +6,7 @@ import { MessageCircle } from "lucide-react";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { PresenceIndicator } from "@/components/PresenceIndicator";
 import { useHiddenUserIds } from "@/hooks/useBlocks";
+import { useUnreadMatches } from "@/hooks/useUnreadMatches";
 
 export const Route = createFileRoute("/_authenticated/matches/")({
   head: () => ({ meta: [{ title: "Matches — Senda" }] }),
@@ -25,6 +26,7 @@ function Matches() {
   const [loading, setLoading] = useState(true);
   const [photoMap, setPhotoMap] = useState<Record<string, string>>({});
   const { hidden } = useHiddenUserIds(me);
+  const { unread } = useUnreadMatches(me);
   const visibleRows = rows.filter((r) => !hidden.has(r.other.id));
 
   useEffect(() => { (async () => {
@@ -82,7 +84,7 @@ function Matches() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1 font-semibold">{r.other.display_name}{r.other.photo_verified && <VerifiedBadge className="h-3.5 w-3.5" />}</div>
-                  <div className="truncate text-sm text-muted-foreground">
+                  <div className={`truncate text-sm ${unread[r.id] ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
                     {r.lastMessage
                       ? (r.lastMessage.media_type === "image" ? "📷 Photo"
                         : r.lastMessage.media_type === "audio" ? "🎤 Voice note"
@@ -90,6 +92,7 @@ function Matches() {
                       : "Say hi 👋"}
                   </div>
                 </div>
+                {unread[r.id] && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-primary" aria-label="Unread" />}
               </Link>
             </li>
           ))}
