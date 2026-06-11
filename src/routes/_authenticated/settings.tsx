@@ -118,11 +118,20 @@ function SettingsPage() {
           </section>
         )}
 
-        <section className="rounded-2xl border border-border bg-card p-4">
-          <div className="text-xs text-muted-foreground">
-            <p className="font-semibold text-foreground">Your user ID</p>
-            <code className="mt-1 block rounded bg-muted px-2 py-1 text-xs text-muted-foreground">{me ?? "…"}</code>
-          </div>
+        <section className="rounded-2xl border-2 border-primary/50 bg-primary/5 p-4">
+          <p className="font-semibold text-foreground">Your user ID</p>
+          <p className="mt-1 text-xs text-muted-foreground">Tap to copy and send to support.</p>
+          <button
+            type="button"
+            onClick={() => {
+              if (!me) return;
+              navigator.clipboard.writeText(me);
+              toast.success("User ID copied");
+            }}
+            className="mt-2 block w-full break-all rounded bg-muted px-3 py-2 text-left text-xs font-mono text-foreground hover:bg-muted/70"
+          >
+            {me ?? "Loading…"}
+          </button>
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-4">
