@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck, Ban, ChevronRight, Gavel, Pause, Tag } from "lucide-react";
+import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck, Ban, ChevronRight, Gavel, Pause, Tag, Crown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { deleteAccount, exportUserData } from "@/lib/account.functions";
