@@ -44,7 +44,7 @@ export function useUnreadMatches(me: string | null | undefined) {
       .on("postgres_changes", { event: "*", schema: "public", table: "match_reads", filter: `user_id=eq.${me}` }, () => refresh())
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [me, refresh]);
+  }, [me, refresh, instanceId]);
 
   const totalUnread = Object.values(unread).filter(Boolean).length;
   return { unread, totalUnread, loading, refresh };
