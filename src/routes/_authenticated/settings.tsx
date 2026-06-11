@@ -5,9 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck, Ban, ChevronRight } from "lucide-react";
+import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck, Ban, ChevronRight, Gavel } from "lucide-react";
 import { toast } from "sonner";
 import { deleteAccount, exportUserData } from "@/lib/account.functions";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Settings — Senda" }] }),
@@ -22,6 +23,9 @@ function SettingsPage() {
   const [deleting, setDeleting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
+  const [me, setMe] = useState<string | null>(null);
+  useState(() => { supabase.auth.getUser().then(({ data }) => setMe(data.user?.id ?? null)); });
+  const { isAdmin } = useIsAdmin(me);
 
   async function handleExport() {
     setExporting(true);
