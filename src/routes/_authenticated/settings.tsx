@@ -1,13 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck, Ban, ChevronRight } from "lucide-react";
+import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck, Ban, ChevronRight, Gavel } from "lucide-react";
 import { toast } from "sonner";
 import { deleteAccount, exportUserData } from "@/lib/account.functions";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Settings — Senda" }] }),
@@ -22,6 +23,9 @@ function SettingsPage() {
   const [deleting, setDeleting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
+  const [me, setMe] = useState<string | null>(null);
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => setMe(data.user?.id ?? null)); }, []);
+  const { isAdmin } = useIsAdmin(me);
 
   async function handleExport() {
     setExporting(true);
@@ -98,6 +102,22 @@ function SettingsPage() {
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </Link>
         </section>
+
+        {isAdmin && (
+          <section className="overflow-hidden rounded-2xl border border-primary/40 bg-primary/5">
+            <Link to="/admin/reports" className="flex items-center gap-3 p-4 transition hover:bg-primary/10">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
+                <Gavel className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold">Reports queue</div>
+                <p className="text-xs text-muted-foreground">Triage flagged users and chat reports.</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          </section>
+        )}
+
 
 
         <section className="rounded-2xl border border-border bg-card p-4">
