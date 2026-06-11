@@ -9,6 +9,8 @@ import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck,
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { deleteAccount, exportUserData } from "@/lib/account.functions";
+import { setSubscriptionPause } from "@/lib/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -20,6 +22,7 @@ function SettingsPage() {
   const navigate = useNavigate();
   const doExport = useServerFn(exportUserData);
   const doDelete = useServerFn(deleteAccount);
+  const doPauseSub = useServerFn(setSubscriptionPause);
   const [exporting, setExporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -44,14 +47,31 @@ function SettingsPage() {
     const prev = paused;
     setPaused(next);
     const { error } = await supabase.from("profiles").update({ is_paused: next }).eq("id", me);
-    setPausing(false);
     if (error) {
       setPaused(prev);
+      setPausing(false);
       toast.error(error.message);
       return;
     }
-    toast.success(next ? "Account paused — you're hidden from Discover" : "Welcome back — you're visible again");
+    let subNote = "";
+    try {
+      const res = await doPauseSub({ data: { paused: next, environment: getStripeEnvironment() } });
+      if ("error" in res) {
+        subNote = next
+          ? " (couldn't pause your subscription — manage it from billing)"
+          : " (couldn't resume your subscription — manage it from billing)";
+      } else if (!("noSubscription" in res)) {
+        subNote = next
+          ? " — billing paused too"
+          : " — billing resumed";
+      }
+    } catch {
+      subNote = "";
+    }
+    setPausing(false);
+    toast.success((next ? "Account paused — you're hidden from Discover" : "Welcome back — you're visible again") + subNote);
   }
+
 
   async function handleExport() {
     setExporting(true);
@@ -205,7 +225,7 @@ function SettingsPage() {
                 <Switch checked={paused} onCheckedChange={togglePause} disabled={pausing || !me} />
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                Take a break. You won't appear in Discover and won't get new likes. Your matches and messages stay safe — turn it back on anytime.
+                Take a break. You won't appear in Discover, won't get new likes, and any monthly subscription pauses billing until you're back. Matches and messages stay safe — turn it back on anytime.
               </p>
             </div>
           </div>
