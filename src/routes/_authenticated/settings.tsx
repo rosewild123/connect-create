@@ -9,6 +9,8 @@ import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck,
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { deleteAccount, exportUserData } from "@/lib/account.functions";
+import { setSubscriptionPause } from "@/lib/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 export const Route = createFileRoute("/_authenticated/settings")({
