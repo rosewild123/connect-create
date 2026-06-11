@@ -1,0 +1,21 @@
+{
+  "name": "Senda",
+  "short_name": "Senda",
+  "description": "Senda is where adult creators discover and connect with each other for collabs, shoots, and promos.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}

@@ -65,6 +65,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Senda — Match. Collab. Create." },
       { name: "description", content: "Senda is where adult creators discover and connect with each other for collabs, shoots, and promos." },
       { name: "author", content: "Senda" },
+      { name: "theme-color", content: "#1a1a1a" },
       { property: "og:title", content: "Senda — Match. Collab. Create." },
       { property: "og:description", content: "Where creators meet creators. Swipe, match, message, collab." },
       { property: "og:type", content: "website" },
@@ -72,6 +73,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
