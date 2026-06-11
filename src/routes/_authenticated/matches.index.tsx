@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { MessageCircle } from "lucide-react";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { PresenceIndicator } from "@/components/PresenceIndicator";
 import { useHiddenUserIds } from "@/hooks/useBlocks";
 
 export const Route = createFileRoute("/_authenticated/matches/")({
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/matches/")({
 type MatchRow = {
   id: string;
   created_at: string;
-  other: { id: string; display_name: string | null; photos: string[]; photo_verified?: boolean };
+  other: { id: string; display_name: string | null; photos: string[]; photo_verified?: boolean; last_active_at?: string | null };
   lastMessage?: { content: string | null; created_at: string; media_type: string | null } | null;
 };
 
@@ -33,7 +34,7 @@ function Matches() {
     const { data: matches } = await supabase.from("matches").select("*").order("created_at", { ascending: false });
     if (!matches) { setLoading(false); return; }
     const otherIds = matches.map((m) => m.user_a === u.user!.id ? m.user_b : m.user_a);
-    const { data: profs } = await supabase.from("profiles").select("id,display_name,photos,photo_verified").in("id", otherIds);
+    const { data: profs } = await supabase.from("profiles").select("id,display_name,photos,photo_verified,last_active_at").in("id", otherIds);
     const profMap = new Map(profs?.map((p) => [p.id, p]));
 
     const result: MatchRow[] = await Promise.all(matches.map(async (m) => {
@@ -75,8 +76,9 @@ function Matches() {
           {visibleRows.map((r) => (
             <li key={r.id}>
               <Link to="/matches/$id" params={{ id: r.id }} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 transition hover:border-primary">
-                <div className="h-14 w-14 overflow-hidden rounded-full bg-muted">
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-muted">
                   {photoMap[r.other.id] && <img src={photoMap[r.other.id]} alt="" className="h-full w-full object-cover" />}
+                  <PresenceIndicator lastActiveAt={r.other.last_active_at} variant="dot" className="absolute bottom-0 right-0" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1 font-semibold">{r.other.display_name}{r.other.photo_verified && <VerifiedBadge className="h-3.5 w-3.5" />}</div>
