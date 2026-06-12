@@ -101,11 +101,8 @@ export const notifyNewMessage = createServerFn({ method: "POST" })
     if (!match) return { sent: 0 };
     const recipient = match.user_a === userId ? match.user_b : match.user_a;
 
-    const { data: sender } = await supabase
-      .from("profiles")
-      .select("display_name")
-      .eq("id", userId)
-      .single();
+    const { data: senderRpc } = await supabase.rpc("get_my_profile");
+    const sender = Array.isArray(senderRpc) ? senderRpc[0] : senderRpc;
 
     return sendToUser({
       toUserId: recipient,
