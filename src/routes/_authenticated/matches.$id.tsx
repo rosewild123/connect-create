@@ -210,7 +210,7 @@ function Chat() {
         )}
       </header>
 
-      <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-4">
+      <div ref={scrollRef} className="flex-1 space-y-1 overflow-y-auto px-4 pt-4 pb-2">
         {messages.length === 0 && !otherTyping && (
           <div className="mt-8 text-center text-sm text-muted-foreground">You matched! Start the conversation.</div>
         )}
