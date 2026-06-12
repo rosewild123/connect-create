@@ -600,6 +600,7 @@ export type Database = {
       }
     }
     Functions: {
+      activate_boost: { Args: { _duration_minutes?: number }; Returns: Json }
       active_boost_ends_at: { Args: { _user_id: string }; Returns: string }
       boosted_user_ids: { Args: never; Returns: string[] }
       boosts_this_month: { Args: never; Returns: number }
