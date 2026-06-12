@@ -120,7 +120,7 @@ function LikerCard({ profile, onAct }: { profile: LikerProfile; onAct: (id: stri
     setUrl(data?.signedUrl || "");
   })(); }, [profile.id]);
 
-  const age = ageFromDob(profile.date_of_birth);
+  const age = profile.age;
   const loc = [profile.location_city, profile.location_country].filter(Boolean).join(", ");
 
   return (
