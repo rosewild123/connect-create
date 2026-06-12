@@ -214,10 +214,10 @@ function Discover() {
   return (
     <AppShell>
       <header className="flex items-center justify-between px-5 py-4">
-        <div className="flex items-center gap-2">
-          <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground font-display text-lg font-bold">s</div>
-          <span className="font-display text-xl font-bold">senda</span>
-        </div>
+        <Link to="/discover" className="flex items-center gap-2">
+          <div className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground font-display text-xl font-bold">s</div>
+          <span className="font-display text-2xl font-bold tracking-tight">senda</span>
+        </Link>
         <div className="flex items-center gap-2">
           <Link to="/likes" className="relative grid h-9 w-9 place-items-center rounded-full border border-border bg-card text-foreground hover:bg-accent" aria-label="Likes you">
             <Heart className="h-4 w-4" />
