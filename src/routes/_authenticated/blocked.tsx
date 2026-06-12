@@ -33,9 +33,9 @@ function BlockedPage() {
       .order("created_at", { ascending: false });
     if (!blocks?.length) { setRows([]); setLoading(false); return; }
     const ids = blocks.map((b) => b.blocked_id);
-    const { data: profs } = await supabase.from("profiles")
+    const { data: profs } = await supabase.from("profiles_public")
       .select("id, display_name, photos").in("id", ids);
-    const map = new Map(profs?.map((p) => [p.id, p]));
+    const map = new Map((profs ?? []).filter((p) => p.id).map((p) => [p.id as string, p]));
     const merged: Row[] = blocks.map((b) => ({
       ...b,
       profile: (map.get(b.blocked_id) as Row["profile"]) || null,
