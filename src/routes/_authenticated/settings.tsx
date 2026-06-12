@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Download, LogOut, Trash2, Loader2, ShieldAlert, ShieldCheck, Ban, ChevronRight, Gavel, Pause, Tag, Crown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { deleteAccount, exportUserData } from "@/lib/account.functions";
 import { setSubscriptionPause } from "@/lib/payments.functions";
@@ -268,33 +269,45 @@ function SettingsPage() {
               <p className="text-xs text-muted-foreground">
                 Permanently remove your profile, photos, matches, and messages. This cannot be undone.
               </p>
-              {!confirmOpen ? (
-                <Button
-                  onClick={() => setConfirmOpen(true)}
-                  variant="destructive"
-                  size="sm"
-                  className="mt-3 rounded-full"
-                >
-                  Delete account
-                </Button>
-              ) : (
-                <div className="mt-3 space-y-2 rounded-xl border border-destructive/30 bg-background/40 p-3">
-                  <div className="flex items-start gap-2 text-xs text-destructive">
-                    <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                    <span>
-                      Tip: download your export first. Type <span className="font-bold">DELETE</span> to confirm.
-                    </span>
+              <Button
+                onClick={() => { setConfirmText(""); setConfirmOpen(true); }}
+                variant="destructive"
+                size="sm"
+                className="mt-3 rounded-full"
+              >
+                Delete account
+              </Button>
+
+              <AlertDialog open={confirmOpen} onOpenChange={(o) => { if (!deleting) { setConfirmOpen(o); if (!o) setConfirmText(""); } }}>
+                <AlertDialogContent className="rounded-2xl">
+                  <AlertDialogHeader>
+                    <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-destructive/15 text-destructive">
+                      <ShieldAlert className="h-6 w-6" />
+                    </div>
+                    <AlertDialogTitle className="text-center font-display text-2xl">
+                      Are you sure you want to delete your account?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="text-center">
+                      This permanently removes your profile, photos, matches, and messages.
+                      This action cannot be undone. Consider exporting your data first.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+
+                  <div className="space-y-2 pt-1">
+                    <p className="text-xs text-muted-foreground">
+                      Type <span className="font-bold text-foreground">DELETE</span> to confirm.
+                    </p>
+                    <Input
+                      value={confirmText}
+                      onChange={(e) => setConfirmText(e.target.value)}
+                      placeholder="DELETE"
+                      autoFocus
+                    />
                   </div>
-                  <Input
-                    value={confirmText}
-                    onChange={(e) => setConfirmText(e.target.value)}
-                    placeholder="DELETE"
-                    autoFocus
-                  />
-                  <div className="flex gap-2">
+
+                  <AlertDialogFooter className="flex-row gap-2 sm:justify-stretch">
                     <Button
                       variant="outline"
-                      size="sm"
                       className="flex-1 rounded-full"
                       onClick={() => { setConfirmOpen(false); setConfirmText(""); }}
                       disabled={deleting}
@@ -303,16 +316,15 @@ function SettingsPage() {
                     </Button>
                     <Button
                       variant="destructive"
-                      size="sm"
                       className="flex-1 rounded-full"
                       onClick={handleDelete}
                       disabled={deleting || confirmText.trim().toUpperCase() !== "DELETE"}
                     >
                       {deleting ? <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> Deleting…</> : "Delete forever"}
                     </Button>
-                  </div>
-                </div>
-              )}
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </section>
