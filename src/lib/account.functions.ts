@@ -7,7 +7,7 @@ export const exportUserData = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
 
     const [profile, swipesOut, swipesIn, matches, blocks, subs, pushSubs] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
+      supabase.rpc("get_my_profile"),
       supabase.from("swipes").select("*").eq("swiper_id", userId),
       supabase.from("swipes").select("*").eq("swipee_id", userId),
       supabase.from("matches").select("*").or(`user_a.eq.${userId},user_b.eq.${userId}`),
