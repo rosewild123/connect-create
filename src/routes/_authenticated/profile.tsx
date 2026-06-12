@@ -105,10 +105,12 @@ function ProfilePage() {
           <BoostCard userId={profile.id} />
           <NotificationsToggle />
           <PromptsEditor userId={profile.id} initial={profile.prompts ?? []} />
-          <VerificationCard
-            ageVerified={profile.age_verified}
-            idVerified={profile.id_verified}
-          />
+          {!(profile.age_verified || profile.id_verified) && (
+            <VerificationCard
+              ageVerified={profile.age_verified}
+              idVerified={profile.id_verified}
+            />
+          )}
 
         </div>
 
