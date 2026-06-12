@@ -190,7 +190,7 @@ function Chat() {
   }
 
   return (
-    <div className="mx-auto flex h-screen max-w-md flex-col">
+    <div className="mx-auto flex h-dvh max-w-md flex-col overflow-hidden">
       <header className="flex items-center gap-3 border-b border-border bg-card/80 px-4 py-3 backdrop-blur">
         <Link to="/matches"><ArrowLeft className="h-5 w-5" /></Link>
         {other?.id ? (
