@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/likes")({
 type LikerProfile = {
   id: string;
   display_name: string | null;
-  date_of_birth: string | null;
+  age: number | null;
   location_city: string | null;
   location_country: string | null;
   niches: string[];
