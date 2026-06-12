@@ -24,7 +24,7 @@ export const exportUserData = createServerFn({ method: "POST" })
     return {
       exported_at: new Date().toISOString(),
       user_id: userId,
-      profile: profile.data,
+      profile: Array.isArray(profile.data) ? profile.data[0] : profile.data,
       swipes_sent: swipesOut.data ?? [],
       swipes_received: swipesIn.data ?? [],
       matches: matches.data ?? [],
