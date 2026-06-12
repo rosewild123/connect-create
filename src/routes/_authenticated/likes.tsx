@@ -53,8 +53,8 @@ function LikesPage() {
     const ids = Array.from(new Set((incoming || []).map((r) => r.swiper_id)))
       .filter((id) => !swipedIds.has(id) && !hiddenSet.has(id));
     if (ids.length === 0) { setLikers([]); setLoading(false); return; }
-    const { data: profs } = await supabase.from("profiles")
-      .select("id, display_name, date_of_birth, location_city, location_country, niches, photos, photo_verified")
+    const { data: profs } = await supabase.from("profiles_public")
+      .select("id, display_name, age, location_city, location_country, niches, photos, photo_verified")
       .in("id", ids);
     const merged = (profs || []).map((p) => ({ ...p, isSuper: superSet.has(p.id) })) as LikerProfile[];
     // Super likes first
