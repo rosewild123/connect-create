@@ -242,7 +242,7 @@ function BoostCard({ userId }: { userId: string }) {
     if (!isPlus) { toast.info("Boosts are a Plus feature."); return; }
     if (remaining <= 0) { toast.info("You've used this month's boost."); return; }
     setActivating(true);
-    const ends = new Date(Date.now() + BOOST_DURATION_MIN * 60_000);
+    
     const { data, error } = await supabase.rpc("activate_boost", { _duration_minutes: BOOST_DURATION_MIN });
     setActivating(false);
     const res = (data ?? {}) as { ok?: boolean; error?: string };
