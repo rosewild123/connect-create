@@ -10,7 +10,6 @@ import { notifyNewMessage } from "@/lib/push.functions";
 import { PresenceIndicator } from "@/components/PresenceIndicator";
 import { scanContent } from "@/lib/contentFilter";
 import { useVerified } from "@/hooks/useVerified";
-import { Link } from "@tanstack/react-router";
 import { ShieldCheck } from "lucide-react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
