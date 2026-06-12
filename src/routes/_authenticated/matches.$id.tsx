@@ -156,6 +156,7 @@ function Chat() {
 
   async function uploadAndInsert(file: Blob, mediaType: "image" | "audio", ext: string, durationMs?: number) {
     if (!me) return;
+    if (verified === false) { toast.error("Verify your identity to send messages."); return; }
     setUploading(true);
     try {
       const path = `${id}/${me}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
