@@ -8,7 +8,7 @@ import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock,
 import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOSTS_PREMIUM_MONTHLY, BOOST_DURATION_MIN } from "@/lib/senda";
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
-import { startIdentityVerification } from "@/lib/verification.functions";
+import { startIdentityVerification, refreshIdentityVerification } from "@/lib/verification.functions";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { PromptsEditor } from "@/components/PromptsEditor";
@@ -35,6 +35,10 @@ function ProfilePage() {
   useEffect(() => { (async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
+    // Sync verification status from Stripe in case the webhook hasn't fired yet
+    try {
+      await refreshIdentityVerification({ data: { environment: getStripeEnvironment() } });
+    } catch { /* ignore */ }
     const { data: rpcData } = await supabase.rpc("get_my_profile");
     const data = Array.isArray(rpcData) ? rpcData[0] : rpcData;
     if (data) {
