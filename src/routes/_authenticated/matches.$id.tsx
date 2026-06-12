@@ -133,6 +133,7 @@ function Chat() {
   async function send(e: React.FormEvent) {
     e.preventDefault();
     if (!draft.trim() || !me) return;
+    if (verified === false) { toast.error("Verify your identity to send messages."); return; }
     const text = draft.trim();
     const scan = scanContent(text);
     if (!scan.clean) {
