@@ -243,11 +243,10 @@ function BoostCard({ userId }: { userId: string }) {
     if (remaining <= 0) { toast.info("You've used this month's boost."); return; }
     setActivating(true);
     const ends = new Date(Date.now() + BOOST_DURATION_MIN * 60_000);
-    const { error } = await supabase.from("boosts").insert({
-      user_id: userId, ends_at: ends.toISOString(), source: "plus_monthly",
-    });
+    const { data, error } = await supabase.rpc("activate_boost", { _duration_minutes: BOOST_DURATION_MIN });
     setActivating(false);
-    if (error) { toast.error(error.message); return; }
+    const res = (data ?? {}) as { ok?: boolean; error?: string };
+    if (error || !res.ok) { toast.error(error?.message || res.error || "Failed"); return; }
     toast.success(`Boosted for ${BOOST_DURATION_MIN} minutes ⚡`);
     refresh();
   }
