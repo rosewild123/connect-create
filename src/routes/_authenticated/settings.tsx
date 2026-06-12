@@ -251,8 +251,8 @@ function SettingsPage() {
             <div className="flex-1">
               <div className="font-semibold">Log out</div>
               <p className="text-xs text-muted-foreground">Sign out of Senda on this device.</p>
-              <Button onClick={handleSignOut} variant="outline" size="sm" className="mt-3 rounded-full">
-                Log out
+              <Button onClick={handleSignOut} size="sm" className="mt-3 rounded-full gap-1.5">
+                <LogOut className="h-3.5 w-3.5" /> Log out
               </Button>
             </div>
           </div>
