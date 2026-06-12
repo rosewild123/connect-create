@@ -56,7 +56,7 @@ function LikesPage() {
     const { data: profs } = await supabase.from("profiles_public")
       .select("id, display_name, age, location_city, location_country, niches, photos, photo_verified")
       .in("id", ids);
-    const merged = (profs || []).map((p) => ({ ...p, isSuper: superSet.has(p.id) })) as LikerProfile[];
+    const merged = (profs || []).filter((p) => p.id).map((p) => ({ ...p, isSuper: superSet.has(p.id!) })) as unknown as LikerProfile[];
     // Super likes first
     merged.sort((a, b) => Number(b.isSuper) - Number(a.isSuper));
     setLikers(merged);
