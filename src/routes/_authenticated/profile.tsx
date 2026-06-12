@@ -173,7 +173,10 @@ function VerificationCard({ ageVerified, idVerified }: { ageVerified: boolean; i
         },
       });
       if ("error" in result) {
-        toast.error(result.error);
+        const friendly = /identity/i.test(result.error) && /not set up|invalid_application|identity_api/i.test(result.error)
+          ? "Verification isn't available yet — we're finishing setup. Please check back soon."
+          : result.error;
+        toast.error(friendly);
         setLoading(false);
         return;
       }
