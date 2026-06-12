@@ -8,6 +8,8 @@ import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { ageFromDob } from "@/lib/senda";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useVerified } from "@/hooks/useVerified";
+import { VerifiedGate } from "@/components/VerifiedGate";
 
 export const Route = createFileRoute("/_authenticated/likes")({
   head: () => ({ meta: [{ title: "Likes you — Senda" }] }),
@@ -32,6 +34,7 @@ function LikesPage() {
   const [likers, setLikers] = useState<LikerProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const { isActive: isPlus, loading: subLoading } = useSubscription(me);
+  const { verified, loading: verifyLoading } = useVerified(me);
 
   useEffect(() => { (async () => {
     const { data: u } = await supabase.auth.getUser();
@@ -90,10 +93,12 @@ function LikesPage() {
       </header>
 
       <div className="px-5">
-        {subLoading || loading ? (
+        {subLoading || loading || verifyLoading ? (
           <div className="grid grid-cols-2 gap-3">
             {[0,1,2,3].map((i) => <div key={i} className="aspect-[3/4] animate-pulse rounded-2xl bg-card" />)}
           </div>
+        ) : verified === false ? (
+          <VerifiedGate />
         ) : !isPlus ? (
           <PlusGate />
         ) : likers.length === 0 ? (

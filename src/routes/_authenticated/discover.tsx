@@ -19,6 +19,8 @@ import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { useHiddenUserIds } from "@/hooks/useBlocks";
 import { notifyPotentialMatch } from "@/lib/push.functions";
 import { PresenceIndicator } from "@/components/PresenceIndicator";
+import { useVerified } from "@/hooks/useVerified";
+import { VerifiedGate } from "@/components/VerifiedGate";
 
 export const Route = createFileRoute("/_authenticated/discover")({
   head: () => ({ meta: [{ title: "Discover — Senda" }] }),
@@ -93,6 +95,7 @@ function Discover() {
   const [boostedIds, setBoostedIds] = useState<Set<string>>(new Set());
   const { isActive: isPlus, isPremium } = useSubscription(me);
   const { hidden, refresh: refreshHidden } = useHiddenUserIds(me);
+  const { verified, loading: verifyLoading } = useVerified(me);
   const superLikeQuota = isPremium ? SUPER_LIKES_PREMIUM_DAILY : isPlus ? SUPER_LIKES_PLUS_DAILY : SUPER_LIKES_FREE_DAILY;
   const superLikesLeft = Math.max(0, superLikeQuota - superLikesUsed);
 
@@ -245,14 +248,15 @@ function Discover() {
 
 
       <div className="px-5">
-        {loading && <SkeletonCard />}
-        {!loading && limitReached && <LimitReached />}
-        {!loading && !limitReached && !current && (
+        {(loading || verifyLoading) && <SkeletonCard />}
+        {!loading && !verifyLoading && verified === false && <VerifiedGate />}
+        {!loading && !verifyLoading && verified && limitReached && <LimitReached />}
+        {!loading && !verifyLoading && verified && !limitReached && !current && (
           activeFilterCount > 0
             ? <EmptyDeck title="No matches with these filters" subtitle="Try loosening your filters to see more creators." onReset={() => { setFilters(DEFAULT_FILTERS); localStorage.removeItem(STORAGE_KEY); }} />
             : <EmptyDeck title="You're all caught up" subtitle="New creators join every day. Check back soon." />
         )}
-        {!limitReached && current && (
+        {!verifyLoading && verified && !limitReached && current && (
           <CardView profile={current} photoIdx={photoIdx} setPhotoIdx={setPhotoIdx} onSwipe={swipe}
             onUndo={lastSwipe ? undo : undefined} isPlus={isPlus} onBlocked={refreshHidden}
             isBoosted={boostedIds.has(current.id)} superLikesLeft={superLikesLeft} />
