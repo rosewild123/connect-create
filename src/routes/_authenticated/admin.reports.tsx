@@ -46,8 +46,8 @@ function AdminReports() {
       if (error) { toast.error("Failed to load reports"); setLoading(false); return; }
       const rep = (data || []) as Report[];
       const ids = Array.from(new Set(rep.flatMap((r) => [r.reporter_id, r.reported_id])));
-      const { data: profs } = await supabase.from("profiles").select("id,display_name").in("id", ids);
-      const map = new Map((profs || []).map((p) => [p.id, p]));
+      const { data: profs } = await supabase.from("profiles_public").select("id,display_name").in("id", ids);
+      const map = new Map((profs || []).filter((p) => p.id).map((p) => [p.id as string, p]));
       setRows(rep.map((r) => ({
         ...r,
         reporter: map.get(r.reporter_id) ?? null,

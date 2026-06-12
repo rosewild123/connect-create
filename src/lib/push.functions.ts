@@ -101,11 +101,8 @@ export const notifyNewMessage = createServerFn({ method: "POST" })
     if (!match) return { sent: 0 };
     const recipient = match.user_a === userId ? match.user_b : match.user_a;
 
-    const { data: sender } = await supabase
-      .from("profiles")
-      .select("display_name")
-      .eq("id", userId)
-      .single();
+    const { data: senderRpc } = await supabase.rpc("get_my_profile");
+    const sender = Array.isArray(senderRpc) ? senderRpc[0] : senderRpc;
 
     return sendToUser({
       toUserId: recipient,
@@ -134,8 +131,10 @@ export const notifyPotentialMatch = createServerFn({ method: "POST" })
     // Only notify if match was just created (within last 10s)
     if (Date.now() - new Date(match.created_at).getTime() > 10_000) return { sent: 0 };
 
-    const { data: me } = await supabase.from("profiles").select("display_name").eq("id", userId).single();
-    const { data: them } = await supabase.from("profiles").select("display_name").eq("id", data.swipeeId).single();
+    const { data: meRpc } = await supabase.rpc("get_my_profile");
+    const me = Array.isArray(meRpc) ? meRpc[0] : meRpc;
+    const { data: themRow } = await supabase.from("profiles_public").select("display_name").eq("id", data.swipeeId).maybeSingle();
+    const them = themRow;
 
     const [r1, r2] = await Promise.all([
       sendToUser({

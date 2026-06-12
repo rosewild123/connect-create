@@ -50,9 +50,9 @@ function Chat() {
     const { data: m, error } = await supabase.from("matches").select("*").eq("id", id).maybeSingle();
     if (error || !m) { toast.error("Match not found"); navigate({ to: "/matches" }); return; }
     const otherId = m.user_a === u.user.id ? m.user_b : m.user_a;
-    const { data: prof } = await supabase.from("profiles").select("id,display_name,photos,photo_verified,last_active_at").eq("id", otherId).maybeSingle();
-    if (prof) {
-      setOther(prof);
+    const { data: prof } = await supabase.from("profiles_public").select("id,display_name,photos,photo_verified,last_active_at").eq("id", otherId).maybeSingle();
+    if (prof && prof.id) {
+      setOther({ id: prof.id, display_name: prof.display_name, photos: prof.photos ?? [], photo_verified: prof.photo_verified ?? undefined, last_active_at: prof.last_active_at });
       if (prof.photos?.[0]) {
         const { data: s } = await supabase.storage.from("profile-photos").createSignedUrl(prof.photos[0], 3600);
         if (s) setPhotoUrl(s.signedUrl);

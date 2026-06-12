@@ -38,11 +38,11 @@ export function useSubscription(userId: string | null | undefined) {
             .limit(1)
             .maybeSingle()
         : Promise.resolve({ data: null });
-      const profPromise = supabase.from("profiles").select("plus_until, premium_until, is_ambassador").eq("id", userId).maybeSingle();
+      const profPromise = supabase.rpc("get_my_profile");
       const [subRes, profRes] = await Promise.all([subPromise, profPromise]);
       if (!active) return;
       setSubscription((subRes.data as SubscriptionRow | null) ?? null);
-      const prof = profRes.data as { plus_until: string | null; premium_until: string | null; is_ambassador: boolean | null } | null;
+      const prof = (Array.isArray(profRes.data) ? profRes.data[0] : profRes.data) as { plus_until: string | null; premium_until: string | null; is_ambassador: boolean | null } | null;
       setPlusUntil(prof?.plus_until ?? null);
       setPremiumUntil(prof?.premium_until ?? null);
       setIsAmbassador(!!prof?.is_ambassador);

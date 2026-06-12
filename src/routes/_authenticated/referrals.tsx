@@ -24,11 +24,12 @@ function ReferralsPage() {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
     const [p, r] = await Promise.all([
-      supabase.from("profiles").select("referral_code, plus_until").eq("id", u.user.id).maybeSingle(),
+      supabase.rpc("get_my_profile"),
       supabase.from("referrals").select("id, referred_user_id, created_at, reward_days").eq("referrer_id", u.user.id).order("created_at", { ascending: false }),
     ]);
-    setCode((p.data?.referral_code as string | null) ?? null);
-    setPlusUntil((p.data?.plus_until as string | null) ?? null);
+    const prof = (Array.isArray(p.data) ? p.data[0] : p.data) as { referral_code: string | null; plus_until: string | null } | null;
+    setCode(prof?.referral_code ?? null);
+    setPlusUntil(prof?.plus_until ?? null);
     setReferrals((r.data as Referral[]) ?? []);
     setLoading(false);
   })(); }, []);

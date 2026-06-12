@@ -35,7 +35,8 @@ function ProfilePage() {
   useEffect(() => { (async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
-    const { data } = await supabase.from("profiles").select("*").eq("id", u.user.id).maybeSingle();
+    const { data: rpcData } = await supabase.rpc("get_my_profile");
+    const data = Array.isArray(rpcData) ? rpcData[0] : rpcData;
     if (data) {
       setProfile(data as unknown as typeof profile);
       if (data.photos?.[0]) {
@@ -241,12 +242,11 @@ function BoostCard({ userId }: { userId: string }) {
     if (!isPlus) { toast.info("Boosts are a Plus feature."); return; }
     if (remaining <= 0) { toast.info("You've used this month's boost."); return; }
     setActivating(true);
-    const ends = new Date(Date.now() + BOOST_DURATION_MIN * 60_000);
-    const { error } = await supabase.from("boosts").insert({
-      user_id: userId, ends_at: ends.toISOString(), source: "plus_monthly",
-    });
+    
+    const { data, error } = await supabase.rpc("activate_boost", { _duration_minutes: BOOST_DURATION_MIN });
     setActivating(false);
-    if (error) { toast.error(error.message); return; }
+    const res = (data ?? {}) as { ok?: boolean; error?: string };
+    if (error || !res.ok) { toast.error(error?.message || res.error || "Failed"); return; }
     toast.success(`Boosted for ${BOOST_DURATION_MIN} minutes ⚡`);
     refresh();
   }

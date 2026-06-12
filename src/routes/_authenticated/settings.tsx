@@ -35,8 +35,9 @@ function SettingsPage() {
     const uid = data.user?.id ?? null;
     setMe(uid);
     if (uid) {
-      const { data: p } = await supabase.from("profiles").select("is_paused").eq("id", uid).maybeSingle();
-      setPaused(!!p?.is_paused);
+      const { data: p } = await supabase.rpc("get_my_profile");
+      const row = Array.isArray(p) ? p[0] : p;
+      setPaused(!!row?.is_paused);
     }
   })(); }, []);
   const { isAdmin } = useIsAdmin(me);

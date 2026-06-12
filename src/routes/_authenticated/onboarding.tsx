@@ -40,7 +40,8 @@ function Onboarding() {
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) return;
       setUserId(data.user.id);
-      const { data: p } = await supabase.from("profiles").select("*").eq("id", data.user.id).maybeSingle();
+      const { data: rpc } = await supabase.rpc("get_my_profile");
+      const p = Array.isArray(rpc) ? rpc[0] : rpc;
       if (p) {
         setDisplayName(p.display_name || "");
         setBio(p.bio || "");

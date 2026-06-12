@@ -36,8 +36,8 @@ function Matches() {
     const { data: matches } = await supabase.from("matches").select("*").order("created_at", { ascending: false });
     if (!matches) { setLoading(false); return; }
     const otherIds = matches.map((m) => m.user_a === u.user!.id ? m.user_b : m.user_a);
-    const { data: profs } = await supabase.from("profiles").select("id,display_name,photos,photo_verified,last_active_at").in("id", otherIds);
-    const profMap = new Map(profs?.map((p) => [p.id, p]));
+    const { data: profs } = await supabase.from("profiles_public").select("id,display_name,photos,photo_verified,last_active_at").in("id", otherIds);
+    const profMap = new Map((profs ?? []).filter((p) => p.id).map((p) => [p.id as string, p]));
 
     const result: MatchRow[] = await Promise.all(matches.map(async (m) => {
       const otherId = m.user_a === u.user!.id ? m.user_b : m.user_a;
