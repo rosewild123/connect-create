@@ -32,6 +32,7 @@ function Chat() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const [me, setMe] = useState<string | null>(null);
+  const { verified } = useVerified(me);
   const [other, setOther] = useState<{ id: string; display_name: string | null; photos: string[]; photo_verified?: boolean; last_active_at?: string | null } | null>(null);
   const [photoUrl, setPhotoUrl] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -229,21 +230,35 @@ function Chat() {
         )}
       </div>
 
-      <form onSubmit={send} className="flex items-center gap-2 border-t border-border bg-card/80 px-3 py-3 backdrop-blur">
-        <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickImage} />
-        <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-accent disabled:opacity-40"
-          aria-label="Send image">
-          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
-        </button>
-        <VoiceRecorder onRecorded={(blob, ms) => uploadAndInsert(blob, "audio", "webm", ms)} disabled={uploading} />
-        <Input value={draft}
-          onChange={(e) => { setDraft(e.target.value); if (e.target.value) broadcastTyping(); }}
-          placeholder="Message..." className="rounded-full" maxLength={2000} />
-        <button type="submit" disabled={!draft.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground disabled:opacity-40">
-          <Send className="h-4 w-4" />
-        </button>
-      </form>
+      {verified === false ? (
+        <div className="flex items-center gap-3 border-t border-border bg-card/80 px-4 py-3 backdrop-blur">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
+            <ShieldCheck className="h-4 w-4" />
+          </div>
+          <div className="min-w-0 flex-1 text-xs text-muted-foreground">
+            Verify your identity to send messages.
+          </div>
+          <Link to="/profile" className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground">
+            Verify
+          </Link>
+        </div>
+      ) : (
+        <form onSubmit={send} className="flex items-center gap-2 border-t border-border bg-card/80 px-3 py-3 backdrop-blur">
+          <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickImage} />
+          <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-accent disabled:opacity-40"
+            aria-label="Send image">
+            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+          </button>
+          <VoiceRecorder onRecorded={(blob, ms) => uploadAndInsert(blob, "audio", "webm", ms)} disabled={uploading} />
+          <Input value={draft}
+            onChange={(e) => { setDraft(e.target.value); if (e.target.value) broadcastTyping(); }}
+            placeholder="Message..." className="rounded-full" maxLength={2000} />
+          <button type="submit" disabled={!draft.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground disabled:opacity-40">
+            <Send className="h-4 w-4" />
+          </button>
+        </form>
+      )}
     </div>
   );
 }
