@@ -35,6 +35,10 @@ function ProfilePage() {
   useEffect(() => { (async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
+    // Sync verification status from Stripe in case the webhook hasn't fired yet
+    try {
+      await refreshIdentityVerification({ data: { environment: getStripeEnvironment() } });
+    } catch { /* ignore */ }
     const { data: rpcData } = await supabase.rpc("get_my_profile");
     const data = Array.isArray(rpcData) ? rpcData[0] : rpcData;
     if (data) {
