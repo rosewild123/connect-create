@@ -26,6 +26,7 @@ import { Route as AuthenticatedLikesRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedBlockedRouteImport } from './routes/_authenticated/blocked'
 import { Route as AuthenticatedMatchesIndexRouteImport } from './routes/_authenticated/matches.index'
+import { Route as AuthenticatedUsersIdRouteImport } from './routes/_authenticated/users.$id'
 import { Route as AuthenticatedMatchesIdRouteImport } from './routes/_authenticated/matches.$id'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminPromoCodesRouteImport } from './routes/_authenticated/admin.promo-codes'
@@ -117,6 +118,11 @@ const AuthenticatedMatchesIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedMatchesRoute,
   } as any)
+const AuthenticatedUsersIdRoute = AuthenticatedUsersIdRouteImport.update({
+  id: '/users/$id',
+  path: '/users/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMatchesIdRoute = AuthenticatedMatchesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
+  '/users/$id': typeof AuthenticatedUsersIdRoute
   '/matches/': typeof AuthenticatedMatchesIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -189,6 +196,7 @@ export interface FileRoutesByTo {
   '/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
+  '/users/$id': typeof AuthenticatedUsersIdRoute
   '/matches': typeof AuthenticatedMatchesIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/matches/$id': typeof AuthenticatedMatchesIdRoute
+  '/_authenticated/users/$id': typeof AuthenticatedUsersIdRoute
   '/_authenticated/matches/': typeof AuthenticatedMatchesIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/admin/promo-codes'
     | '/admin/reports'
     | '/matches/$id'
+    | '/users/$id'
     | '/matches/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -261,6 +271,7 @@ export interface FileRouteTypes {
     | '/admin/promo-codes'
     | '/admin/reports'
     | '/matches/$id'
+    | '/users/$id'
     | '/matches'
     | '/api/public/payments/webhook'
   id:
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/promo-codes'
     | '/_authenticated/admin/reports'
     | '/_authenticated/matches/$id'
+    | '/_authenticated/users/$id'
     | '/_authenticated/matches/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
@@ -419,6 +431,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMatchesIndexRouteImport
       parentRoute: typeof AuthenticatedMatchesRoute
     }
+    '/_authenticated/users/$id': {
+      id: '/_authenticated/users/$id'
+      path: '/users/$id'
+      fullPath: '/users/$id'
+      preLoaderRoute: typeof AuthenticatedUsersIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/matches/$id': {
       id: '/_authenticated/matches/$id'
       path: '/$id'
@@ -485,6 +504,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminAmbassadorsRoute: typeof AuthenticatedAdminAmbassadorsRoute
   AuthenticatedAdminPromoCodesRoute: typeof AuthenticatedAdminPromoCodesRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
+  AuthenticatedUsersIdRoute: typeof AuthenticatedUsersIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -502,6 +522,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminAmbassadorsRoute: AuthenticatedAdminAmbassadorsRoute,
   AuthenticatedAdminPromoCodesRoute: AuthenticatedAdminPromoCodesRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
+  AuthenticatedUsersIdRoute: AuthenticatedUsersIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

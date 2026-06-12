@@ -193,9 +193,15 @@ function Chat() {
     <div className="mx-auto flex h-screen max-w-md flex-col">
       <header className="flex items-center gap-3 border-b border-border bg-card/80 px-4 py-3 backdrop-blur">
         <Link to="/matches"><ArrowLeft className="h-5 w-5" /></Link>
-        <div className="h-9 w-9 overflow-hidden rounded-full bg-muted">
-          {photoUrl && <img src={photoUrl} alt="" className="h-full w-full object-cover" />}
-        </div>
+        {other?.id ? (
+          <Link to="/users/$id" params={{ id: other.id }} className="h-9 w-9 overflow-hidden rounded-full bg-muted">
+            {photoUrl && <img src={photoUrl} alt="" className="h-full w-full object-cover" />}
+          </Link>
+        ) : (
+          <div className="h-9 w-9 overflow-hidden rounded-full bg-muted">
+            {photoUrl && <img src={photoUrl} alt="" className="h-full w-full object-cover" />}
+          </div>
+        )}
         <div className="flex flex-1 flex-col">
           <div className="flex items-center gap-1 font-semibold">{other?.display_name || "Creator"}{other?.photo_verified && <VerifiedBadge className="h-4 w-4" />}</div>
           {otherTyping
