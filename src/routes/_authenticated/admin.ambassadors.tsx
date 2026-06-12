@@ -87,11 +87,7 @@ function AdminAmbassadors() {
 
   const doSearch = async () => {
     if (!search.trim()) { setResults([]); return; }
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, display_name, is_ambassador")
-      .ilike("display_name", `%${search.trim()}%`)
-      .limit(20);
+    const { data, error } = await supabase.rpc("admin_search_profiles", { _query: search.trim() });
     if (error) return toast.error(error.message);
     setResults((data as SearchRow[]) ?? []);
   };
