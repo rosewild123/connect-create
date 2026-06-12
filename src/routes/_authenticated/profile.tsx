@@ -35,7 +35,8 @@ function ProfilePage() {
   useEffect(() => { (async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
-    const { data } = await supabase.from("profiles").select("*").eq("id", u.user.id).maybeSingle();
+    const { data: rpcData } = await supabase.rpc("get_my_profile");
+    const data = Array.isArray(rpcData) ? rpcData[0] : rpcData;
     if (data) {
       setProfile(data as unknown as typeof profile);
       if (data.photos?.[0]) {
