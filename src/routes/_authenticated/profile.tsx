@@ -63,7 +63,7 @@ function ProfilePage() {
     <AppShell>
       <header className="flex items-center justify-between px-5 py-4">
         <h1 className="font-display text-3xl font-bold">Profile</h1>
-        <button onClick={signOut} className="text-muted-foreground hover:text-foreground"><LogOut className="h-5 w-5" /></button>
+        <button onClick={signOut} aria-label="Log out" className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground transition hover:border-primary hover:text-primary"><LogOut className="h-3.5 w-3.5" />Log out</button>
       </header>
 
       <div className="px-5">
