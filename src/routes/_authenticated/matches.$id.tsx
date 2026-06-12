@@ -50,7 +50,7 @@ function Chat() {
     const { data: m, error } = await supabase.from("matches").select("*").eq("id", id).maybeSingle();
     if (error || !m) { toast.error("Match not found"); navigate({ to: "/matches" }); return; }
     const otherId = m.user_a === u.user.id ? m.user_b : m.user_a;
-    const { data: prof } = await supabase.from("profiles").select("id,display_name,photos,photo_verified,last_active_at").eq("id", otherId).maybeSingle();
+    const { data: prof } = await supabase.from("profiles_public").select("id,display_name,photos,photo_verified,last_active_at").eq("id", otherId).maybeSingle();
     if (prof) {
       setOther(prof);
       if (prof.photos?.[0]) {
