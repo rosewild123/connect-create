@@ -130,10 +130,15 @@ function Discover() {
     setAllProfiles((profs || []) as unknown as Profile[]);
 
 
-    const { count: likesCount } = await supabase.from("swipes")
-      .select("id", { count: "exact", head: true })
-      .eq("swipee_id", u.user.id).in("direction", ["like", "super"]);
-    setLikesYouCount(likesCount ?? 0);
+    // Count only likers the user hasn't already swiped on (or blocked), to match the Likes page
+    const { data: incoming } = await supabase.from("swipes")
+      .select("swiper_id").eq("swipee_id", u.user.id).in("direction", ["like", "super"]);
+    const { data: hiddenIds } = await supabase.rpc("get_hidden_user_ids");
+    const hiddenSet = new Set<string>((hiddenIds as unknown as string[]) || []);
+    const pendingLikers = new Set(
+      (incoming || []).map((r) => r.swiper_id).filter((id) => !swiped.has(id) && !hiddenSet.has(id))
+    );
+    setLikesYouCount(pendingLikers.size);
 
     const { data: sl } = await supabase.rpc("super_likes_today");
     setSuperLikesUsed((sl as unknown as number) ?? 0);
