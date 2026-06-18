@@ -133,13 +133,10 @@ function Discover() {
     // Count only likers the user hasn't already swiped on (or blocked), to match the Likes page
     const { data: incoming } = await supabase.from("swipes")
       .select("swiper_id").eq("swipee_id", u.user.id).in("direction", ["like", "super"]);
-    const { data: mine } = await supabase.from("swipes")
-      .select("swipee_id").eq("swiper_id", u.user.id);
     const { data: hiddenIds } = await supabase.rpc("get_hidden_user_ids");
-    const swipedSet = new Set((mine || []).map((r) => r.swipee_id));
     const hiddenSet = new Set<string>((hiddenIds as unknown as string[]) || []);
     const pendingLikers = new Set(
-      (incoming || []).map((r) => r.swiper_id).filter((id) => !swipedSet.has(id) && !hiddenSet.has(id))
+      (incoming || []).map((r) => r.swiper_id).filter((id) => !swiped.has(id) && !hiddenSet.has(id))
     );
     setLikesYouCount(pendingLikers.size);
 
