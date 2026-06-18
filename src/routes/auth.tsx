@@ -14,7 +14,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -37,6 +37,13 @@ function AuthPage() {
         if (error) throw error;
         toast.success("Account created — check your email if confirmation is required.");
         navigate({ to: "/onboarding" });
+      } else if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + "/reset-password",
+        });
+        if (error) throw error;
+        toast.success("Check your email for a reset link.");
+        setMode("signin");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -70,31 +77,46 @@ function AuthPage() {
 
       <div className="w-full max-w-sm rounded-3xl border border-border bg-card/80 p-8 backdrop-blur">
         <h1 className="font-display text-3xl font-bold">
-          {mode === "signin" ? "Welcome back" : "Join Senda"}
+          {mode === "signin" ? "Welcome back" : mode === "forgot" ? "Reset password" : "Join Senda"}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {mode === "signin" ? "Sign in to keep swiping." : "Creators only. 18+."}
+          {mode === "signin" ? "Sign in to keep swiping." : mode === "forgot" ? "We'll send you a reset link." : "Creators only. 18+."}
         </p>
 
-        <Button onClick={handleGoogle} disabled={loading} variant="outline" className="mt-6 w-full rounded-full">
-          Continue with Google
-        </Button>
+        {mode !== "forgot" && (
+          <Button onClick={handleGoogle} disabled={loading} variant="outline" className="mt-6 w-full rounded-full">
+            Continue with Google
+          </Button>
+        )}
 
-        <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-          <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
-        </div>
+        {mode !== "forgot" && (
+          <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
+            <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 rounded-xl" />
           </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 rounded-xl" />
-          </div>
+          {mode !== "forgot" && (
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 rounded-xl" />
+            </div>
+          )}
+          {mode === "signin" && (
+            <button
+              type="button"
+              onClick={() => setMode("forgot")}
+              className="block text-xs text-muted-foreground hover:text-foreground"
+            >
+              Forgot password?
+            </button>
+          )}
           <Button type="submit" disabled={loading} className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-            {loading ? "..." : mode === "signin" ? "Sign in" : "Create account"}
+            {loading ? "..." : mode === "signin" ? "Sign in" : mode === "forgot" ? "Send reset link" : "Create account"}
           </Button>
         </form>
 
@@ -110,7 +132,7 @@ function AuthPage() {
           onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
           className="mt-5 w-full text-center text-sm text-muted-foreground hover:text-foreground"
         >
-          {mode === "signin" ? "New here? Create an account" : "Already have an account? Sign in"}
+          {mode === "signin" ? "New here? Create an account" : mode === "forgot" ? "Back to sign in" : "Already have an account? Sign in"}
         </button>
       </div>
     </main>
