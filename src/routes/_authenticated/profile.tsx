@@ -228,6 +228,8 @@ function BoostCard({ userId }: { userId: string }) {
   const [endsAt, setEndsAt] = useState<Date | null>(null);
   const [activating, setActivating] = useState(false);
   const [, setTick] = useState(0);
+  const [buying, setBuying] = useState(false);
+  const [email, setEmail] = useState<string | undefined>(undefined);
 
   async function refresh() {
     const [b, e] = await Promise.all([
@@ -239,20 +241,39 @@ function BoostCard({ userId }: { userId: string }) {
   }
   useEffect(() => { refresh(); }, [userId]);
   useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? undefined));
+  }, []);
+  useEffect(() => {
     if (!endsAt) return;
     const i = setInterval(() => setTick((n) => n + 1), 1000);
     return () => clearInterval(i);
   }, [endsAt]);
+  // Poll briefly after returning from checkout so the new boost appears.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("boost") !== "success") return;
+    let n = 0;
+    const i = setInterval(() => {
+      refresh();
+      if (++n >= 6) clearInterval(i);
+    }, 1500);
+    // Clean the query param
+    const url = new URL(window.location.href);
+    url.searchParams.delete("boost");
+    window.history.replaceState({}, "", url.toString());
+    toast.success("Boost purchased ⚡");
+    return () => clearInterval(i);
+  }, []);
 
   const active = !!endsAt && endsAt.getTime() > Date.now();
   const quota = isPremium ? BOOSTS_PREMIUM_MONTHLY : BOOSTS_PLUS_MONTHLY;
   const remaining = Math.max(0, quota - used);
 
   async function activate() {
-    if (!isPlus) { toast.info("Boosts are a Plus feature."); return; }
+    if (!isPlus) return;
     if (remaining <= 0) { toast.info("You've used this month's boost."); return; }
     setActivating(true);
-    
     const { data, error } = await supabase.rpc("activate_boost", { _duration_minutes: BOOST_DURATION_MIN });
     setActivating(false);
     const res = (data ?? {}) as { ok?: boolean; error?: string };
@@ -267,6 +288,23 @@ function BoostCard({ userId }: { userId: string }) {
     return `${m}:${sec.toString().padStart(2, "0")}`;
   }
 
+  if (buying) {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-4">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="font-semibold">Buy a Boost · {BOOST_SINGLE_PRICE_LABEL}</div>
+          <button onClick={() => setBuying(false)} className="text-xs text-muted-foreground">Cancel</button>
+        </div>
+        <StripeEmbeddedCheckout
+          priceId={PRICE_BOOST_SINGLE}
+          userId={userId}
+          customerEmail={email}
+          returnUrl={`${window.location.origin}/profile?boost=success`}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={`flex items-start gap-3 rounded-2xl border p-4 ${active ? "border-primary/50 bg-primary/5" : "border-border bg-card"}`}>
       <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
@@ -279,27 +317,37 @@ function BoostCard({ userId }: { userId: string }) {
         <p className="text-xs text-muted-foreground">
           {isPlus
             ? `Move to the front of the deck for ${BOOST_DURATION_MIN} min. ${remaining} of ${quota} left this month.`
-            : "Plus members get 1 boost per month. Upgrade to unlock."}
+            : `Move to the front of the deck for ${BOOST_DURATION_MIN} min. Buy one for ${BOOST_SINGLE_PRICE_LABEL} or get free monthly boosts with Plus.`}
         </p>
-        {isPlus ? (
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {isPlus && (
+            <button
+              onClick={activate}
+              disabled={activating || active || remaining <= 0}
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
+            >
+              {active
+                ? <>Boost active · {endsAt && fmt(endsAt)}</>
+                : remaining <= 0
+                  ? "No boosts left this month"
+                  : activating
+                    ? <><Loader2 className="h-3 w-3 animate-spin" /> Activating…</>
+                    : <><Zap className="h-3 w-3" /> Boost now</>}
+            </button>
+          )}
           <button
-            onClick={activate}
-            disabled={activating || active || remaining <= 0}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
+            onClick={() => setBuying(true)}
+            disabled={active}
+            className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {active
-              ? <>Boost active · {endsAt && fmt(endsAt)}</>
-              : remaining <= 0
-                ? "No boosts left this month"
-                : activating
-                  ? <><Loader2 className="h-3 w-3 animate-spin" /> Activating…</>
-                  : <><Zap className="h-3 w-3" /> Boost now</>}
+            <Zap className="h-3 w-3" /> Buy boost · {BOOST_SINGLE_PRICE_LABEL}
           </button>
-        ) : (
-          <Link to="/upgrade" className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">
-            <Lock className="h-3 w-3" /> Unlock with Plus →
-          </Link>
-        )}
+          {!isPlus && (
+            <Link to="/upgrade" className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+              <Lock className="h-3 w-3" /> Or get Plus
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );
