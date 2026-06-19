@@ -30,6 +30,8 @@ export const BOOST_DURATION_MIN = 30;
 
 export const PRICE_PLUS = "senda_plus_monthly_gbp";
 export const PRICE_PREMIUM = "senda_premium_monthly_gbp";
+export const PRICE_BOOST_SINGLE = "senda_boost_single_gbp";
+export const BOOST_SINGLE_PRICE_LABEL = "£2.99";
 
 export type Tier = "free" | "plus" | "premium";
 
