@@ -137,6 +137,7 @@ async function upsertSubscription(
   if (error) {
     console.error("Failed to upsert subscription", error);
     throw error;
+  }
 }
 
 async function handleOneOffPayment(
@@ -165,5 +166,4 @@ async function handleOneOffPayment(
       }
     }
   }
-}
 }
