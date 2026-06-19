@@ -42,6 +42,8 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
                 const subId = typeof session.subscription === "string" ? session.subscription : session.subscription.id;
                 const sub = await stripe.subscriptions.retrieve(subId);
                 await upsertSubscription(stripe, supabaseAdmin, sub, env);
+              } else if (session.mode === "payment") {
+                await handleOneOffPayment(stripe, supabaseAdmin, session);
               }
               break;
             }
