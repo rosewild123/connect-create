@@ -42,6 +42,8 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
                 const subId = typeof session.subscription === "string" ? session.subscription : session.subscription.id;
                 const sub = await stripe.subscriptions.retrieve(subId);
                 await upsertSubscription(stripe, supabaseAdmin, sub, env);
+              } else if (session.mode === "payment") {
+                await handleOneOffPayment(stripe, supabaseAdmin, session);
               }
               break;
             }
@@ -135,5 +137,33 @@ async function upsertSubscription(
   if (error) {
     console.error("Failed to upsert subscription", error);
     throw error;
+  }
+}
+
+async function handleOneOffPayment(
+  stripe: Stripe,
+  supabaseAdmin: import("@supabase/supabase-js").SupabaseClient,
+  session: Stripe.Checkout.Session,
+) {
+  const userId = session.metadata?.userId as string | undefined;
+  if (!userId) {
+    console.warn("One-off checkout session has no userId metadata", session.id);
+    return;
+  }
+  const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 10, expand: ["data.price"] });
+  for (const item of items.data) {
+    const price = item.price;
+    const lookup = (price?.lookup_key as string | undefined) ?? price?.id;
+    if (lookup === "senda_boost_single_gbp") {
+      const durationMin = 30;
+      const endsAt = new Date(Date.now() + durationMin * 60_000).toISOString();
+      const { error } = await supabaseAdmin
+        .from("boosts")
+        .insert({ user_id: userId, ends_at: endsAt, source: "one_off_purchase" });
+      if (error) {
+        console.error("Failed to insert one-off boost", error);
+        throw error;
+      }
+    }
   }
 }
