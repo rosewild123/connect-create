@@ -13,14 +13,15 @@ export function useVerified(userId: string | null) {
       return;
     }
     setLoading(true);
+    // Use SECURITY DEFINER RPC so we can read sensitive own-profile columns
+    // (id_verified, age_verified) without relying on column-level grants.
     supabase
-      .from("profiles")
-      .select("id_verified, age_verified")
-      .eq("id", userId)
+      .rpc("get_my_profile")
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled) return;
-        setVerified(Boolean(data?.id_verified && data?.age_verified !== false));
+        const row = data as { id_verified?: boolean | null; age_verified?: boolean | null } | null;
+        setVerified(Boolean(row?.id_verified && row?.age_verified !== false));
         setLoading(false);
       });
     return () => { cancelled = true; };
