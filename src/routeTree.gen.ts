@@ -31,6 +31,7 @@ import { Route as AuthenticatedUsersIdRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMatchesIdRouteImport } from './routes/_authenticated/matches.$id'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminPromoCodesRouteImport } from './routes/_authenticated/admin.promo-codes'
+import { Route as AuthenticatedAdminMessagingRouteImport } from './routes/_authenticated/admin.messaging'
 import { Route as AuthenticatedAdminAmbassadorsRouteImport } from './routes/_authenticated/admin.ambassadors'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
@@ -146,6 +147,12 @@ const AuthenticatedAdminPromoCodesRoute =
     path: '/admin/promo-codes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminMessagingRoute =
+  AuthenticatedAdminMessagingRouteImport.update({
+    id: '/admin/messaging',
+    path: '/admin/messaging',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminAmbassadorsRoute =
   AuthenticatedAdminAmbassadorsRouteImport.update({
     id: '/admin/ambassadors',
@@ -177,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
   '/admin/ambassadors': typeof AuthenticatedAdminAmbassadorsRoute
+  '/admin/messaging': typeof AuthenticatedAdminMessagingRoute
   '/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
@@ -201,6 +209,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
   '/admin/ambassadors': typeof AuthenticatedAdminAmbassadorsRoute
+  '/admin/messaging': typeof AuthenticatedAdminMessagingRoute
   '/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
@@ -228,6 +237,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/upgrade': typeof AuthenticatedUpgradeRoute
   '/_authenticated/admin/ambassadors': typeof AuthenticatedAdminAmbassadorsRoute
+  '/_authenticated/admin/messaging': typeof AuthenticatedAdminMessagingRoute
   '/_authenticated/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/matches/$id': typeof AuthenticatedMatchesIdRoute
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/upgrade'
     | '/admin/ambassadors'
+    | '/admin/messaging'
     | '/admin/promo-codes'
     | '/admin/reports'
     | '/matches/$id'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/upgrade'
     | '/admin/ambassadors'
+    | '/admin/messaging'
     | '/admin/promo-codes'
     | '/admin/reports'
     | '/matches/$id'
@@ -305,6 +317,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/upgrade'
     | '/_authenticated/admin/ambassadors'
+    | '/_authenticated/admin/messaging'
     | '/_authenticated/admin/promo-codes'
     | '/_authenticated/admin/reports'
     | '/_authenticated/matches/$id'
@@ -479,6 +492,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPromoCodesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/messaging': {
+      id: '/_authenticated/admin/messaging'
+      path: '/admin/messaging'
+      fullPath: '/admin/messaging'
+      preLoaderRoute: typeof AuthenticatedAdminMessagingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/ambassadors': {
       id: '/_authenticated/admin/ambassadors'
       path: '/admin/ambassadors'
@@ -522,6 +542,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedUpgradeRoute: typeof AuthenticatedUpgradeRoute
   AuthenticatedAdminAmbassadorsRoute: typeof AuthenticatedAdminAmbassadorsRoute
+  AuthenticatedAdminMessagingRoute: typeof AuthenticatedAdminMessagingRoute
   AuthenticatedAdminPromoCodesRoute: typeof AuthenticatedAdminPromoCodesRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedUsersIdRoute: typeof AuthenticatedUsersIdRoute
@@ -540,6 +561,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedUpgradeRoute: AuthenticatedUpgradeRoute,
   AuthenticatedAdminAmbassadorsRoute: AuthenticatedAdminAmbassadorsRoute,
+  AuthenticatedAdminMessagingRoute: AuthenticatedAdminMessagingRoute,
   AuthenticatedAdminPromoCodesRoute: AuthenticatedAdminPromoCodesRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedUsersIdRoute: AuthenticatedUsersIdRoute,
