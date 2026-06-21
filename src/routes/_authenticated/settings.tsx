@@ -185,6 +185,17 @@ function SettingsPage() {
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </Link>
+            <div className="h-px bg-primary/20" />
+            <Link to="/admin/messaging" className="flex items-center gap-3 p-4 transition hover:bg-primary/10">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
+                <Gavel className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold">Messaging stats</div>
+                <p className="text-xs text-muted-foreground">Aggregate activity — no message content.</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
           </section>
         )}
 
