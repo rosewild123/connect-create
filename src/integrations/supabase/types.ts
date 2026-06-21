@@ -602,6 +602,7 @@ export type Database = {
     Functions: {
       activate_boost: { Args: { _duration_minutes?: number }; Returns: Json }
       active_boost_ends_at: { Args: { _user_id: string }; Returns: string }
+      admin_messaging_stats: { Args: { _days?: number }; Returns: Json }
       admin_search_profiles: {
         Args: { _query: string }
         Returns: {
