@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Authenticated can read safe columns of active profiles" ON public.profiles;
