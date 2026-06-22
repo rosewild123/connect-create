@@ -536,7 +536,6 @@ export type Database = {
           display_name: string | null
           experience_years: number | null
           id: string | null
-          id_verified: boolean | null
           is_onboarded: boolean | null
           last_active_at: string | null
           location_city: string | null
@@ -548,53 +547,8 @@ export type Database = {
           photos: string[] | null
           platforms: Json | null
           prompts: Json | null
+          updated_at: string | null
           willing_to_travel: boolean | null
-        }
-        Insert: {
-          age?: never
-          age_verified?: boolean | null
-          bio?: string | null
-          completed_collabs?: number | null
-          created_at?: string | null
-          display_name?: string | null
-          experience_years?: number | null
-          id?: string | null
-          id_verified?: boolean | null
-          is_onboarded?: boolean | null
-          last_active_at?: string | null
-          location_city?: string | null
-          location_country?: string | null
-          looking_for?: string[] | null
-          niches?: string[] | null
-          photo_verified?: boolean | null
-          photo_verified_at?: string | null
-          photos?: string[] | null
-          platforms?: Json | null
-          prompts?: Json | null
-          willing_to_travel?: boolean | null
-        }
-        Update: {
-          age?: never
-          age_verified?: boolean | null
-          bio?: string | null
-          completed_collabs?: number | null
-          created_at?: string | null
-          display_name?: string | null
-          experience_years?: number | null
-          id?: string | null
-          id_verified?: boolean | null
-          is_onboarded?: boolean | null
-          last_active_at?: string | null
-          location_city?: string | null
-          location_country?: string | null
-          looking_for?: string[] | null
-          niches?: string[] | null
-          photo_verified?: boolean | null
-          photo_verified_at?: string | null
-          photos?: string[] | null
-          platforms?: Json | null
-          prompts?: Json | null
-          willing_to_travel?: boolean | null
         }
         Relationships: []
       }
@@ -653,6 +607,32 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      get_public_profiles: {
+        Args: never
+        Returns: {
+          age: number
+          age_verified: boolean
+          bio: string
+          completed_collabs: number
+          created_at: string
+          display_name: string
+          experience_years: number
+          id: string
+          is_onboarded: boolean
+          last_active_at: string
+          location_city: string
+          location_country: string
+          looking_for: string[]
+          niches: string[]
+          photo_verified: boolean
+          photo_verified_at: string
+          photos: string[]
+          platforms: Json
+          prompts: Json
+          updated_at: string
+          willing_to_travel: boolean
+        }[]
       }
       has_active_subscription: {
         Args: { _environment: string; _user_id: string }
