@@ -83,7 +83,10 @@ function UserProfilePage() {
     <AppShell>
       <div className="px-5 py-4">
         <button
-          onClick={() => navigate({ to: ".." })}
+          onClick={() => {
+            if (window.history.length > 1) window.history.back();
+            else navigate({ to: "/discover" });
+          }}
           className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
