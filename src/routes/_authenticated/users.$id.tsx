@@ -6,6 +6,7 @@ import { ArrowLeft, MapPin, Sparkles, Flame } from "lucide-react";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { PresenceIndicator } from "@/components/PresenceIndicator";
 import type { Platform } from "@/lib/senda";
+import { ProtectedPhoto } from "@/components/ProtectedPhoto";
 
 export const Route = createFileRoute("/_authenticated/users/$id")({
   head: () => ({ meta: [{ title: "Profile — Senda" }] }),
