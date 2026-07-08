@@ -22,6 +22,7 @@ import { PresenceIndicator } from "@/components/PresenceIndicator";
 import { useVerified } from "@/hooks/useVerified";
 import { VerifiedGate } from "@/components/VerifiedGate";
 import { ProtectedPhoto } from "@/components/ProtectedPhoto";
+import { useProfilePhotoUrls } from "@/hooks/useProfilePhotoUrls";
 
 export const Route = createFileRoute("/_authenticated/discover")({
   head: () => ({ meta: [{ title: "Discover — Senda" }] }),
@@ -419,16 +420,7 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onB
   onSwipe: (d: "like" | "pass" | "super") => void; onUndo?: () => void; isPlus: boolean;
   onBlocked?: () => void; isBoosted?: boolean; superLikesLeft: number;
 }) {
-  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
-  useEffect(() => {
-    (async () => {
-      if (!profile.photos.length) { setPhotoUrls([]); return; }
-      const results = await Promise.all(profile.photos.map((p) =>
-        supabase.storage.from("profile-photos").createSignedUrl(p, 3600)
-      ));
-      setPhotoUrls(results.map((r) => r.data?.signedUrl || ""));
-    })();
-  }, [profile.id]);
+  const photoUrls = useProfilePhotoUrls(profile.photos);
 
   const age = profile.age;
   const loc = [profile.location_city, profile.location_country].filter(Boolean).join(", ");

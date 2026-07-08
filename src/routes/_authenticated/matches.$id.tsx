@@ -12,6 +12,7 @@ import { scanContent } from "@/lib/contentFilter";
 import { useVerified } from "@/hooks/useVerified";
 import { ShieldCheck } from "lucide-react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
+import { useProfilePhotoUrl } from "@/hooks/useProfilePhotoUrls";
 
 export const Route = createFileRoute("/_authenticated/matches/$id")({
   head: () => ({ meta: [{ title: "Chat — Senda" }] }),
@@ -34,7 +35,6 @@ function Chat() {
   const [me, setMe] = useState<string | null>(null);
   const { verified } = useVerified(me);
   const [other, setOther] = useState<{ id: string; display_name: string | null; photos: string[]; photo_verified?: boolean; last_active_at?: string | null } | null>(null);
-  const [photoUrl, setPhotoUrl] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -45,6 +45,7 @@ function Chat() {
   const typingChannelRef = useRef<RealtimeChannel | null>(null);
   const typingClearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastTypingSentRef = useRef<number>(0);
+  const photoUrl = useProfilePhotoUrl(other?.photos?.[0]);
 
   useEffect(() => { (async () => {
     const { data: u } = await supabase.auth.getUser();
@@ -56,10 +57,6 @@ function Chat() {
     const { data: prof } = await supabase.from("profiles_public").select("id,display_name,photos,photo_verified,last_active_at").eq("id", otherId).maybeSingle();
     if (prof && prof.id) {
       setOther({ id: prof.id, display_name: prof.display_name, photos: prof.photos ?? [], photo_verified: prof.photo_verified ?? undefined, last_active_at: prof.last_active_at });
-      if (prof.photos?.[0]) {
-        const { data: s } = await supabase.storage.from("profile-photos").createSignedUrl(prof.photos[0], 3600);
-        if (s) setPhotoUrl(s.signedUrl);
-      }
     }
     const { data: msgs } = await supabase.from("messages").select("*").eq("match_id", id).order("created_at");
     setMessages((msgs || []) as Message[]);

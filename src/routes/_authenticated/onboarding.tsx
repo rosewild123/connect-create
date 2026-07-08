@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { NICHES, PLATFORMS, LOOKING_FOR, type Platform } from "@/lib/senda";
 import { X, Plus, Upload } from "lucide-react";
 import { scanContent } from "@/lib/contentFilter";
+import { useProfilePhotoUrl } from "@/hooks/useProfilePhotoUrls";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({ meta: [{ title: "Set up your profile — Senda" }] }),
@@ -283,12 +284,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
 }
 
 function PhotoTile({ path, onRemove }: { path: string; onRemove: () => void }) {
-  const [url, setUrl] = useState<string>("");
-  useEffect(() => {
-    supabase.storage.from("profile-photos").createSignedUrl(path, 3600).then(({ data }) => {
-      if (data) setUrl(data.signedUrl);
-    });
-  }, [path]);
+  const url = useProfilePhotoUrl(path);
   return (
     <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-muted">
       {url && <img src={url} alt="" className="h-full w-full object-cover" />}

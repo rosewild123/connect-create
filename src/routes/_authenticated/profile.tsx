@@ -15,6 +15,7 @@ import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { PromptsEditor } from "@/components/PromptsEditor";
 import type { Prompt } from "@/lib/prompts";
 import { getStripeEnvironment } from "@/lib/stripe";
+import { useProfilePhotoUrls } from "@/hooks/useProfilePhotoUrls";
 
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -31,10 +32,9 @@ function ProfilePage() {
     age_verified: boolean; id_verified: boolean; photo_verified: boolean; experience_years: number | null; completed_collabs: number;
     prompts: Prompt[];
   } | null>(null);
-  const [photoUrl, setPhotoUrl] = useState("");
+  const photoUrl = useProfilePhotoUrls(profile?.photos)[0] ?? "";
 
   useEffect(() => {
-    let revoke: string | null = null;
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
@@ -46,30 +46,7 @@ function ProfilePage() {
       const data = Array.isArray(rpcData) ? rpcData[0] : rpcData;
       if (!data) return;
       setProfile(data as unknown as typeof profile);
-      const first = data.photos?.[0];
-      if (!first) return;
-      if (/^https?:\/\//i.test(first)) {
-        setPhotoUrl(first);
-        return;
-      }
-      // Try signed URL first
-      const { data: s, error } = await supabase.storage.from("profile-photos").createSignedUrl(first, 3600);
-      if (s?.signedUrl) {
-        setPhotoUrl(s.signedUrl);
-        return;
-      }
-      if (error) console.error("[profile] signed URL failed", error, "path=", first);
-      // Fallback: download as blob (works even when signed URL is blocked on mobile)
-      const dl = await supabase.storage.from("profile-photos").download(first);
-      if (dl.data) {
-        const url = URL.createObjectURL(dl.data);
-        revoke = url;
-        setPhotoUrl(url);
-      } else if (dl.error) {
-        console.error("[profile] download failed", dl.error, "path=", first);
-      }
     })();
-    return () => { if (revoke) URL.revokeObjectURL(revoke); };
   }, []);
 
 
