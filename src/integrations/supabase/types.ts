@@ -567,6 +567,7 @@ export type Database = {
       }
       boosted_user_ids: { Args: never; Returns: string[] }
       boosts_this_month: { Args: never; Returns: number }
+      can_view_profile_photo: { Args: { _owner_id: string }; Returns: boolean }
       claim_referral: { Args: { _code: string }; Returns: Json }
       gen_referral_code: { Args: never; Returns: string }
       get_hidden_user_ids: { Args: never; Returns: string[] }
