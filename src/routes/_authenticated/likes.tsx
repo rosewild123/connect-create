@@ -131,7 +131,7 @@ function LikerCard({ profile, onAct }: { profile: LikerProfile; onAct: (id: stri
   return (
     <div className="swipe-card-shadow relative aspect-[3/4] overflow-hidden rounded-2xl bg-muted">
       {url ? (
-        <img src={url} alt={profile.display_name || ""} className="h-full w-full object-cover" />
+        <ProtectedPhoto src={url} alt={profile.display_name || ""} />
       ) : (
         <div className="grid h-full place-items-center text-xs text-muted-foreground">No photo</div>
       )}
