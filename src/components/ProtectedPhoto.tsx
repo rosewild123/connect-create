@@ -1,12 +1,10 @@
-import { useEffect, useState, type ImgHTMLAttributes } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { type ImgHTMLAttributes } from "react";
 
 /**
  * Displays a profile photo with anti-screenshot deterrents:
  * - Disables right-click / long-press save / drag
  * - Blocks text/image selection
- * - Overlays a repeating diagonal watermark of the viewer's short ID so
- *   any screenshot that leaks can be traced back to the account that took it.
+ * - Overlays a repeating diagonal "SENDA" watermark.
  *
  * Note: no web tech can truly prevent OS-level screenshots. This is a strong
  * deterrent + attribution layer, which is the industry standard approach.
@@ -23,16 +21,8 @@ export function ProtectedPhoto({
   className?: string;
   imgClassName?: string;
 } & Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt" | "className">) {
-  const [tag, setTag] = useState<string>("SENDA");
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      const id = data.user?.id;
-      const email = data.user?.email;
-      const short = id ? id.slice(0, 8) : "";
-      const handle = email ? email.split("@")[0] : "";
-      setTag(`SENDA · ${handle || short}`.toUpperCase());
-    });
-  }, []);
+  const tag = "SENDA";
+
 
   if (!src) return null;
 
@@ -53,7 +43,7 @@ export function ProtectedPhoto({
         className={`absolute inset-0 h-full w-full object-cover ${imgClassName ?? ""}`}
         {...rest}
       />
-      {/* Tiled diagonal watermark — traceable to the viewing account */}
+      {/* Tiled diagonal watermark */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 select-none overflow-hidden"
