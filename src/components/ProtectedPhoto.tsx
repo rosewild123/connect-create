@@ -37,7 +37,7 @@ export function ProtectedPhoto({
   if (!src) return null;
 
   return (
-    <div className={`relative h-full w-full ${className ?? ""}`}>
+    <div className={`absolute inset-0 ${className ?? ""}`}>
       <img
         src={src}
         alt={alt ?? ""}
@@ -50,7 +50,7 @@ export function ProtectedPhoto({
           WebkitTouchCallout: "none",
           pointerEvents: "none",
         }}
-        className={`h-full w-full object-cover ${imgClassName ?? ""}`}
+        className={`absolute inset-0 h-full w-full object-cover ${imgClassName ?? ""}`}
         {...rest}
       />
       {/* Tiled diagonal watermark — traceable to the viewing account */}
