@@ -43,7 +43,7 @@ export function ProtectedPhoto({
         className={`absolute inset-0 h-full w-full object-cover ${imgClassName ?? ""}`}
         {...rest}
       />
-      {/* Tiled diagonal watermark — traceable to the viewing account */}
+      {/* Tiled diagonal watermark */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 select-none overflow-hidden"
