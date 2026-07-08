@@ -53,20 +53,6 @@ export function ProtectedPhoto({
         className={`absolute inset-0 h-full w-full object-cover ${imgClassName ?? ""}`}
         {...rest}
       />
-        src={src}
-        alt={alt ?? ""}
-        draggable={false}
-        onContextMenu={(e) => e.preventDefault()}
-        onDragStart={(e) => e.preventDefault()}
-        style={{
-          userSelect: "none",
-          WebkitUserSelect: "none",
-          WebkitTouchCallout: "none",
-          pointerEvents: "none",
-        }}
-        className={`h-full w-full object-cover ${imgClassName ?? ""}`}
-        {...rest}
-      />
       {/* Tiled diagonal watermark — traceable to the viewing account */}
       <div
         aria-hidden
