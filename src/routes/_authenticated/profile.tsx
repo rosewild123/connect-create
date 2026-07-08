@@ -44,9 +44,15 @@ function ProfilePage() {
     const data = Array.isArray(rpcData) ? rpcData[0] : rpcData;
     if (data) {
       setProfile(data as unknown as typeof profile);
-      if (data.photos?.[0]) {
-        const { data: s } = await supabase.storage.from("profile-photos").createSignedUrl(data.photos[0], 3600);
-        if (s) setPhotoUrl(s.signedUrl);
+      const first = data.photos?.[0];
+      if (first) {
+        if (/^https?:\/\//i.test(first)) {
+          setPhotoUrl(first);
+        } else {
+          const { data: s, error } = await supabase.storage.from("profile-photos").createSignedUrl(first, 3600);
+          if (error) console.error("[profile] signed URL failed", error, "path=", first);
+          if (s) setPhotoUrl(s.signedUrl);
+        }
       }
     }
   })(); }, []);
