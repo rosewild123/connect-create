@@ -1,6 +1,7 @@
 export const NICHES = [
   "Cosplay", "Fitness", "Glamour", "BDSM", "Dom", "Sub", "Feet", "Latina", "Asian", "Ebony",
   "Goth/Alt", "MILF", "Trans", "Couple", "Solo", "Fetish", "Roleplay", "ASMR",
+  "Photographer", "Videographer",
 ];
 
 export const PLATFORMS = ["OnlyFans", "Fansly", "ManyVids", "Pornhub", "Clips4Sale", "LoyalFans", "JustForFans", "Other"];
@@ -10,6 +11,8 @@ export const LOOKING_FOR = [
   { id: "promos", label: "Cross-promos / shoutouts" },
   { id: "friendship", label: "Friendship in the industry" },
   { id: "mentorship", label: "Mentorship" },
+  { id: "photographer", label: "Photographer / videographer to film content" },
+  { id: "offering_filming", label: "I offer photo / video filming" },
 ];
 
 export function ageFromDob(dob: string | null | undefined): number | null {
