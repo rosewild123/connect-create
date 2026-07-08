@@ -21,6 +21,7 @@ import { notifyPotentialMatch } from "@/lib/push.functions";
 import { PresenceIndicator } from "@/components/PresenceIndicator";
 import { useVerified } from "@/hooks/useVerified";
 import { VerifiedGate } from "@/components/VerifiedGate";
+import { ProtectedPhoto } from "@/components/ProtectedPhoto";
 
 export const Route = createFileRoute("/_authenticated/discover")({
   head: () => ({ meta: [{ title: "Discover — Senda" }] }),
