@@ -37,8 +37,22 @@ export function ProtectedPhoto({
   if (!src) return null;
 
   return (
-    <div className={`relative h-full w-full ${className ?? ""}`}>
+    <div className={`absolute inset-0 ${className ?? ""}`}>
       <img
+        src={src}
+        alt={alt ?? ""}
+        draggable={false}
+        onContextMenu={(e) => e.preventDefault()}
+        onDragStart={(e) => e.preventDefault()}
+        style={{
+          userSelect: "none",
+          WebkitUserSelect: "none",
+          WebkitTouchCallout: "none",
+          pointerEvents: "none",
+        }}
+        className={`absolute inset-0 h-full w-full object-cover ${imgClassName ?? ""}`}
+        {...rest}
+      />
         src={src}
         alt={alt ?? ""}
         draggable={false}
