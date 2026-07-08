@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useVerified } from "@/hooks/useVerified";
 import { VerifiedGate } from "@/components/VerifiedGate";
+import { ProtectedPhoto } from "@/components/ProtectedPhoto";
 
 export const Route = createFileRoute("/_authenticated/likes")({
   head: () => ({ meta: [{ title: "Likes you — Senda" }] }),
