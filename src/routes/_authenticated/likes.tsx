@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useVerified } from "@/hooks/useVerified";
 import { VerifiedGate } from "@/components/VerifiedGate";
 import { ProtectedPhoto } from "@/components/ProtectedPhoto";
+import { useProfilePhotoUrl } from "@/hooks/useProfilePhotoUrls";
 
 export const Route = createFileRoute("/_authenticated/likes")({
   head: () => ({ meta: [{ title: "Likes you — Senda" }] }),
@@ -119,12 +120,7 @@ function LikesPage() {
 }
 
 function LikerCard({ profile, onAct }: { profile: LikerProfile; onAct: (id: string, d: "like" | "pass") => void }) {
-  const [url, setUrl] = useState<string>("");
-  useEffect(() => { (async () => {
-    if (!profile.photos[0]) return;
-    const { data } = await supabase.storage.from("profile-photos").createSignedUrl(profile.photos[0], 3600);
-    setUrl(data?.signedUrl || "");
-  })(); }, [profile.id]);
+  const url = useProfilePhotoUrl(profile.photos[0]);
 
   const age = profile.age;
   const loc = [profile.location_city, profile.location_country].filter(Boolean).join(", ");

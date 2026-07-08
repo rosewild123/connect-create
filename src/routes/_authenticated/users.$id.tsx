@@ -7,6 +7,7 @@ import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { PresenceIndicator } from "@/components/PresenceIndicator";
 import type { Platform } from "@/lib/senda";
 import { ProtectedPhoto } from "@/components/ProtectedPhoto";
+import { useProfilePhotoUrls } from "@/hooks/useProfilePhotoUrls";
 
 export const Route = createFileRoute("/_authenticated/users/$id")({
   head: () => ({ meta: [{ title: "Profile — Senda" }] }),
@@ -36,9 +37,9 @@ function UserProfilePage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [photoIdx, setPhotoIdx] = useState(0);
   const [loading, setLoading] = useState(true);
+  const photoUrls = useProfilePhotoUrls(profile?.photos);
 
   useEffect(() => {
     (async () => {
@@ -53,15 +54,6 @@ function UserProfilePage() {
         return;
       }
       setProfile(data as unknown as Profile);
-      const p = data as unknown as Profile;
-      if (p.photos?.length) {
-        const results = await Promise.all(
-          p.photos.map((path) =>
-            supabase.storage.from("profile-photos").createSignedUrl(path, 3600)
-          )
-        );
-        setPhotoUrls(results.map((r) => r.data?.signedUrl || ""));
-      }
       setLoading(false);
     })();
   }, [id]);

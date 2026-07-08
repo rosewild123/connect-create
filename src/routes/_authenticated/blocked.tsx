@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { ArrowLeft, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useProfilePhotoUrl } from "@/hooks/useProfilePhotoUrls";
 
 export const Route = createFileRoute("/_authenticated/blocked")({
   head: () => ({ meta: [{ title: "Blocked users — Senda" }] }),
@@ -21,7 +22,6 @@ type Row = {
 function BlockedPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
-  const [photoMap, setPhotoMap] = useState<Record<string, string>>({});
 
   async function load() {
     setLoading(true);
@@ -41,16 +41,6 @@ function BlockedPage() {
       profile: (map.get(b.blocked_id) as Row["profile"]) || null,
     }));
     setRows(merged);
-
-    const urls: Record<string, string> = {};
-    await Promise.all(merged.map(async (r) => {
-      const p = r.profile?.photos?.[0];
-      if (p) {
-        const { data } = await supabase.storage.from("profile-photos").createSignedUrl(p, 3600);
-        if (data) urls[r.blocked_id] = data.signedUrl;
-      }
-    }));
-    setPhotoMap(urls);
     setLoading(false);
   }
 
@@ -87,9 +77,7 @@ function BlockedPage() {
         <ul className="space-y-2">
           {rows.map((r) => (
             <li key={r.id} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
-              <div className="h-12 w-12 overflow-hidden rounded-full bg-muted">
-                {photoMap[r.blocked_id] && <img src={photoMap[r.blocked_id]} alt="" className="h-full w-full object-cover" />}
-              </div>
+              <BlockedAvatar photo={r.profile?.photos?.[0]} />
               <div className="min-w-0 flex-1">
                 <div className="font-semibold">{r.profile?.display_name || "Creator"}</div>
                 <div className="text-xs text-muted-foreground">Blocked {new Date(r.created_at).toLocaleDateString()}</div>
@@ -102,5 +90,14 @@ function BlockedPage() {
         </ul>
       </div>
     </AppShell>
+  );
+}
+
+function BlockedAvatar({ photo }: { photo?: string }) {
+  const url = useProfilePhotoUrl(photo);
+  return (
+    <div className="h-12 w-12 overflow-hidden rounded-full bg-muted">
+      {url && <img src={url} alt="" className="h-full w-full object-cover" />}
+    </div>
   );
 }

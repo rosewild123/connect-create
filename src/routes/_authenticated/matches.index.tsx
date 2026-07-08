@@ -7,6 +7,7 @@ import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { PresenceIndicator } from "@/components/PresenceIndicator";
 import { useHiddenUserIds } from "@/hooks/useBlocks";
 import { useUnreadMatches } from "@/hooks/useUnreadMatches";
+import { useProfilePhotoUrl } from "@/hooks/useProfilePhotoUrls";
 
 export const Route = createFileRoute("/_authenticated/matches/")({
   head: () => ({ meta: [{ title: "Matches — Senda" }] }),
@@ -24,7 +25,6 @@ function Matches() {
   const [me, setMe] = useState<string | null>(null);
   const [rows, setRows] = useState<MatchRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [photoMap, setPhotoMap] = useState<Record<string, string>>({});
   const { hidden } = useHiddenUserIds(me);
   const { unread } = useUnreadMatches(me);
   const visibleRows = rows.filter((r) => !hidden.has(r.other.id));
@@ -46,16 +46,6 @@ function Matches() {
       return { id: m.id, created_at: m.created_at, other: other as MatchRow["other"], lastMessage: msgs?.[0] || null };
     }));
     setRows(result);
-
-    const urls: Record<string, string> = {};
-    await Promise.all(result.map(async (r) => {
-      const p = r.other.photos?.[0];
-      if (p) {
-        const { data } = await supabase.storage.from("profile-photos").createSignedUrl(p, 3600);
-        if (data) urls[r.other.id] = data.signedUrl;
-      }
-    }));
-    setPhotoMap(urls);
     setLoading(false);
   })(); }, []);
 
@@ -78,10 +68,7 @@ function Matches() {
           {visibleRows.map((r) => (
             <li key={r.id}>
               <Link to="/matches/$id" params={{ id: r.id }} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 transition hover:border-primary">
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-muted">
-                  {photoMap[r.other.id] && <img src={photoMap[r.other.id]} alt="" className="h-full w-full object-cover" />}
-                  <PresenceIndicator lastActiveAt={r.other.last_active_at} variant="dot" className="absolute bottom-0 right-0" />
-                </div>
+                <MatchAvatar photo={r.other.photos?.[0]} lastActiveAt={r.other.last_active_at} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1 font-semibold">{r.other.display_name}{r.other.photo_verified && <VerifiedBadge className="h-3.5 w-3.5" />}</div>
                   <div className={`truncate text-sm ${unread[r.id] ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
@@ -99,5 +86,15 @@ function Matches() {
         </ul>
       </div>
     </AppShell>
+  );
+}
+
+function MatchAvatar({ photo, lastActiveAt }: { photo?: string; lastActiveAt?: string | null }) {
+  const url = useProfilePhotoUrl(photo);
+  return (
+    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-muted">
+      {url && <img src={url} alt="" className="h-full w-full object-cover" />}
+      <PresenceIndicator lastActiveAt={lastActiveAt} variant="dot" className="absolute bottom-0 right-0" />
+    </div>
   );
 }
