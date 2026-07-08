@@ -6,6 +6,7 @@ import { ArrowLeft, MapPin, Sparkles, Flame } from "lucide-react";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { PresenceIndicator } from "@/components/PresenceIndicator";
 import type { Platform } from "@/lib/senda";
+import { ProtectedPhoto } from "@/components/ProtectedPhoto";
 
 export const Route = createFileRoute("/_authenticated/users/$id")({
   head: () => ({ meta: [{ title: "Profile — Senda" }] }),
@@ -99,10 +100,9 @@ function UserProfilePage() {
 
         <div className="relative aspect-[3/4] w-full overflow-hidden rounded-3xl bg-muted">
           {photoUrls[photoIdx] ? (
-            <img
+            <ProtectedPhoto
               src={photoUrls[photoIdx]}
               alt={profile.display_name || ""}
-              className="h-full w-full object-cover"
             />
           ) : (
             <div className="grid h-full place-items-center text-muted-foreground">

@@ -21,6 +21,7 @@ import { notifyPotentialMatch } from "@/lib/push.functions";
 import { PresenceIndicator } from "@/components/PresenceIndicator";
 import { useVerified } from "@/hooks/useVerified";
 import { VerifiedGate } from "@/components/VerifiedGate";
+import { ProtectedPhoto } from "@/components/ProtectedPhoto";
 
 export const Route = createFileRoute("/_authenticated/discover")({
   head: () => ({ meta: [{ title: "Discover — Senda" }] }),
@@ -437,7 +438,7 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onB
     <div>
       <div className="swipe-card-shadow relative aspect-[3/4] w-full overflow-hidden rounded-3xl bg-muted">
         {photoUrls[photoIdx] ? (
-          <img src={photoUrls[photoIdx]} alt={profile.display_name || ""} className="h-full w-full object-cover" />
+          <ProtectedPhoto src={photoUrls[photoIdx]} alt={profile.display_name || ""} />
         ) : (
           <div className="grid h-full place-items-center text-muted-foreground">No photo</div>
         )}
