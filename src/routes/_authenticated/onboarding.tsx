@@ -116,9 +116,13 @@ function Onboarding() {
       if (finish) {
         toast.success("Welcome to Senda 🔥");
         navigate({ to: "/discover" });
+      } else {
+        toast.success("Saved");
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Save failed");
+      console.error("Profile save failed:", e);
+      const msg = e instanceof Error ? e.message : (e && typeof e === "object" && "message" in e ? String((e as { message: unknown }).message) : "Save failed");
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
