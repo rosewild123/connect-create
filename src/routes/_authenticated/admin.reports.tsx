@@ -117,7 +117,7 @@ function AdminReports() {
                 <div className="mt-1 text-sm">
                   <span className="font-semibold">{r.reporter?.display_name ?? r.reporter_id.slice(0, 8)}</span>
                   <span className="text-muted-foreground"> reported </span>
-                  <Link to="/u/$id" params={{ id: r.reported_id }} className="font-semibold text-primary hover:underline">
+                  <Link to="/users/$id" params={{ id: r.reported_id }} className="font-semibold text-primary hover:underline">
                     {r.reported?.display_name ?? r.reported_id.slice(0, 8)}
                   </Link>
                 </div>
