@@ -10,7 +10,17 @@ import { useUnreadMatches } from "@/hooks/useUnreadMatches";
 import { useProfilePhotoUrl } from "@/hooks/useProfilePhotoUrls";
 
 export const Route = createFileRoute("/_authenticated/matches/")({
-  head: () => ({ meta: [{ title: "Matches — Senda" }] }),
+  head: () => ({
+    meta: [
+      { title: "Your matches — Senda" },
+      { name: "description", content: "See every creator you've matched with on Senda and pick up your collab conversations." },
+      { property: "og:title", content: "Your matches — Senda" },
+      { property: "og:description", content: "See every creator you've matched with and continue your collab conversations." },
+      { property: "og:url", content: "https://sendaclub.live/matches" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://sendaclub.live/matches" }],
+  }),
   component: Matches,
 });
 

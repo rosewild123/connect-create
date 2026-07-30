@@ -19,7 +19,17 @@ import { useProfilePhotoUrls } from "@/hooks/useProfilePhotoUrls";
 
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "Profile — Senda" }] }),
+  head: () => ({
+    meta: [
+      { title: "Your profile — Senda" },
+      { name: "description", content: "Manage your Senda creator profile, photos, verification status, boosts, and subscription." },
+      { property: "og:title", content: "Your profile — Senda" },
+      { property: "og:description", content: "Manage your Senda creator profile, photos, verification, and subscription." },
+      { property: "og:url", content: "https://sendaclub.live/profile" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://sendaclub.live/profile" }],
+  }),
   component: ProfilePage,
 });
 

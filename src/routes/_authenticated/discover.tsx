@@ -25,7 +25,17 @@ import { ProtectedPhoto } from "@/components/ProtectedPhoto";
 import { useProfilePhotoUrls } from "@/hooks/useProfilePhotoUrls";
 
 export const Route = createFileRoute("/_authenticated/discover")({
-  head: () => ({ meta: [{ title: "Discover — Senda" }] }),
+  head: () => ({
+    meta: [
+      { title: "Discover creators — Senda" },
+      { name: "description", content: "Swipe through verified adult creators near you and filter by niche, platform, and the kind of collab you're after." },
+      { property: "og:title", content: "Discover creators — Senda" },
+      { property: "og:description", content: "Swipe through verified adult creators and filter by niche, platform, and collab type." },
+      { property: "og:url", content: "https://sendaclub.live/discover" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://sendaclub.live/discover" }],
+  }),
   component: Discover,
 });
 
@@ -223,6 +233,7 @@ function Discover() {
 
   return (
     <AppShell>
+      <h1 className="sr-only">Discover creators</h1>
       <header className="flex items-center justify-between px-5 py-4">
         <Link to="/discover" className="flex items-center gap-2">
           <div className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground font-display text-xl font-bold">s</div>
