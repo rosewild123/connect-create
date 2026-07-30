@@ -69,7 +69,7 @@ function ProfilePage() {
       <div className="px-5">
         <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-muted">
           {photoUrl && <img src={photoUrl} alt="" className="h-full w-full object-cover" />}
-          <Link to="/onboarding" className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-black/60 text-white backdrop-blur">
+          <Link to="/onboarding" aria-label="Edit profile photo" className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-black/60 text-white backdrop-blur">
             <Pencil className="h-4 w-4" />
           </Link>
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent p-5 text-white">

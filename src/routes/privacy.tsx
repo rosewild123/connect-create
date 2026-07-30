@@ -6,8 +6,15 @@ export const Route = createFileRoute("/privacy")({
     meta: [
       { title: "Privacy Policy — Senda" },
       { name: "description", content: "Senda Privacy Policy. Learn how we collect, use, and protect your personal data." },
+      { property: "og:title", content: "Privacy Policy — Senda" },
+      { property: "og:description", content: "How Senda collects, uses, stores, and protects creators' personal data." },
+      { property: "og:url", content: "https://sendaclub.live/privacy" },
+      { name: "twitter:title", content: "Privacy Policy — Senda" },
+      { name: "twitter:description", content: "How Senda collects, uses, stores, and protects creators' personal data." },
     ],
+    links: [{ rel: "canonical", href: "https://sendaclub.live/privacy" }],
   }),
+
   component: PrivacyPage,
 });
 

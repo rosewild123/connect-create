@@ -8,7 +8,18 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — Senda" }] }),
+  head: () => ({
+    meta: [
+      { title: "Sign in — Senda" },
+      { name: "description", content: "Sign in or create your Senda profile to match and collab with verified adult content creators. 18+ only." },
+      { property: "og:title", content: "Sign in — Senda" },
+      { property: "og:description", content: "Sign in or create your Senda profile to match and collab with verified creators." },
+      { property: "og:url", content: "https://sendaclub.live/auth" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://sendaclub.live/auth" }],
+  }),
+
   component: AuthPage,
 });
 

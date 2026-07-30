@@ -10,11 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogHowToFindOnlyfansCollaboratorsRouteImport } from './routes/blog.how-to-find-onlyfans-collaborators'
 import { Route as AuthenticatedUpgradeRouteImport } from './routes/_authenticated/upgrade'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSafetyRouteImport } from './routes/_authenticated/safety'
@@ -38,6 +40,11 @@ import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/publi
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -64,6 +71,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogHowToFindOnlyfansCollaboratorsRoute =
+  BlogHowToFindOnlyfansCollaboratorsRouteImport.update({
+    id: '/blog/how-to-find-onlyfans-collaborators',
+    path: '/blog/how-to-find-onlyfans-collaborators',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedUpgradeRoute = AuthenticatedUpgradeRouteImport.update({
   id: '/upgrade',
   path: '/upgrade',
@@ -171,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/blocked': typeof AuthenticatedBlockedRoute
   '/discover': typeof AuthenticatedDiscoverRoute
@@ -183,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/safety': typeof AuthenticatedSafetyRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
+  '/blog/how-to-find-onlyfans-collaborators': typeof BlogHowToFindOnlyfansCollaboratorsRoute
   '/admin/ambassadors': typeof AuthenticatedAdminAmbassadorsRoute
   '/admin/messaging': typeof AuthenticatedAdminMessagingRoute
   '/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
@@ -197,6 +212,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/blocked': typeof AuthenticatedBlockedRoute
   '/discover': typeof AuthenticatedDiscoverRoute
@@ -208,6 +224,7 @@ export interface FileRoutesByTo {
   '/safety': typeof AuthenticatedSafetyRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
+  '/blog/how-to-find-onlyfans-collaborators': typeof BlogHowToFindOnlyfansCollaboratorsRoute
   '/admin/ambassadors': typeof AuthenticatedAdminAmbassadorsRoute
   '/admin/messaging': typeof AuthenticatedAdminMessagingRoute
   '/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
@@ -224,6 +241,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/_authenticated/blocked': typeof AuthenticatedBlockedRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
@@ -236,6 +254,7 @@ export interface FileRoutesById {
   '/_authenticated/safety': typeof AuthenticatedSafetyRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/upgrade': typeof AuthenticatedUpgradeRoute
+  '/blog/how-to-find-onlyfans-collaborators': typeof BlogHowToFindOnlyfansCollaboratorsRoute
   '/_authenticated/admin/ambassadors': typeof AuthenticatedAdminAmbassadorsRoute
   '/_authenticated/admin/messaging': typeof AuthenticatedAdminMessagingRoute
   '/_authenticated/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
@@ -252,6 +271,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/privacy'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/terms'
     | '/blocked'
     | '/discover'
@@ -264,6 +284,7 @@ export interface FileRouteTypes {
     | '/safety'
     | '/settings'
     | '/upgrade'
+    | '/blog/how-to-find-onlyfans-collaborators'
     | '/admin/ambassadors'
     | '/admin/messaging'
     | '/admin/promo-codes'
@@ -278,6 +299,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/privacy'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/terms'
     | '/blocked'
     | '/discover'
@@ -289,6 +311,7 @@ export interface FileRouteTypes {
     | '/safety'
     | '/settings'
     | '/upgrade'
+    | '/blog/how-to-find-onlyfans-collaborators'
     | '/admin/ambassadors'
     | '/admin/messaging'
     | '/admin/promo-codes'
@@ -304,6 +327,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/privacy'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/terms'
     | '/_authenticated/blocked'
     | '/_authenticated/discover'
@@ -316,6 +340,7 @@ export interface FileRouteTypes {
     | '/_authenticated/safety'
     | '/_authenticated/settings'
     | '/_authenticated/upgrade'
+    | '/blog/how-to-find-onlyfans-collaborators'
     | '/_authenticated/admin/ambassadors'
     | '/_authenticated/admin/messaging'
     | '/_authenticated/admin/promo-codes'
@@ -332,7 +357,9 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  BlogHowToFindOnlyfansCollaboratorsRoute: typeof BlogHowToFindOnlyfansCollaboratorsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -343,6 +370,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -378,6 +412,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/how-to-find-onlyfans-collaborators': {
+      id: '/blog/how-to-find-onlyfans-collaborators'
+      path: '/blog/how-to-find-onlyfans-collaborators'
+      fullPath: '/blog/how-to-find-onlyfans-collaborators'
+      preLoaderRoute: typeof BlogHowToFindOnlyfansCollaboratorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/upgrade': {
@@ -576,7 +617,10 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  BlogHowToFindOnlyfansCollaboratorsRoute:
+    BlogHowToFindOnlyfansCollaboratorsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
