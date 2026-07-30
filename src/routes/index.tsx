@@ -8,8 +8,13 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Swipe, match, and collab with verified adult content creators. Built for shoots, promos, and partnerships." },
       { property: "og:title", content: "Senda — Where creators meet creators" },
       { property: "og:description", content: "Swipe, match, and collab with verified adult content creators." },
+      { property: "og:url", content: "https://sendaclub.live/" },
+      { name: "twitter:title", content: "Senda — Where creators meet creators" },
+      { name: "twitter:description", content: "Swipe, match, and collab with verified adult content creators." },
     ],
+    links: [{ rel: "canonical", href: "https://sendaclub.live/" }],
   }),
+
   component: Landing,
 });
 

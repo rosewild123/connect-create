@@ -6,8 +6,15 @@ export const Route = createFileRoute("/terms")({
     meta: [
       { title: "Terms of Service — Senda" },
       { name: "description", content: "Senda Terms of Service. Read the rules and conditions for using our creator collaboration platform." },
+      { property: "og:title", content: "Terms of Service — Senda" },
+      { property: "og:description", content: "The rules and conditions for using Senda's verified creator collaboration platform." },
+      { property: "og:url", content: "https://sendaclub.live/terms" },
+      { name: "twitter:title", content: "Terms of Service — Senda" },
+      { name: "twitter:description", content: "The rules and conditions for using Senda's verified creator collaboration platform." },
     ],
+    links: [{ rel: "canonical", href: "https://sendaclub.live/terms" }],
   }),
+
   component: TermsPage,
 });
 

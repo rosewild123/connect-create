@@ -19,7 +19,17 @@ import { useProfilePhotoUrls } from "@/hooks/useProfilePhotoUrls";
 
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "Profile — Senda" }] }),
+  head: () => ({
+    meta: [
+      { title: "Your profile — Senda" },
+      { name: "description", content: "Manage your Senda creator profile, photos, verification status, boosts, and subscription." },
+      { property: "og:title", content: "Your profile — Senda" },
+      { property: "og:description", content: "Manage your Senda creator profile, photos, verification, and subscription." },
+      { property: "og:url", content: "https://sendaclub.live/profile" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://sendaclub.live/profile" }],
+  }),
   component: ProfilePage,
 });
 
@@ -69,7 +79,7 @@ function ProfilePage() {
       <div className="px-5">
         <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-muted">
           {photoUrl && <img src={photoUrl} alt="" className="h-full w-full object-cover" />}
-          <Link to="/onboarding" className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-black/60 text-white backdrop-blur">
+          <Link to="/onboarding" aria-label="Edit profile photo" className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-black/60 text-white backdrop-blur">
             <Pencil className="h-4 w-4" />
           </Link>
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent p-5 text-white">

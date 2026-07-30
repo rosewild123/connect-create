@@ -84,7 +84,36 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": "https://sendaclub.live/#organization",
+              name: "Senda",
+              url: "https://sendaclub.live",
+              logo: "https://sendaclub.live/apple-touch-icon.png",
+              description:
+                "Senda is where verified adult content creators discover and connect with each other for collabs, shoots, and promos.",
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://sendaclub.live/#website",
+              name: "Senda",
+              url: "https://sendaclub.live",
+              publisher: { "@id": "https://sendaclub.live/#organization" },
+              description:
+                "Swipe-and-match app for verified adult content creators looking for collabs, shoots, cross-promos, and partnerships.",
+            },
+          ],
+        }),
+      },
+    ],
   }),
+
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,

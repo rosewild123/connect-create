@@ -14,7 +14,17 @@ import { ProtectedPhoto } from "@/components/ProtectedPhoto";
 import { useProfilePhotoUrl } from "@/hooks/useProfilePhotoUrls";
 
 export const Route = createFileRoute("/_authenticated/likes")({
-  head: () => ({ meta: [{ title: "Likes you — Senda" }] }),
+  head: () => ({
+    meta: [
+      { title: "Creators who liked you — Senda" },
+      { name: "description", content: "See which verified creators have already liked your Senda profile and swipe back to match instantly." },
+      { property: "og:title", content: "Creators who liked you — Senda" },
+      { property: "og:description", content: "See which verified creators liked your profile and swipe back to match." },
+      { property: "og:url", content: "https://sendaclub.live/likes" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://sendaclub.live/likes" }],
+  }),
   component: LikesPage,
 });
 

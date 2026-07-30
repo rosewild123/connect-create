@@ -1,0 +1,12 @@
+# Senda
+
+> Senda is a swipe-and-match app where verified adult content creators find each other for collabs, shoots, cross-promos, and partnerships. 18+ only.
+
+Senda is creator-to-creator, not creator-to-fan. Every profile is ID and age verified before it can match or message. Creators filter by niche, platform, location, and the kind of collab they're after — including photographers and videographers.
+
+## Pages
+
+- [Home](/): What Senda is, how matching works, and how to create a profile.
+- [Collab guide](/blog/how-to-find-onlyfans-collaborators): How to find, vet, and safely work with content collaborators.
+- [Terms of Service](/terms): Rules and conditions for using Senda.
+- [Privacy Policy](/privacy): How Senda collects, uses, and protects personal data.

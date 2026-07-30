@@ -25,7 +25,17 @@ import { ProtectedPhoto } from "@/components/ProtectedPhoto";
 import { useProfilePhotoUrls } from "@/hooks/useProfilePhotoUrls";
 
 export const Route = createFileRoute("/_authenticated/discover")({
-  head: () => ({ meta: [{ title: "Discover — Senda" }] }),
+  head: () => ({
+    meta: [
+      { title: "Discover creators — Senda" },
+      { name: "description", content: "Swipe through verified adult creators near you and filter by niche, platform, and the kind of collab you're after." },
+      { property: "og:title", content: "Discover creators — Senda" },
+      { property: "og:description", content: "Swipe through verified adult creators and filter by niche, platform, and collab type." },
+      { property: "og:url", content: "https://sendaclub.live/discover" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://sendaclub.live/discover" }],
+  }),
   component: Discover,
 });
 
@@ -223,6 +233,7 @@ function Discover() {
 
   return (
     <AppShell>
+      <h1 className="sr-only">Discover creators</h1>
       <header className="flex items-center justify-between px-5 py-4">
         <Link to="/discover" className="flex items-center gap-2">
           <div className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground font-display text-xl font-bold">s</div>
@@ -307,7 +318,7 @@ function FiltersSheet({ filters, setFilters, activeCount }: {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button className="relative grid h-9 w-9 place-items-center rounded-full border border-border bg-card text-foreground hover:bg-accent">
+        <button aria-label="Filters" className="relative grid h-9 w-9 place-items-center rounded-full border border-border bg-card text-foreground hover:bg-accent">
           <SlidersHorizontal className="h-4 w-4" />
           {activeCount > 0 && (
             <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
@@ -447,8 +458,9 @@ function CardView({ profile, photoIdx, setPhotoIdx, onSwipe, onUndo, isPlus, onB
                 <div key={i} className={`h-1 flex-1 rounded-full ${i === photoIdx ? "bg-white" : "bg-white/30"}`} />
               ))}
             </div>
-            <button onClick={() => setPhotoIdx(Math.max(0, photoIdx - 1))} className="absolute inset-y-0 left-0 w-1/3" />
-            <button onClick={() => setPhotoIdx(Math.min(photoCount - 1, photoIdx + 1))} className="absolute inset-y-0 right-0 w-1/3" />
+            <button aria-label="Previous photo" onClick={() => setPhotoIdx(Math.max(0, photoIdx - 1))} className="absolute inset-y-0 left-0 w-1/3" />
+            <button aria-label="Next photo" onClick={() => setPhotoIdx(Math.min(photoCount - 1, photoIdx + 1))} className="absolute inset-y-0 right-0 w-1/3" />
+
           </>
         )}
 
