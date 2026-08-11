@@ -7,7 +7,10 @@ import {
   getStripeErrorMessage,
 } from "@/lib/stripe.server";
 
-type StartVerificationResult = { url: string } | { error: string };
+type StartVerificationResult =
+  | { url: string; reused?: boolean }
+  | { alreadyVerified: true }
+  | { error: string };
 
 export const startIdentityVerification = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -16,6 +19,26 @@ export const startIdentityVerification = createServerFn({ method: "POST" })
     const { userId } = context;
     try {
       const stripe = createStripeClient(data.environment);
+
+      // Reuse an existing session for this user instead of creating (and
+      // paying for) a new one on every attempt.
+      const existing = await stripe.identity.verificationSessions.list({ limit: 100 });
+      const mine = existing.data.filter((s) => s.metadata?.userId === userId);
+
+      if (mine.some((s) => s.status === "verified")) {
+        return { alreadyVerified: true };
+      }
+      const open = mine.find(
+        (s) => s.status === "requires_input" || s.status === "processing",
+      );
+      if (open) {
+        if (open.url) return { url: open.url, reused: true };
+        // Session exists but its hosted link expired — re-issue the same
+        // session's link rather than creating a new billable session.
+        const refreshed = await stripe.identity.verificationSessions.retrieve(open.id);
+        if (refreshed.url) return { url: refreshed.url, reused: true };
+      }
+
       const session = await stripe.identity.verificationSessions.create({
         type: "document",
         metadata: { userId },
@@ -34,6 +57,7 @@ export const startIdentityVerification = createServerFn({ method: "POST" })
       return { error: getStripeErrorMessage(error) };
     }
   });
+
 
 type RefreshResult = { verified: boolean; ageVerified?: boolean } | { error: string };
 
