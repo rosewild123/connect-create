@@ -196,6 +196,12 @@ function VerificationCard({ ageVerified, idVerified }: { ageVerified: boolean; i
         setLoading(false);
         return;
       }
+      if ("alreadyVerified" in result) {
+        toast.success("You're already verified");
+        setLoading(false);
+        window.location.reload();
+        return;
+      }
       window.location.href = result.url;
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not start verification");
