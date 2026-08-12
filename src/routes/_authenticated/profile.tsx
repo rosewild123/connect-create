@@ -5,8 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock, Gift } from "lucide-react";
-import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOSTS_PREMIUM_MONTHLY, BOOST_DURATION_MIN, PRICE_BOOST_SINGLE, BOOST_SINGLE_PRICE_LABEL } from "@/lib/senda";
-import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
+import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOSTS_PREMIUM_MONTHLY, BOOST_DURATION_MIN, BOOST_SINGLE_PRICE_LABEL } from "@/lib/senda";
+import { BillingCheckout } from "@/components/BillingCheckout";
+
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import { startIdentityVerification, refreshIdentityVerification } from "@/lib/verification.functions";
