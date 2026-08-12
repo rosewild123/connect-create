@@ -81,7 +81,13 @@ function TermsPage() {
         </div>
 
         <footer className="mt-12 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} Senda. All rights reserved.</p>
+          <p>© 2026 Senda. All rights reserved.</p>
+          <div className="mt-3 flex items-center justify-center gap-4">
+            <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+            <Link to="/billing" className="hover:text-foreground">Billing</Link>
+            <Link to="/compliance" className="hover:text-foreground">Compliance</Link>
+          </div>
+
         </footer>
       </div>
     </main>
