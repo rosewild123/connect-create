@@ -193,8 +193,10 @@ function UpgradePage() {
         </div>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          Cancel anytime. Tax handled automatically.
+          Monthly, renews until cancelled. Cancel anytime. Tax included.{" "}
+          <a href="/billing" className="underline">Billing &amp; refund terms</a>
         </p>
+
       </div>
     </AppShell>
   );
