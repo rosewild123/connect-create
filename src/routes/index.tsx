@@ -68,11 +68,14 @@ function Landing() {
 
       <footer className="border-t border-border/50 px-6 py-8 text-center text-xs text-muted-foreground md:px-12">
         <p>© 2026 Senda. Creators only. 18+.</p>
-        <div className="mt-3 flex items-center justify-center gap-4">
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-4">
           <Link to="/terms" className="hover:text-foreground">Terms</Link>
           <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+          <Link to="/billing" className="hover:text-foreground">Billing &amp; refunds</Link>
+          <Link to="/compliance" className="hover:text-foreground">18+ compliance</Link>
         </div>
       </footer>
+
     </main>
   );
 }
