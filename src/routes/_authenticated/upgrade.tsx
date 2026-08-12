@@ -133,9 +133,16 @@ function UpgradePage() {
                 {subscription.cancel_at_period_end ? "Ends" : "Renews"} {new Date(subscription.current_period_end).toLocaleDateString()}
               </p>
             )}
-            <button onClick={openPortal} className="mt-3 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold">
-              Manage subscription
-            </button>
+            {capabilities().customerPortal ? (
+              <button onClick={openPortal} className="mt-3 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold">
+                Manage subscription
+              </button>
+            ) : (
+              <a href="/billing" className="mt-3 inline-block rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold">
+                Cancel or manage billing
+              </a>
+            )}
+
           </div>
         )}
 
