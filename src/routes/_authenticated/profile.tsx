@@ -5,8 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock, Gift } from "lucide-react";
-import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOSTS_PREMIUM_MONTHLY, BOOST_DURATION_MIN, PRICE_BOOST_SINGLE, BOOST_SINGLE_PRICE_LABEL } from "@/lib/senda";
-import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
+import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOSTS_PREMIUM_MONTHLY, BOOST_DURATION_MIN, BOOST_SINGLE_PRICE_LABEL } from "@/lib/senda";
+import { BillingCheckout } from "@/components/BillingCheckout";
+
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import { startIdentityVerification, refreshIdentityVerification } from "@/lib/verification.functions";
@@ -310,12 +311,13 @@ function BoostCard({ userId }: { userId: string }) {
           <div className="font-semibold">Buy a Boost · {BOOST_SINGLE_PRICE_LABEL}</div>
           <button onClick={() => setBuying(false)} className="text-xs text-muted-foreground">Cancel</button>
         </div>
-        <StripeEmbeddedCheckout
-          priceId={PRICE_BOOST_SINGLE}
+        <BillingCheckout
+          product="boost_single"
           userId={userId}
           customerEmail={email}
           returnUrl={`${window.location.origin}/profile?boost=success`}
         />
+
       </div>
     );
   }

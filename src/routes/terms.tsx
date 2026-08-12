@@ -30,8 +30,9 @@ function TermsPage() {
 
         <div className="mt-8 space-y-6 text-sm leading-relaxed text-muted-foreground">
           <Section title="1. Eligibility">
-            <p>Senda is strictly for adults aged 18 and over. By creating an account, you confirm that you are at least 18 years old and have the legal capacity to enter into these terms. We do not permit minors on the platform under any circumstances.</p>
+            <p>Senda is strictly for adults aged 18 and over. By creating an account, you confirm that you are at least 18 years old and have the legal capacity to enter into these terms. We do not permit minors on the platform under any circumstances. See our <Link to="/compliance" className="text-primary underline">Age &amp; Content Compliance policy</Link> for how age is verified and what content is prohibited.</p>
           </Section>
+
 
           <Section title="2. Account & Verification">
             <p>You are responsible for maintaining the confidentiality of your login credentials. We may require government-issued ID verification and a selfie check to confirm your identity and age. Accounts found to be fraudulent, misleading, or operated by minors will be terminated immediately.</p>
@@ -53,8 +54,10 @@ function TermsPage() {
           </Section>
 
           <Section title="5. Subscriptions & Payments">
-            <p>Paid subscriptions are processed through our payment partner. Subscription fees are non-refundable except where required by law. You may cancel at any time; cancellation takes effect at the end of the current billing period. We may change pricing with reasonable notice.</p>
+            <p>Paid plans (Senda Plus, Senda Premium) and one-off boosts are collected by our authorised payment processor, which acts as reseller or payment agent and appears on your card statement under its own billing descriptor. Subscriptions renew monthly until cancelled. You may cancel at any time from Profile → Upgrade → Manage subscription, or by emailing support; cancellation stops all future charges and takes effect at the end of the period you have already paid for. No purchase on Senda unlocks explicit content — paid plans change discovery and messaging features only.</p>
+            <p className="mt-2">Full pricing, billing descriptor, renewal, refund and chargeback terms are set out in our <Link to="/billing" className="text-primary underline">Billing, Refunds &amp; Cancellation policy</Link>, which forms part of these terms.</p>
           </Section>
+
 
           <Section title="6. Termination">
             <p>Either you or Senda may terminate your account at any time. Upon termination, your profile, photos, matches, and messages will be deleted in accordance with our data retention policy. Provisions that by their nature should survive termination will remain in effect.</p>
@@ -78,7 +81,13 @@ function TermsPage() {
         </div>
 
         <footer className="mt-12 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} Senda. All rights reserved.</p>
+          <p>© 2026 Senda. All rights reserved.</p>
+          <div className="mt-3 flex items-center justify-center gap-4">
+            <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+            <Link to="/billing" className="hover:text-foreground">Billing</Link>
+            <Link to="/compliance" className="hover:text-foreground">Compliance</Link>
+          </div>
+
         </footer>
       </div>
     </main>

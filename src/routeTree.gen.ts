@@ -13,6 +13,8 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ComplianceRouteImport } from './routes/compliance'
+import { Route as BillingRouteImport } from './routes/billing'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -36,6 +38,7 @@ import { Route as AuthenticatedAdminPromoCodesRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminMessagingRouteImport } from './routes/_authenticated/admin.messaging'
 import { Route as AuthenticatedAdminAmbassadorsRouteImport } from './routes/_authenticated/admin.ambassadors'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicBillingCcbillWebhookRouteImport } from './routes/api/public/billing/ccbill-webhook'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -55,6 +58,16 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComplianceRoute = ComplianceRouteImport.update({
+  id: '/compliance',
+  path: '/compliance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BillingRoute = BillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -178,10 +191,18 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicBillingCcbillWebhookRoute =
+  ApiPublicBillingCcbillWebhookRouteImport.update({
+    id: '/api/public/billing/ccbill-webhook',
+    path: '/api/public/billing/ccbill-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/billing': typeof BillingRoute
+  '/compliance': typeof ComplianceRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -205,11 +226,14 @@ export interface FileRoutesByFullPath {
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/users/$id': typeof AuthenticatedUsersIdRoute
   '/matches/': typeof AuthenticatedMatchesIndexRoute
+  '/api/public/billing/ccbill-webhook': typeof ApiPublicBillingCcbillWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/billing': typeof BillingRoute
+  '/compliance': typeof ComplianceRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -232,6 +256,7 @@ export interface FileRoutesByTo {
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/users/$id': typeof AuthenticatedUsersIdRoute
   '/matches': typeof AuthenticatedMatchesIndexRoute
+  '/api/public/billing/ccbill-webhook': typeof ApiPublicBillingCcbillWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -239,6 +264,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/billing': typeof BillingRoute
+  '/compliance': typeof ComplianceRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -262,6 +289,7 @@ export interface FileRoutesById {
   '/_authenticated/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/_authenticated/users/$id': typeof AuthenticatedUsersIdRoute
   '/_authenticated/matches/': typeof AuthenticatedMatchesIndexRoute
+  '/api/public/billing/ccbill-webhook': typeof ApiPublicBillingCcbillWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -269,6 +297,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/billing'
+    | '/compliance'
     | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
@@ -292,11 +322,14 @@ export interface FileRouteTypes {
     | '/matches/$id'
     | '/users/$id'
     | '/matches/'
+    | '/api/public/billing/ccbill-webhook'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/billing'
+    | '/compliance'
     | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
@@ -319,12 +352,15 @@ export interface FileRouteTypes {
     | '/matches/$id'
     | '/users/$id'
     | '/matches'
+    | '/api/public/billing/ccbill-webhook'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/billing'
+    | '/compliance'
     | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
@@ -348,6 +384,7 @@ export interface FileRouteTypes {
     | '/_authenticated/matches/$id'
     | '/_authenticated/users/$id'
     | '/_authenticated/matches/'
+    | '/api/public/billing/ccbill-webhook'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -355,11 +392,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  BillingRoute: typeof BillingRoute
+  ComplianceRoute: typeof ComplianceRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   BlogHowToFindOnlyfansCollaboratorsRoute: typeof BlogHowToFindOnlyfansCollaboratorsRoute
+  ApiPublicBillingCcbillWebhookRoute: typeof ApiPublicBillingCcbillWebhookRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -391,6 +431,20 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compliance': {
+      id: '/compliance'
+      path: '/compliance'
+      fullPath: '/compliance'
+      preLoaderRoute: typeof ComplianceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/billing': {
+      id: '/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof BillingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -554,6 +608,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/billing/ccbill-webhook': {
+      id: '/api/public/billing/ccbill-webhook'
+      path: '/api/public/billing/ccbill-webhook'
+      fullPath: '/api/public/billing/ccbill-webhook'
+      preLoaderRoute: typeof ApiPublicBillingCcbillWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -615,24 +676,17 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  BillingRoute: BillingRoute,
+  ComplianceRoute: ComplianceRoute,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   BlogHowToFindOnlyfansCollaboratorsRoute:
     BlogHowToFindOnlyfansCollaboratorsRoute,
+  ApiPublicBillingCcbillWebhookRoute: ApiPublicBillingCcbillWebhookRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
-import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
+import { BillingCheckout } from "@/components/BillingCheckout";
 import { useSubscription } from "@/hooks/useSubscription";
 import { createPortalSession } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
-import { PRICE_PLUS, PRICE_PREMIUM } from "@/lib/senda";
+import { capabilities } from "@/lib/billing/config";
+
 import { ArrowLeft, Check, Flame, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
@@ -22,7 +23,6 @@ const PLANS: Record<PlanKey, {
   name: string;
   tagline: string;
   price: string;
-  priceId: string;
   perks: string[];
   gradient: string;
   icon: typeof Flame;
@@ -31,7 +31,6 @@ const PLANS: Record<PlanKey, {
     name: "Senda Plus",
     tagline: "For active creators",
     price: "£11.99",
-    priceId: PRICE_PLUS,
     gradient: "from-primary to-primary/60",
     icon: Flame,
     perks: [
@@ -45,7 +44,6 @@ const PLANS: Record<PlanKey, {
     name: "Senda Premium",
     tagline: "Maximum reach",
     price: "£24.99",
-    priceId: PRICE_PREMIUM,
     gradient: "from-amber-500 to-pink-500",
     icon: Sparkles,
     perks: [
@@ -88,8 +86,8 @@ function UpgradePage() {
             <ArrowLeft className="h-4 w-4" />Back
           </button>
           <h2 className="mb-3 font-display text-2xl font-bold">{plan.name}</h2>
-          <StripeEmbeddedCheckout
-            priceId={plan.priceId}
+          <BillingCheckout
+            product={checkoutPlan}
             userId={me.id}
             customerEmail={me.email}
             returnUrl={`${window.location.origin}/upgrade?status=success`}
@@ -135,9 +133,16 @@ function UpgradePage() {
                 {subscription.cancel_at_period_end ? "Ends" : "Renews"} {new Date(subscription.current_period_end).toLocaleDateString()}
               </p>
             )}
-            <button onClick={openPortal} className="mt-3 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold">
-              Manage subscription
-            </button>
+            {capabilities().customerPortal ? (
+              <button onClick={openPortal} className="mt-3 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold">
+                Manage subscription
+              </button>
+            ) : (
+              <a href="/billing" className="mt-3 inline-block rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold">
+                Cancel or manage billing
+              </a>
+            )}
+
           </div>
         )}
 
@@ -188,8 +193,10 @@ function UpgradePage() {
         </div>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          Cancel anytime. Tax handled automatically.
+          Monthly, renews until cancelled. Cancel anytime. Tax included.{" "}
+          <a href="/billing" className="underline">Billing &amp; refund terms</a>
         </p>
+
       </div>
     </AppShell>
   );
