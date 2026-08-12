@@ -18,6 +18,9 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/blog/how-to-find-onlyfans-collaborators", changefreq: "monthly", priority: "0.8" },
           { path: "/terms", changefreq: "yearly", priority: "0.3" },
           { path: "/privacy", changefreq: "yearly", priority: "0.3" },
+          { path: "/billing", changefreq: "yearly", priority: "0.3" },
+          { path: "/compliance", changefreq: "yearly", priority: "0.4" },
+
         ];
 
         const urls = entries.map((e) =>
