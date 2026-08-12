@@ -30,8 +30,9 @@ function TermsPage() {
 
         <div className="mt-8 space-y-6 text-sm leading-relaxed text-muted-foreground">
           <Section title="1. Eligibility">
-            <p>Senda is strictly for adults aged 18 and over. By creating an account, you confirm that you are at least 18 years old and have the legal capacity to enter into these terms. We do not permit minors on the platform under any circumstances.</p>
+            <p>Senda is strictly for adults aged 18 and over. By creating an account, you confirm that you are at least 18 years old and have the legal capacity to enter into these terms. We do not permit minors on the platform under any circumstances. See our <Link to="/compliance" className="text-primary underline">Age &amp; Content Compliance policy</Link> for how age is verified and what content is prohibited.</p>
           </Section>
+
 
           <Section title="2. Account & Verification">
             <p>You are responsible for maintaining the confidentiality of your login credentials. We may require government-issued ID verification and a selfie check to confirm your identity and age. Accounts found to be fraudulent, misleading, or operated by minors will be terminated immediately.</p>
