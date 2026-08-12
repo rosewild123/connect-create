@@ -53,8 +53,10 @@ function TermsPage() {
           </Section>
 
           <Section title="5. Subscriptions & Payments">
-            <p>Paid subscriptions are processed through our payment partner. Subscription fees are non-refundable except where required by law. You may cancel at any time; cancellation takes effect at the end of the current billing period. We may change pricing with reasonable notice.</p>
+            <p>Paid plans (Senda Plus, Senda Premium) and one-off boosts are collected by our authorised payment processor, which acts as reseller or payment agent and appears on your card statement under its own billing descriptor. Subscriptions renew monthly until cancelled. You may cancel at any time from Profile → Upgrade → Manage subscription, or by emailing support; cancellation stops all future charges and takes effect at the end of the period you have already paid for. No purchase on Senda unlocks explicit content — paid plans change discovery and messaging features only.</p>
+            <p className="mt-2">Full pricing, billing descriptor, renewal, refund and chargeback terms are set out in our <Link to="/billing" className="text-primary underline">Billing, Refunds &amp; Cancellation policy</Link>, which forms part of these terms.</p>
           </Section>
+
 
           <Section title="6. Termination">
             <p>Either you or Senda may terminate your account at any time. Upon termination, your profile, photos, matches, and messages will be deleted in accordance with our data retention policy. Provisions that by their nature should survive termination will remain in effect.</p>
