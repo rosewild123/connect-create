@@ -23,7 +23,6 @@ const PLANS: Record<PlanKey, {
   name: string;
   tagline: string;
   price: string;
-  priceId: string;
   perks: string[];
   gradient: string;
   icon: typeof Flame;
@@ -32,7 +31,6 @@ const PLANS: Record<PlanKey, {
     name: "Senda Plus",
     tagline: "For active creators",
     price: "£11.99",
-    priceId: PRICE_PLUS,
     gradient: "from-primary to-primary/60",
     icon: Flame,
     perks: [
@@ -46,7 +44,6 @@ const PLANS: Record<PlanKey, {
     name: "Senda Premium",
     tagline: "Maximum reach",
     price: "£24.99",
-    priceId: PRICE_PREMIUM,
     gradient: "from-amber-500 to-pink-500",
     icon: Sparkles,
     perks: [
@@ -89,8 +86,8 @@ function UpgradePage() {
             <ArrowLeft className="h-4 w-4" />Back
           </button>
           <h2 className="mb-3 font-display text-2xl font-bold">{plan.name}</h2>
-          <StripeEmbeddedCheckout
-            priceId={plan.priceId}
+          <BillingCheckout
+            product={checkoutPlan}
             userId={me.id}
             customerEmail={me.email}
             returnUrl={`${window.location.origin}/upgrade?status=success`}
