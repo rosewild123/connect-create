@@ -49,14 +49,14 @@ export const Route = createFileRoute("/api/public/billing/ccbill-webhook")({
 
         try {
           if (product === "boost_single" && eventType === "NewSaleSuccess") {
-            const until = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+            const endsAt = new Date(Date.now() + 30 * 60_000).toISOString();
             const { error } = await supabaseAdmin
-              .from("profiles")
-              .update({ boost_until: until })
-              .eq("id", userId);
+              .from("boosts")
+              .insert({ user_id: userId, ends_at: endsAt, source: "one_off_purchase" });
             if (error) console.error("CCBill boost grant failed", error);
             return new Response("ok");
           }
+
 
           if (!subscriptionId || !priceId) return new Response("ok");
 
