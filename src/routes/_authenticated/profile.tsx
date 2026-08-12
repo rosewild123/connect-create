@@ -310,12 +310,13 @@ function BoostCard({ userId }: { userId: string }) {
           <div className="font-semibold">Buy a Boost · {BOOST_SINGLE_PRICE_LABEL}</div>
           <button onClick={() => setBuying(false)} className="text-xs text-muted-foreground">Cancel</button>
         </div>
-        <StripeEmbeddedCheckout
-          priceId={PRICE_BOOST_SINGLE}
+        <BillingCheckout
+          product="boost_single"
           userId={userId}
           customerEmail={email}
           returnUrl={`${window.location.origin}/profile?boost=success`}
         />
+
       </div>
     );
   }
