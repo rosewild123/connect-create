@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
-import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
+import { BillingCheckout } from "@/components/BillingCheckout";
 import { useSubscription } from "@/hooks/useSubscription";
 import { createPortalSession } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
-import { PRICE_PLUS, PRICE_PREMIUM } from "@/lib/senda";
+import { capabilities } from "@/lib/billing/config";
+
 import { ArrowLeft, Check, Flame, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
