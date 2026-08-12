@@ -38,6 +38,7 @@ import { Route as AuthenticatedAdminPromoCodesRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminMessagingRouteImport } from './routes/_authenticated/admin.messaging'
 import { Route as AuthenticatedAdminAmbassadorsRouteImport } from './routes/_authenticated/admin.ambassadors'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicBillingCcbillWebhookRouteImport } from './routes/api/public/billing/ccbill-webhook'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -190,6 +191,12 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicBillingCcbillWebhookRoute =
+  ApiPublicBillingCcbillWebhookRouteImport.update({
+    id: '/api/public/billing/ccbill-webhook',
+    path: '/api/public/billing/ccbill-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -219,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/users/$id': typeof AuthenticatedUsersIdRoute
   '/matches/': typeof AuthenticatedMatchesIndexRoute
+  '/api/public/billing/ccbill-webhook': typeof ApiPublicBillingCcbillWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -248,6 +256,7 @@ export interface FileRoutesByTo {
   '/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/users/$id': typeof AuthenticatedUsersIdRoute
   '/matches': typeof AuthenticatedMatchesIndexRoute
+  '/api/public/billing/ccbill-webhook': typeof ApiPublicBillingCcbillWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -280,6 +289,7 @@ export interface FileRoutesById {
   '/_authenticated/matches/$id': typeof AuthenticatedMatchesIdRoute
   '/_authenticated/users/$id': typeof AuthenticatedUsersIdRoute
   '/_authenticated/matches/': typeof AuthenticatedMatchesIndexRoute
+  '/api/public/billing/ccbill-webhook': typeof ApiPublicBillingCcbillWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -312,6 +322,7 @@ export interface FileRouteTypes {
     | '/matches/$id'
     | '/users/$id'
     | '/matches/'
+    | '/api/public/billing/ccbill-webhook'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/matches/$id'
     | '/users/$id'
     | '/matches'
+    | '/api/public/billing/ccbill-webhook'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -372,6 +384,7 @@ export interface FileRouteTypes {
     | '/_authenticated/matches/$id'
     | '/_authenticated/users/$id'
     | '/_authenticated/matches/'
+    | '/api/public/billing/ccbill-webhook'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -386,6 +399,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   BlogHowToFindOnlyfansCollaboratorsRoute: typeof BlogHowToFindOnlyfansCollaboratorsRoute
+  ApiPublicBillingCcbillWebhookRoute: typeof ApiPublicBillingCcbillWebhookRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -594,6 +608,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/billing/ccbill-webhook': {
+      id: '/api/public/billing/ccbill-webhook'
+      path: '/api/public/billing/ccbill-webhook'
+      fullPath: '/api/public/billing/ccbill-webhook'
+      preLoaderRoute: typeof ApiPublicBillingCcbillWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -663,6 +684,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   BlogHowToFindOnlyfansCollaboratorsRoute:
     BlogHowToFindOnlyfansCollaboratorsRoute,
+  ApiPublicBillingCcbillWebhookRoute: ApiPublicBillingCcbillWebhookRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
