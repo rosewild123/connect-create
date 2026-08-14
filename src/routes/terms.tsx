@@ -64,11 +64,11 @@ function TermsPage() {
           </Section>
 
           <Section title="7. Disclaimers & Limitation of Liability">
-            <p>Senda is provided "as is" without warranties of any kind. We do not guarantee that you will find matches or that all users are accurately represented. To the maximum extent permitted by law, our liability is limited to the amount you paid us in the 12 months preceding the claim, or $100 if you did not pay.</p>
+            <p>Senda is provided "as is" without warranties of any kind. We do not guarantee that you will find matches or that all users are accurately represented. To the maximum extent permitted by law, our liability is limited to the amount you paid us in the 12 months preceding the claim, or £100 if you did not pay.</p>
           </Section>
 
           <Section title="8. Governing Law">
-            <p>These terms are governed by the laws of the State of California, USA, without regard to conflict-of-law principles. Any dispute will be resolved through binding arbitration in San Francisco, CA, except that either party may seek injunctive relief in court.</p>
+            <p>These terms are governed by the laws of England and Wales, United Kingdom. Any dispute arising out of or in connection with these terms will be subject to the exclusive jurisdiction of the courts of England and Wales. The provisions of the Consumer Rights Act 2015 and other applicable UK consumer protection legislation apply to all contracts made with consumers.</p>
           </Section>
 
           <Section title="9. Changes to Terms">
@@ -76,7 +76,7 @@ function TermsPage() {
           </Section>
 
           <Section title="10. Contact">
-            <p>Questions about these terms? Email us at <a href="mailto:support@senda.app" className="text-primary underline">support@senda.app</a>.</p>
+            <p>Questions about these terms? Email us at <a href="mailto:support@sendaclub.live" className="text-primary underline">support@sendaclub.live</a>.</p>
           </Section>
         </div>
 
