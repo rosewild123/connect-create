@@ -11,6 +11,9 @@ import { BillingCheckout } from "@/components/BillingCheckout";
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import { startIdentityVerification, refreshIdentityVerification } from "@/lib/verification.functions";
+import { startYotiVerification } from "@/lib/verification/yoti.functions";
+import { ACTIVE_VERIFICATION_PROVIDER } from "@/lib/verification/config";
+
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { PromptsEditor } from "@/components/PromptsEditor";
@@ -49,10 +52,14 @@ function ProfilePage() {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
-      // Sync verification status from Stripe in case the webhook hasn't fired yet
-      try {
-        await refreshIdentityVerification({ data: { environment: getStripeEnvironment() } });
-      } catch { /* ignore */ }
+      // Sync verification status from Stripe in case the webhook hasn't fired
+      // yet. Yoti pushes its result to our webhook, so no polling needed.
+      if (ACTIVE_VERIFICATION_PROVIDER === "stripe") {
+        try {
+          await refreshIdentityVerification({ data: { environment: getStripeEnvironment() } });
+        } catch { /* ignore */ }
+      }
+
       const { data: rpcData } = await supabase.rpc("get_my_profile");
       const data = Array.isArray(rpcData) ? rpcData[0] : rpcData;
       if (!data) return;
@@ -177,12 +184,31 @@ function ProfilePage() {
 
 function VerificationCard({ ageVerified, idVerified }: { ageVerified: boolean; idVerified: boolean }) {
   const startVerify = useServerFn(startIdentityVerification);
+  const startYoti = useServerFn(startYotiVerification);
   const [loading, setLoading] = useState(false);
   const verified = ageVerified || idVerified;
 
   async function handleVerify() {
     setLoading(true);
     try {
+      if (ACTIVE_VERIFICATION_PROVIDER === "yoti") {
+        const outcome = await startYoti({
+          data: { returnUrl: `${window.location.origin}/profile` },
+        });
+        if (outcome.kind === "error") {
+          toast.error(outcome.error);
+          setLoading(false);
+          return;
+        }
+        if (outcome.kind === "already_verified") {
+          toast.success("You're already verified");
+          window.location.reload();
+          return;
+        }
+        window.location.href = outcome.url;
+        return;
+      }
+
       const result = await startVerify({
         data: {
           returnUrl: `${window.location.origin}/profile`,
@@ -209,6 +235,7 @@ function VerificationCard({ ageVerified, idVerified }: { ageVerified: boolean; i
       setLoading(false);
     }
   }
+
 
   return (
     <div className={`flex items-start gap-3 rounded-2xl border p-4 ${verified ? "border-primary/50 bg-primary/5" : "border-border bg-card"}`}>

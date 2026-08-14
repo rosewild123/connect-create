@@ -37,6 +37,7 @@ import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminPromoCodesRouteImport } from './routes/_authenticated/admin.promo-codes'
 import { Route as AuthenticatedAdminMessagingRouteImport } from './routes/_authenticated/admin.messaging'
 import { Route as AuthenticatedAdminAmbassadorsRouteImport } from './routes/_authenticated/admin.ambassadors'
+import { Route as ApiPublicVerificationYotiWebhookRouteImport } from './routes/api/public/verification/yoti-webhook'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicBillingCcbillWebhookRouteImport } from './routes/api/public/billing/ccbill-webhook'
 
@@ -185,6 +186,12 @@ const AuthenticatedAdminAmbassadorsRoute =
     path: '/admin/ambassadors',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicVerificationYotiWebhookRoute =
+  ApiPublicVerificationYotiWebhookRouteImport.update({
+    id: '/api/public/verification/yoti-webhook',
+    path: '/api/public/verification/yoti-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -228,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/matches/': typeof AuthenticatedMatchesIndexRoute
   '/api/public/billing/ccbill-webhook': typeof ApiPublicBillingCcbillWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/verification/yoti-webhook': typeof ApiPublicVerificationYotiWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -258,6 +266,7 @@ export interface FileRoutesByTo {
   '/matches': typeof AuthenticatedMatchesIndexRoute
   '/api/public/billing/ccbill-webhook': typeof ApiPublicBillingCcbillWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/verification/yoti-webhook': typeof ApiPublicVerificationYotiWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -291,6 +300,7 @@ export interface FileRoutesById {
   '/_authenticated/matches/': typeof AuthenticatedMatchesIndexRoute
   '/api/public/billing/ccbill-webhook': typeof ApiPublicBillingCcbillWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/verification/yoti-webhook': typeof ApiPublicVerificationYotiWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | '/matches/'
     | '/api/public/billing/ccbill-webhook'
     | '/api/public/payments/webhook'
+    | '/api/public/verification/yoti-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/api/public/billing/ccbill-webhook'
     | '/api/public/payments/webhook'
+    | '/api/public/verification/yoti-webhook'
   id:
     | '__root__'
     | '/'
@@ -386,6 +398,7 @@ export interface FileRouteTypes {
     | '/_authenticated/matches/'
     | '/api/public/billing/ccbill-webhook'
     | '/api/public/payments/webhook'
+    | '/api/public/verification/yoti-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -401,6 +414,7 @@ export interface RootRouteChildren {
   BlogHowToFindOnlyfansCollaboratorsRoute: typeof BlogHowToFindOnlyfansCollaboratorsRoute
   ApiPublicBillingCcbillWebhookRoute: typeof ApiPublicBillingCcbillWebhookRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicVerificationYotiWebhookRoute: typeof ApiPublicVerificationYotiWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -601,6 +615,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAmbassadorsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/verification/yoti-webhook': {
+      id: '/api/public/verification/yoti-webhook'
+      path: '/api/public/verification/yoti-webhook'
+      fullPath: '/api/public/verification/yoti-webhook'
+      preLoaderRoute: typeof ApiPublicVerificationYotiWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -686,6 +707,7 @@ const rootRouteChildren: RootRouteChildren = {
     BlogHowToFindOnlyfansCollaboratorsRoute,
   ApiPublicBillingCcbillWebhookRoute: ApiPublicBillingCcbillWebhookRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicVerificationYotiWebhookRoute: ApiPublicVerificationYotiWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

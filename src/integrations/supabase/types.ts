@@ -524,6 +524,39 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          provider: string
+          session_id: string
+          session_url: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          provider: string
+          session_id: string
+          session_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          provider?: string
+          session_id?: string
+          session_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       profiles_public: {
