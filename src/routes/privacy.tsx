@@ -26,7 +26,7 @@ function PrivacyPage() {
           <ArrowLeft className="h-4 w-4" /> Back to Senda
         </Link>
         <h1 className="mt-6 font-display text-3xl font-bold">Privacy Policy</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Last updated: June 2026</p>
+        <p className="mt-2 text-sm text-muted-foreground">Last updated: August 2026</p>
 
         <div className="mt-8 space-y-6 text-sm leading-relaxed text-muted-foreground">
           <Section title="1. Who We Are">
@@ -67,13 +67,14 @@ function PrivacyPage() {
             <p>We retain your data for as long as your account is active. If you delete your account, we remove your profile, photos, messages, and personal data within 30 days, except where we must retain it for legal compliance, fraud prevention, or enforcing our terms. Anonymized analytics data may be kept longer.</p>
           </Section>
 
-          <Section title="6. Your Rights">
-            <p>Depending on your location, you may have the right to:</p>
+          <Section title="6. Your Rights (UK GDPR)">
+            <p>Under the UK GDPR and the Data Protection Act 2018, you have the right to:</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               <li>Access, correct, or delete your personal data.</li>
-              <li>Export your data in a machine-readable format.</li>
+              <li>Export your data in a machine-readable format (data portability).</li>
               <li>Object to or restrict certain processing activities.</li>
-              <li>Withdraw consent for optional data uses (e.g., marketing).</li>
+              <li>Withdraw consent for optional data uses (e.g., marketing) at any time.</li>
+              <li>Lodge a complaint with the Information Commissioner&rsquo;s Office (ICO) at ico.org.uk.</li>
             </ul>
             <p className="mt-2">To exercise these rights, contact us at <a href="mailto:support@sendaclub.live" className="text-primary underline">support@sendaclub.live</a> or use the <strong>Export your data</strong> and <strong>Delete account</strong> features in Settings.</p>
           </Section>
@@ -87,7 +88,7 @@ function PrivacyPage() {
           </Section>
 
           <Section title="9. International Transfers">
-            <p>Your data may be stored and processed in the United States or other countries where our service providers operate. We use appropriate safeguards (such as Standard Contractual Clauses) to protect your data during international transfers.</p>
+            <p>Senda is a UK-based service. Your data may be processed by service providers (such as cloud hosting, payment, and identity verification partners) located outside the UK. Where this happens, we rely on appropriate safeguards recognised under UK data protection law, including International Data Transfer Additions to the Standard Contractual Clauses, and we ensure those providers meet the requirements of the UK GDPR.</p>
           </Section>
 
           <Section title="10. Changes to This Policy">
