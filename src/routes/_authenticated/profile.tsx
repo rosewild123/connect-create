@@ -52,10 +52,14 @@ function ProfilePage() {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
-      // Sync verification status from Stripe in case the webhook hasn't fired yet
-      try {
-        await refreshIdentityVerification({ data: { environment: getStripeEnvironment() } });
-      } catch { /* ignore */ }
+      // Sync verification status from Stripe in case the webhook hasn't fired
+      // yet. Yoti pushes its result to our webhook, so no polling needed.
+      if (ACTIVE_VERIFICATION_PROVIDER === "stripe") {
+        try {
+          await refreshIdentityVerification({ data: { environment: getStripeEnvironment() } });
+        } catch { /* ignore */ }
+      }
+
       const { data: rpcData } = await supabase.rpc("get_my_profile");
       const data = Array.isArray(rpcData) ? rpcData[0] : rpcData;
       if (!data) return;
