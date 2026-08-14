@@ -75,7 +75,7 @@ function PrivacyPage() {
               <li>Object to or restrict certain processing activities.</li>
               <li>Withdraw consent for optional data uses (e.g., marketing).</li>
             </ul>
-            <p className="mt-2">To exercise these rights, contact us at <a href="mailto:support@senda.app" className="text-primary underline">support@senda.app</a> or use the <strong>Export your data</strong> and <strong>Delete account</strong> features in Settings.</p>
+            <p className="mt-2">To exercise these rights, contact us at <a href="mailto:support@sendaclub.live" className="text-primary underline">support@sendaclub.live</a> or use the <strong>Export your data</strong> and <strong>Delete account</strong> features in Settings.</p>
           </Section>
 
           <Section title="7. Cookies & Tracking">
@@ -95,7 +95,7 @@ function PrivacyPage() {
           </Section>
 
           <Section title="11. Contact Us">
-            <p>If you have questions or concerns about this Privacy Policy or our data practices, please contact us at <a href="mailto:support@senda.app" className="text-primary underline">support@senda.app</a>.</p>
+            <p>If you have questions or concerns about this Privacy Policy or our data practices, please contact us at <a href="mailto:support@sendaclub.live" className="text-primary underline">support@sendaclub.live</a>.</p>
           </Section>
         </div>
 
