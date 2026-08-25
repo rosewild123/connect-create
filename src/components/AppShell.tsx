@@ -40,7 +40,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   };
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col">
-      <main className="flex-1 pb-20">{children}</main>
+      <main className="flex-1 pb-20">
+        {showNudge ? <VerifyNudge /> : null}
+        {children}
+      </main>
+
       <nav className="fixed bottom-0 left-1/2 z-50 flex w-full max-w-md -translate-x-1/2 items-center border-t border-border bg-card/90 backdrop-blur">
         {item("/discover", "Discover", Flame)}
         {item("/likes", "Likes", Heart)}
