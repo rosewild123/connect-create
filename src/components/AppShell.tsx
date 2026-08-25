@@ -3,6 +3,8 @@ import { Flame, Heart, MessageCircle, User } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUnreadMatches } from "@/hooks/useUnreadMatches";
+import { useVerified } from "@/hooks/useVerified";
+import { VerifyNudge } from "@/components/VerifyNudge";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { location } = useRouterState();
@@ -11,6 +13,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setMe(data.user?.id ?? null));
   }, []);
+  const { verified, loading: verifiedLoading } = useVerified(me);
+  const showNudge =
+    !verifiedLoading && verified === false && !path.startsWith("/profile") && !path.startsWith("/onboarding");
+
   const { totalUnread } = useUnreadMatches(me);
 
   const item = (href: string, label: string, Icon: typeof Flame, badge?: number) => {
