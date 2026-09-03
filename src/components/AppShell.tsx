@@ -4,7 +4,9 @@ import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUnreadMatches } from "@/hooks/useUnreadMatches";
 import { useVerified } from "@/hooks/useVerified";
+import { useSubscription } from "@/hooks/useSubscription";
 import { VerifyNudge } from "@/components/VerifyNudge";
+import { PlusNudge } from "@/components/PlusNudge";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { location } = useRouterState();
@@ -17,7 +19,17 @@ export function AppShell({ children }: { children: ReactNode }) {
   const showNudge =
     !verifiedLoading && verified === false && !path.startsWith("/profile") && !path.startsWith("/onboarding");
 
+  const { isActive, loading: subLoading } = useSubscription(me);
+  const showPlusNudge =
+    !showNudge &&
+    !subLoading &&
+    !isActive &&
+    verified === true &&
+    !path.startsWith("/upgrade") &&
+    !path.startsWith("/onboarding");
+
   const { totalUnread } = useUnreadMatches(me);
+
 
   const item = (href: string, label: string, Icon: typeof Flame, badge?: number) => {
     const active = path.startsWith(href);
@@ -42,6 +54,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col">
       <main className="flex-1 pb-20">
         {showNudge ? <VerifyNudge /> : null}
+        {showPlusNudge ? <PlusNudge /> : null}
         {children}
       </main>
 
