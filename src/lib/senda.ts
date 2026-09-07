@@ -43,3 +43,13 @@ export function tierFromPriceId(priceId: string | null | undefined): Tier {
   if (priceId === PRICE_PLUS) return "plus";
   return "free";
 }
+
+// Promotional coupon IDs (stable across Stripe sandbox + live)
+export const COUPON_LAUNCH_20PCT = "senda_launch_20pct";
+export const COUPON_TRIAL_PLUS_1GBP = "senda_trial_plus_1gbp";
+export const COUPON_TRIAL_PREMIUM_1GBP = "senda_trial_premium_1gbp";
+
+/** Returns the trial coupon for a given plan key */
+export function trialCouponFor(plan: "plus" | "premium"): string {
+  return plan === "plus" ? COUPON_TRIAL_PLUS_1GBP : COUPON_TRIAL_PREMIUM_1GBP;
+}
