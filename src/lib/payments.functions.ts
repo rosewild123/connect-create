@@ -101,7 +101,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           })
         : undefined;
 
-      let discounts: Stripe.Checkout.SessionCreateParams.Discount[] | undefined;
+      let discounts: { coupon: string }[] | undefined;
       if (data.couponId) {
         const validId = await ensureCoupon(stripe, data.couponId);
         if (validId) discounts = [{ coupon: validId }];
