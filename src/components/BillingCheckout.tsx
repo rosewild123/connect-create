@@ -9,6 +9,7 @@ interface Props {
   userId: string;
   customerEmail?: string;
   returnUrl: string;
+  couponId?: string;
 }
 
 /**

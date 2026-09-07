@@ -80,8 +80,10 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     userId?: string;
     returnUrl: string;
     environment: StripeEnv;
+    couponId?: string;
   }) => {
     if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
+    if (data.couponId && !/^[a-zA-Z0-9_-]+$/.test(data.couponId)) throw new Error("Invalid couponId");
     return data;
   })
   .handler(async ({ data }): Promise<CheckoutSessionResult> => {
@@ -99,6 +101,12 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           })
         : undefined;
 
+      let discounts: Stripe.Checkout.SessionCreateParams.Discount[] | undefined;
+      if (data.couponId) {
+        const validId = await ensureCoupon(stripe, data.couponId);
+        if (validId) discounts = [{ coupon: validId }];
+      }
+
       const session = await stripe.checkout.sessions.create({
         line_items: [{ price: stripePrice.id, quantity: 1 }],
         mode: isRecurring ? "subscription" : "payment",
@@ -106,6 +114,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         return_url: data.returnUrl,
         ...(customerId && { customer: customerId }),
         managed_payments: { enabled: true },
+        ...(discounts && { discounts }),
         ...(data.userId && {
           metadata: { userId: data.userId },
           ...(isRecurring && { subscription_data: { metadata: { userId: data.userId } } }),
