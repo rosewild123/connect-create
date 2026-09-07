@@ -244,19 +244,23 @@ function UpgradePage() {
                     </div>
                     <Icon className="h-6 w-6" />
                   </div>
-                  <div className="mt-3 flex items-baseline gap-1.5">
+                  <div className="mt-3">
                     {discountedLabel ? (
                       <>
-                        <span className="text-sm opacity-60 line-through">{plan.priceLabel}</span>
-                        <span className="font-display text-4xl font-bold">{discountedLabel}</span>
-                        <span className="opacity-80 text-sm">/month</span>
-                        <span className="ml-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase">20% off</span>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-sm opacity-60 line-through">{plan.priceLabel}</span>
+                          <span className="font-display text-4xl font-bold">{discountedLabel}</span>
+                          <span className="ml-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase">20% off</span>
+                        </div>
+                        <div className="mt-0.5 text-xs opacity-80">
+                          first month, then {plan.priceLabel}/month
+                        </div>
                       </>
                     ) : (
-                      <>
+                      <div className="flex items-baseline gap-1">
                         <span className="font-display text-4xl font-bold">{plan.priceLabel}</span>
                         <span className="opacity-80 text-sm">/month</span>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>
