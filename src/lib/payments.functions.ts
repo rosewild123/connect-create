@@ -7,6 +7,35 @@ import {
   getStripeErrorMessage,
 } from "@/lib/stripe.server";
 
+/** Coupon IDs → creation params, used to lazily provision coupons in each Stripe env. */
+const COUPON_PARAMS: Record<string, Pick<Stripe.CouponCreateParams, "percent_off" | "amount_off" | "currency" | "duration" | "name">> = {
+  senda_launch_20pct: { percent_off: 20, duration: "once", name: "Launch offer — 20% off first month" },
+  senda_trial_plus_1gbp: { amount_off: 1099, currency: "gbp", duration: "once", name: "£1 first month — Plus trial" },
+  senda_trial_premium_1gbp: { amount_off: 2399, currency: "gbp", duration: "once", name: "£1 first month — Premium trial" },
+};
+
+/** Ensure a coupon exists (and is valid) in the given Stripe environment. Returns the coupon ID or null. */
+async function ensureCoupon(
+  stripe: ReturnType<typeof createStripeClient>,
+  couponId: string,
+): Promise<string | null> {
+  try {
+    const existing = await stripe.coupons.retrieve(couponId);
+    if (existing.valid) return couponId;
+    return null;
+  } catch {
+    // not found — create it
+  }
+  const params = COUPON_PARAMS[couponId];
+  if (!params) return null;
+  try {
+    await stripe.coupons.create({ id: couponId, ...params });
+    return couponId;
+  } catch {
+    return null;
+  }
+}
+
 type CheckoutSessionResult = { clientSecret: string } | { error: string };
 type PortalSessionResult = { url: string } | { error: string };
 type PauseSubscriptionResult = { ok: true; paused: boolean } | { ok: true; noSubscription: true } | { error: string };
@@ -51,8 +80,10 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     userId?: string;
     returnUrl: string;
     environment: StripeEnv;
+    couponId?: string;
   }) => {
     if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
+    if (data.couponId && !/^[a-zA-Z0-9_-]+$/.test(data.couponId)) throw new Error("Invalid couponId");
     return data;
   })
   .handler(async ({ data }): Promise<CheckoutSessionResult> => {
@@ -70,6 +101,12 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           })
         : undefined;
 
+      let discounts: { coupon: string }[] | undefined;
+      if (data.couponId) {
+        const validId = await ensureCoupon(stripe, data.couponId);
+        if (validId) discounts = [{ coupon: validId }];
+      }
+
       const session = await stripe.checkout.sessions.create({
         line_items: [{ price: stripePrice.id, quantity: 1 }],
         mode: isRecurring ? "subscription" : "payment",
@@ -77,6 +114,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         return_url: data.returnUrl,
         ...(customerId && { customer: customerId }),
         managed_payments: { enabled: true },
+        ...(discounts && { discounts }),
         ...(data.userId && {
           metadata: { userId: data.userId },
           ...(isRecurring && { subscription_data: { metadata: { userId: data.userId } } }),

@@ -9,13 +9,14 @@ interface Props {
   userId: string;
   customerEmail?: string;
   returnUrl: string;
+  couponId?: string;
 }
 
 /**
  * Provider-agnostic checkout surface: renders Stripe's embedded checkout, or
  * hands off to the active processor's hosted payment page.
  */
-export function BillingCheckout({ product, userId, customerEmail, returnUrl }: Props) {
+export function BillingCheckout({ product, userId, customerEmail, returnUrl, couponId }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [redirecting, setRedirecting] = useState(false);
 
@@ -47,6 +48,7 @@ export function BillingCheckout({ product, userId, customerEmail, returnUrl }: P
         userId={userId}
         customerEmail={customerEmail}
         returnUrl={returnUrl}
+        couponId={couponId}
       />
     );
   }
