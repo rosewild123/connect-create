@@ -114,11 +114,14 @@ function Onboarding() {
       const { error } = await supabase.from("profiles").upsert(payload);
       if (error) throw error;
       if (finish) {
-        toast.success("Welcome to Senda 🔥");
-        navigate({ to: "/discover" });
+        if (go) {
+          toast.success("Welcome to Senda 🔥");
+          navigate({ to: "/discover" });
+        }
       } else {
         toast.success("Saved");
       }
+
     } catch (e) {
       console.error("Profile save failed:", e);
       const msg = e instanceof Error ? e.message : (e && typeof e === "object" && "message" in e ? String((e as { message: unknown }).message) : "Save failed");
