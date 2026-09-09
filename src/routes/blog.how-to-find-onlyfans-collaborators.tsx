@@ -114,7 +114,8 @@ function GuidePage() {
           </Link>
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
+          <Link to="/blog/onlyfans-content-ideas" className="hover:text-foreground">OnlyFans content ideas</Link>
           <Link to="/terms" className="hover:text-foreground">Terms</Link>
           <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
         </div>
