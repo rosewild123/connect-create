@@ -71,6 +71,8 @@ function Landing() {
         <div className="mt-3 flex flex-wrap items-center justify-center gap-4">
           <Link to="/terms" className="hover:text-foreground">Terms</Link>
           <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+          <Link to="/blog/onlyfans-content-ideas" className="hover:text-foreground">Content ideas</Link>
+          <Link to="/blog/how-to-find-onlyfans-collaborators" className="hover:text-foreground">Find collabs</Link>
           <Link to="/billing" className="hover:text-foreground">Billing &amp; refunds</Link>
           <Link to="/compliance" className="hover:text-foreground">18+ compliance</Link>
         </div>

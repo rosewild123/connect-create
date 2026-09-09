@@ -18,6 +18,7 @@ import { Route as BillingRouteImport } from './routes/billing'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogOnlyfansContentIdeasRouteImport } from './routes/blog.onlyfans-content-ideas'
 import { Route as BlogHowToFindOnlyfansCollaboratorsRouteImport } from './routes/blog.how-to-find-onlyfans-collaborators'
 import { Route as AuthenticatedUpgradeRouteImport } from './routes/_authenticated/upgrade'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -85,6 +86,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogOnlyfansContentIdeasRoute =
+  BlogOnlyfansContentIdeasRouteImport.update({
+    id: '/blog/onlyfans-content-ideas',
+    path: '/blog/onlyfans-content-ideas',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BlogHowToFindOnlyfansCollaboratorsRoute =
   BlogHowToFindOnlyfansCollaboratorsRouteImport.update({
     id: '/blog/how-to-find-onlyfans-collaborators',
@@ -226,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
   '/blog/how-to-find-onlyfans-collaborators': typeof BlogHowToFindOnlyfansCollaboratorsRoute
+  '/blog/onlyfans-content-ideas': typeof BlogOnlyfansContentIdeasRoute
   '/admin/ambassadors': typeof AuthenticatedAdminAmbassadorsRoute
   '/admin/messaging': typeof AuthenticatedAdminMessagingRoute
   '/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
@@ -257,6 +265,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
   '/blog/how-to-find-onlyfans-collaborators': typeof BlogHowToFindOnlyfansCollaboratorsRoute
+  '/blog/onlyfans-content-ideas': typeof BlogOnlyfansContentIdeasRoute
   '/admin/ambassadors': typeof AuthenticatedAdminAmbassadorsRoute
   '/admin/messaging': typeof AuthenticatedAdminMessagingRoute
   '/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
@@ -291,6 +300,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/upgrade': typeof AuthenticatedUpgradeRoute
   '/blog/how-to-find-onlyfans-collaborators': typeof BlogHowToFindOnlyfansCollaboratorsRoute
+  '/blog/onlyfans-content-ideas': typeof BlogOnlyfansContentIdeasRoute
   '/_authenticated/admin/ambassadors': typeof AuthenticatedAdminAmbassadorsRoute
   '/_authenticated/admin/messaging': typeof AuthenticatedAdminMessagingRoute
   '/_authenticated/admin/promo-codes': typeof AuthenticatedAdminPromoCodesRoute
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/upgrade'
     | '/blog/how-to-find-onlyfans-collaborators'
+    | '/blog/onlyfans-content-ideas'
     | '/admin/ambassadors'
     | '/admin/messaging'
     | '/admin/promo-codes'
@@ -356,6 +367,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/upgrade'
     | '/blog/how-to-find-onlyfans-collaborators'
+    | '/blog/onlyfans-content-ideas'
     | '/admin/ambassadors'
     | '/admin/messaging'
     | '/admin/promo-codes'
@@ -389,6 +401,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/upgrade'
     | '/blog/how-to-find-onlyfans-collaborators'
+    | '/blog/onlyfans-content-ideas'
     | '/_authenticated/admin/ambassadors'
     | '/_authenticated/admin/messaging'
     | '/_authenticated/admin/promo-codes'
@@ -412,6 +425,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   BlogHowToFindOnlyfansCollaboratorsRoute: typeof BlogHowToFindOnlyfansCollaboratorsRoute
+  BlogOnlyfansContentIdeasRoute: typeof BlogOnlyfansContentIdeasRoute
   ApiPublicBillingCcbillWebhookRoute: typeof ApiPublicBillingCcbillWebhookRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicVerificationYotiWebhookRoute: typeof ApiPublicVerificationYotiWebhookRoute
@@ -480,6 +494,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/onlyfans-content-ideas': {
+      id: '/blog/onlyfans-content-ideas'
+      path: '/blog/onlyfans-content-ideas'
+      fullPath: '/blog/onlyfans-content-ideas'
+      preLoaderRoute: typeof BlogOnlyfansContentIdeasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/how-to-find-onlyfans-collaborators': {
@@ -705,6 +726,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   BlogHowToFindOnlyfansCollaboratorsRoute:
     BlogHowToFindOnlyfansCollaboratorsRoute,
+  BlogOnlyfansContentIdeasRoute: BlogOnlyfansContentIdeasRoute,
   ApiPublicBillingCcbillWebhookRoute: ApiPublicBillingCcbillWebhookRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicVerificationYotiWebhookRoute: ApiPublicVerificationYotiWebhookRoute,
