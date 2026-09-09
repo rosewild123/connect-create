@@ -135,7 +135,7 @@ function Onboarding() {
   return (
     <div className="mx-auto min-h-screen max-w-md px-6 py-8">
       <div className="mb-6 flex gap-1.5">
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className={`h-1 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-muted"}`} />
         ))}
       </div>
@@ -144,13 +144,16 @@ function Onboarding() {
         {step === 2 && "Your style"}
         {step === 3 && "Platforms & experience"}
         {step === 4 && "Show yourself"}
+        {step === 5 && "Last step: verify"}
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
         {step === 1 && "Name, age, where you're based."}
         {step === 2 && "What you make and who you want to meet."}
         {step === 3 && "Where to find you and how long you've been at it."}
         {step === 4 && "Add at least one photo to go live."}
+        {step === 5 && "One quick ID check and your profile goes live."}
       </p>
+
 
       <div className="mt-8 space-y-5">
         {step === 1 && (
