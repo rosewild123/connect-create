@@ -8,9 +8,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { NICHES, PLATFORMS, LOOKING_FOR, type Platform } from "@/lib/senda";
-import { X, Plus, Upload } from "lucide-react";
+import { X, Plus, Upload, ShieldCheck } from "lucide-react";
 import { scanContent } from "@/lib/contentFilter";
 import { useProfilePhotoUrl } from "@/hooks/useProfilePhotoUrls";
+import { StartVerificationButton } from "@/components/StartVerificationButton";
+
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({ meta: [{ title: "Set up your profile — Senda" }] }),
@@ -85,7 +87,7 @@ function Onboarding() {
     }
   }
 
-  async function save(finish: boolean) {
+  async function save(finish: boolean, go = true) {
     if (!userId) return;
     const nameScan = scanContent(displayName);
     const bioScan = scanContent(bio);
@@ -114,11 +116,14 @@ function Onboarding() {
       const { error } = await supabase.from("profiles").upsert(payload);
       if (error) throw error;
       if (finish) {
-        toast.success("Welcome to Senda 🔥");
-        navigate({ to: "/discover" });
+        if (go) {
+          toast.success("Welcome to Senda 🔥");
+          navigate({ to: "/discover" });
+        }
       } else {
         toast.success("Saved");
       }
+
     } catch (e) {
       console.error("Profile save failed:", e);
       const msg = e instanceof Error ? e.message : (e && typeof e === "object" && "message" in e ? String((e as { message: unknown }).message) : "Save failed");
@@ -135,7 +140,7 @@ function Onboarding() {
   return (
     <div className="mx-auto min-h-screen max-w-md px-6 py-8">
       <div className="mb-6 flex gap-1.5">
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className={`h-1 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-muted"}`} />
         ))}
       </div>
@@ -144,13 +149,16 @@ function Onboarding() {
         {step === 2 && "Your style"}
         {step === 3 && "Platforms & experience"}
         {step === 4 && "Show yourself"}
+        {step === 5 && "Last step: verify"}
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
         {step === 1 && "Name, age, where you're based."}
         {step === 2 && "What you make and who you want to meet."}
         {step === 3 && "Where to find you and how long you've been at it."}
         {step === 4 && "Add at least one photo to go live."}
+        {step === 5 && "One quick ID check and your profile goes live."}
       </p>
+
 
       <div className="mt-8 space-y-5">
         {step === 1 && (
@@ -250,10 +258,39 @@ function Onboarding() {
             <p className="text-xs text-muted-foreground">Up to 6 photos. The first one is your main.</p>
           </>
         )}
+
+        {step === 5 && (
+          <div className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
+            <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-full bg-primary/15 text-primary">
+              <ShieldCheck className="h-7 w-7" />
+            </div>
+            <p className="text-center text-sm">
+              Senda is verified creators only. Take a photo of your ID and a selfie — it takes about a minute.
+            </p>
+            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+              <li>You can only swipe, like and message once you're verified.</li>
+              <li>Everyone you meet here has passed the same check.</li>
+              <li>Your ID is checked by our verification partner and never shown on your profile.</li>
+            </ul>
+            <StartVerificationButton
+              className="mt-5 w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+              label="Verify my ID"
+              returnUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/profile`}
+              beforeStart={() => save(true, false)}
+            />
+            <button
+              type="button"
+              onClick={() => save(true)}
+              className="mt-3 block w-full text-center text-xs text-muted-foreground hover:text-foreground"
+            >
+              I'll verify later — just let me look around
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="mt-10 flex gap-3">
-        {step > 1 && <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(step - 1)}>Back</Button>}
+        {step > 1 && step < 5 && <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(step - 1)}>Back</Button>}
         {step < 4 && (
           <Button
             className="flex-1 rounded-full bg-primary text-primary-foreground"
@@ -265,11 +302,12 @@ function Onboarding() {
           <Button
             className="flex-1 rounded-full bg-primary text-primary-foreground"
             disabled={!canFinish || loading}
-            onClick={() => save(true)}
-          >{loading ? "..." : "Go live"}</Button>
+            onClick={async () => { await save(false); setStep(5); }}
+          >{loading ? "..." : "Continue"}</Button>
         )}
       </div>
     </div>
+
   );
 }
 
