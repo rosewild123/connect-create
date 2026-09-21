@@ -25,6 +25,8 @@ const PRODUCT_PRICING: Record<BillingProduct, { price: string; period: string; r
   plus: { price: "11.99", period: "30", recurring: true },
   premium: { price: "24.99", period: "30", recurring: true },
   boost_single: { price: "2.99", period: "30", recurring: false },
+  boost_pack_3: { price: "6.99", period: "30", recurring: false },
+  boost_pack_10: { price: "19.99", period: "30", recurring: false },
 };
 
 const CURRENCY_GBP = "826"; // ISO 4217 numeric, required by CCBill
