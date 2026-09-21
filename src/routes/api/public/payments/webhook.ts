@@ -165,5 +165,19 @@ async function handleOneOffPayment(
         throw error;
       }
     }
+    // Boost packs land as credits the member spends whenever they like.
+    const packCredits = lookup === "senda_boost_pack_3_gbp" ? 3 : lookup === "senda_boost_pack_10_gbp" ? 10 : 0;
+    if (packCredits > 0) {
+      const quantity = item.quantity ?? 1;
+      const { error } = await supabaseAdmin.rpc("grant_boost_credits", {
+        _user_id: userId,
+        _credits: packCredits * quantity,
+      });
+      if (error) {
+        console.error("Failed to grant boost credits", error);
+        throw error;
+      }
+    }
+
   }
 }

@@ -1,5 +1,13 @@
 import type { BillingCapabilities, BillingProduct, BillingProviderId } from "./types";
-import { PRICE_BOOST_SINGLE, PRICE_PLUS, PRICE_PREMIUM } from "@/lib/senda";
+import {
+  PRICE_BOOST_SINGLE,
+  PRICE_BOOST_PACK_3,
+  PRICE_BOOST_PACK_10,
+  BOOST_PACK_3_PRICE_LABEL,
+  BOOST_PACK_10_PRICE_LABEL,
+  PRICE_PLUS,
+  PRICE_PREMIUM,
+} from "@/lib/senda";
 
 /**
  * Which processor is live. Set VITE_BILLING_PROVIDER="ccbill" once the CCBill
@@ -28,6 +36,8 @@ export const CATALOG: Record<
   plus: { name: "Senda Plus", priceLabel: "£11.99", recurring: true, stripePriceId: PRICE_PLUS },
   premium: { name: "Senda Premium", priceLabel: "£24.99", recurring: true, stripePriceId: PRICE_PREMIUM },
   boost_single: { name: "Single boost", priceLabel: "£2.99", recurring: false, stripePriceId: PRICE_BOOST_SINGLE },
+  boost_pack_3: { name: "3 boosts", priceLabel: BOOST_PACK_3_PRICE_LABEL, recurring: false, stripePriceId: PRICE_BOOST_PACK_3 },
+  boost_pack_10: { name: "10 boosts", priceLabel: BOOST_PACK_10_PRICE_LABEL, recurring: false, stripePriceId: PRICE_BOOST_PACK_10 },
 };
 
 /** Maps our stable product ids to the current provider's price identifier. */

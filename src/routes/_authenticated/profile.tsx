@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock, Gift } from "lucide-react";
-import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOSTS_PREMIUM_MONTHLY, BOOST_DURATION_MIN, BOOST_SINGLE_PRICE_LABEL } from "@/lib/senda";
+import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock, Gift, Globe } from "lucide-react";
+import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOSTS_PREMIUM_MONTHLY, BOOST_DURATION_MIN, BOOST_SINGLE_PRICE_LABEL, BOOST_PACK_3_PRICE_LABEL, BOOST_PACK_10_PRICE_LABEL } from "@/lib/senda";
 import { BillingCheckout } from "@/components/BillingCheckout";
 
 import { useSubscription } from "@/hooks/useSubscription";
@@ -45,6 +45,7 @@ function ProfilePage() {
     niches: string[]; looking_for: string[]; platforms: Platform[]; photos: string[];
     age_verified: boolean; id_verified: boolean; photo_verified: boolean; experience_years: number | null; completed_collabs: number;
     prompts: Prompt[];
+    passport_city: string | null; passport_country: string | null;
   } | null>(null);
   const photoUrl = useProfilePhotoUrls(profile?.photos)[0] ?? "";
 
@@ -125,6 +126,12 @@ function ProfilePage() {
 
         <div className="mt-4 space-y-3">
           <BoostCard userId={profile.id} />
+          <PassportCard
+            userId={profile.id}
+            city={profile.passport_city}
+            country={profile.passport_country}
+            onSaved={(city, country) => setProfile((p) => (p ? { ...p, passport_city: city, passport_country: country } : p))}
+          />
           <NotificationsToggle />
           <PromptsEditor userId={profile.id} initial={profile.prompts ?? []} />
           {!(profile.age_verified || profile.id_verified) && (
@@ -265,22 +272,33 @@ function VerificationCard({ ageVerified, idVerified }: { ageVerified: boolean; i
   );
 }
 
+type BoostBuyOption = "boost_single" | "boost_pack_3" | "boost_pack_10";
+
+const BOOST_BUY_OPTIONS: { product: BoostBuyOption; label: string; price: string; note?: string }[] = [
+  { product: "boost_single", label: "1 boost", price: BOOST_SINGLE_PRICE_LABEL },
+  { product: "boost_pack_3", label: "3 boosts", price: BOOST_PACK_3_PRICE_LABEL, note: "Save 22%" },
+  { product: "boost_pack_10", label: "10 boosts", price: BOOST_PACK_10_PRICE_LABEL, note: "Best value" },
+];
+
 function BoostCard({ userId }: { userId: string }) {
   const { isActive: isPlus, isPremium } = useSubscription(userId);
   const [used, setUsed] = useState(0);
+  const [credits, setCredits] = useState(0);
   const [endsAt, setEndsAt] = useState<Date | null>(null);
   const [activating, setActivating] = useState(false);
   const [, setTick] = useState(0);
-  const [buying, setBuying] = useState(false);
+  const [buying, setBuying] = useState<BoostBuyOption | null>(null);
   const [email, setEmail] = useState<string | undefined>(undefined);
 
   async function refresh() {
-    const [b, e] = await Promise.all([
+    const [b, e, c] = await Promise.all([
       supabase.rpc("boosts_this_month"),
       supabase.rpc("active_boost_ends_at", { _user_id: userId }),
+      supabase.rpc("my_boost_credits"),
     ]);
     setUsed((b.data as unknown as number) ?? 0);
     setEndsAt(e.data ? new Date(e.data as unknown as string) : null);
+    setCredits((c.data as unknown as number) ?? 0);
   }
   useEffect(() => { refresh(); }, [userId]);
   useEffect(() => {
@@ -310,12 +328,12 @@ function BoostCard({ userId }: { userId: string }) {
   }, []);
 
   const active = !!endsAt && endsAt.getTime() > Date.now();
-  const quota = isPremium ? BOOSTS_PREMIUM_MONTHLY : BOOSTS_PLUS_MONTHLY;
+  const quota = isPremium ? BOOSTS_PREMIUM_MONTHLY : isPlus ? BOOSTS_PLUS_MONTHLY : 0;
   const remaining = Math.max(0, quota - used);
+  const canBoost = remaining > 0 || credits > 0;
 
   async function activate() {
-    if (!isPlus) return;
-    if (remaining <= 0) { toast.info("You've used this month's boost."); return; }
+    if (!canBoost) { toast.info("No boosts left — buy a boost pack or get Plus."); return; }
     setActivating(true);
     const { data, error } = await supabase.rpc("activate_boost", { _duration_minutes: BOOST_DURATION_MIN });
     setActivating(false);
@@ -332,19 +350,19 @@ function BoostCard({ userId }: { userId: string }) {
   }
 
   if (buying) {
+    const option = BOOST_BUY_OPTIONS.find((o) => o.product === buying)!;
     return (
       <div className="rounded-2xl border border-border bg-card p-4">
         <div className="mb-2 flex items-center justify-between">
-          <div className="font-semibold">Buy a Boost · {BOOST_SINGLE_PRICE_LABEL}</div>
-          <button onClick={() => setBuying(false)} className="text-xs text-muted-foreground">Cancel</button>
+          <div className="font-semibold">{option.label} · {option.price}</div>
+          <button onClick={() => setBuying(null)} className="text-xs text-muted-foreground">Cancel</button>
         </div>
         <BillingCheckout
-          product="boost_single"
+          product={option.product}
           userId={userId}
           customerEmail={email}
           returnUrl={`${window.location.origin}/profile?boost=success`}
         />
-
       </div>
     );
   }
@@ -359,36 +377,131 @@ function BoostCard({ userId }: { userId: string }) {
           Boost {active && <span className="ml-2 text-xs text-primary">Active · {endsAt && fmt(endsAt)}</span>}
         </div>
         <p className="text-xs text-muted-foreground">
-          {isPlus
-            ? `Move to the front of the deck for ${BOOST_DURATION_MIN} min. ${remaining} of ${quota} left this month.`
-            : `Move to the front of the deck for ${BOOST_DURATION_MIN} min. Buy one for ${BOOST_SINGLE_PRICE_LABEL} or get free monthly boosts with Plus.`}
+          Move to the front of the deck for {BOOST_DURATION_MIN} min.{" "}
+          {isPlus && `${remaining} of ${quota} included this month. `}
+          {credits > 0
+            ? `${credits} bought boost${credits === 1 ? "" : "es"} ready to use.`
+            : "Buy a pack below and use them whenever you like."}
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          {isPlus && (
-            <button
-              onClick={activate}
-              disabled={activating || active || remaining <= 0}
-              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
-            >
-              {active
-                ? <>Boost active · {endsAt && fmt(endsAt)}</>
-                : remaining <= 0
-                  ? "No boosts left this month"
-                  : activating
-                    ? <><Loader2 className="h-3 w-3 animate-spin" /> Activating…</>
-                    : <><Zap className="h-3 w-3" /> Boost now</>}
-            </button>
-          )}
           <button
-            onClick={() => setBuying(true)}
-            disabled={active}
-            className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={activate}
+            disabled={activating || active || !canBoost}
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
           >
-            <Zap className="h-3 w-3" /> Buy boost · {BOOST_SINGLE_PRICE_LABEL}
+            {active
+              ? <>Boost active · {endsAt && fmt(endsAt)}</>
+              : !canBoost
+                ? "No boosts left"
+                : activating
+                  ? <><Loader2 className="h-3 w-3 animate-spin" /> Activating…</>
+                  : <><Zap className="h-3 w-3" /> Boost now</>}
           </button>
-          {!isPlus && (
-            <Link to="/upgrade" className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground">
-              <Lock className="h-3 w-3" /> Or get Plus
+        </div>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          {BOOST_BUY_OPTIONS.map((o) => (
+            <button
+              key={o.product}
+              onClick={() => setBuying(o.product)}
+              className="rounded-2xl border border-primary/30 bg-card px-2 py-2 text-center transition hover:bg-primary/10"
+            >
+              <div className="text-xs font-bold text-foreground">{o.label}</div>
+              <div className="text-xs font-semibold text-primary">{o.price}</div>
+              {o.note && <div className="mt-0.5 text-[10px] text-muted-foreground">{o.note}</div>}
+            </button>
+          ))}
+        </div>
+        {!isPlus && (
+          <Link to="/upgrade" className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+            <Lock className="h-3 w-3" /> Or get Plus for a free boost every month
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PassportCard({ userId, city, country, onSaved }: {
+  userId: string;
+  city: string | null;
+  country: string | null;
+  onSaved: (city: string | null, country: string | null) => void;
+}) {
+  const { isActive: isPlus } = useSubscription(userId);
+  const [draftCity, setDraftCity] = useState(city ?? "");
+  const [draftCountry, setDraftCountry] = useState(country ?? "");
+  const [saving, setSaving] = useState(false);
+  const set = !!(city || country);
+
+  async function save(clear = false) {
+    setSaving(true);
+    const nextCity = clear ? null : draftCity.trim() || null;
+    const nextCountry = clear ? null : draftCountry.trim() || null;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ passport_city: nextCity, passport_country: nextCountry })
+      .eq("id", userId);
+    setSaving(false);
+    if (error) { toast.error(error.message); return; }
+    if (clear) { setDraftCity(""); setDraftCountry(""); }
+    onSaved(nextCity, nextCountry);
+    toast.success(clear ? "Back to your real location" : "Passport updated 🌍");
+  }
+
+  return (
+    <div className="rounded-2xl border border-border bg-card p-4">
+      <div className="flex items-start gap-3">
+        <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${set ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+          <Globe className="h-5 w-5" />
+        </div>
+        <div className="flex-1">
+          <div className="font-semibold">
+            Passport {set && <span className="ml-2 text-xs text-primary">On · {[city, country].filter(Boolean).join(", ")}</span>}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Travelling or planning a shoot away? Show up in another city so creators there can find you.
+          </p>
+
+          {isPlus ? (
+            <>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <input
+                  value={draftCity}
+                  onChange={(e) => setDraftCity(e.target.value)}
+                  placeholder="City"
+                  aria-label="Passport city"
+                  className="rounded-xl border border-border bg-background px-3 py-2 text-sm"
+                />
+                <input
+                  value={draftCountry}
+                  onChange={(e) => setDraftCountry(e.target.value)}
+                  placeholder="Country"
+                  aria-label="Passport country"
+                  className="rounded-xl border border-border bg-background px-3 py-2 text-sm"
+                />
+              </div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  onClick={() => save(false)}
+                  disabled={saving || (!draftCity.trim() && !draftCountry.trim())}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground disabled:bg-muted disabled:text-muted-foreground"
+                >
+                  {saving && <Loader2 className="h-3 w-3 animate-spin" />} Use this location
+                </button>
+                {set && (
+                  <button
+                    onClick={() => save(true)}
+                    disabled={saving}
+                    className="rounded-full border border-border bg-card px-4 py-1.5 text-xs font-semibold text-muted-foreground"
+                  >
+                    Turn off
+                  </button>
+                )}
+              </div>
+            </>
+          ) : (
+            <Link to="/upgrade" className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
+              <Lock className="h-3 w-3" /> Unlock Passport with Plus
             </Link>
           )}
         </div>
@@ -396,3 +509,4 @@ function BoostCard({ userId }: { userId: string }) {
     </div>
   );
 }
+

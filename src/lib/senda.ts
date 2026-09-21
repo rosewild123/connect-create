@@ -35,6 +35,17 @@ export const PRICE_PLUS = "senda_plus_monthly_gbp";
 export const PRICE_PREMIUM = "senda_premium_monthly_gbp";
 export const PRICE_BOOST_SINGLE = "senda_boost_single_gbp";
 export const BOOST_SINGLE_PRICE_LABEL = "£2.99";
+export const PRICE_BOOST_PACK_3 = "senda_boost_pack_3_gbp";
+export const PRICE_BOOST_PACK_10 = "senda_boost_pack_10_gbp";
+export const BOOST_PACK_3_PRICE_LABEL = "£6.99";
+export const BOOST_PACK_10_PRICE_LABEL = "£19.99";
+
+/** How many boost credits each one-off purchase grants. */
+export const BOOST_CREDITS_BY_PRICE: Record<string, number> = {
+  [PRICE_BOOST_PACK_3]: 3,
+  [PRICE_BOOST_PACK_10]: 10,
+};
+
 
 export type Tier = "free" | "plus" | "premium";
 
