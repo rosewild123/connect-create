@@ -48,6 +48,15 @@ export const Route = createFileRoute("/api/public/billing/ccbill-webhook")({
                 : null;
 
         try {
+          if ((product === "boost_pack_3" || product === "boost_pack_10") && eventType === "NewSaleSuccess") {
+            const { error } = await supabaseAdmin.rpc("grant_boost_credits", {
+              _user_id: userId,
+              _credits: product === "boost_pack_10" ? 10 : 3,
+            });
+            if (error) console.error("CCBill boost credits grant failed", error);
+            return new Response("ok");
+          }
+
           if (product === "boost_single" && eventType === "NewSaleSuccess") {
             const endsAt = new Date(Date.now() + 30 * 60_000).toISOString();
             const { error } = await supabaseAdmin
