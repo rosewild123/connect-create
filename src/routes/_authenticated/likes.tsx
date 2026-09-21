@@ -55,7 +55,7 @@ function LikesPage() {
   })(); }, []);
 
   useEffect(() => { (async () => {
-    if (!me || !isPlus) { setLoading(false); return; }
+    if (!me) { setLoading(false); return; }
     const { data: incoming, error } = await supabase.from("swipes")
       .select("swiper_id, direction").eq("swipee_id", me).in("direction", ["like", "super"]);
     if (error) { toast.error(error.message); setLoading(false); return; }
@@ -76,7 +76,7 @@ function LikesPage() {
     merged.sort((a, b) => Number(b.isSuper) - Number(a.isSuper));
     setLikers(merged);
     setLoading(false);
-  })(); }, [me, isPlus]);
+  })(); }, [me]);
 
   async function act(targetId: string, dir: "like" | "pass") {
     if (!me) return;
@@ -111,8 +111,6 @@ function LikesPage() {
           </div>
         ) : verified === false ? (
           <VerifiedGate />
-        ) : !isPlus ? (
-          <PlusGate />
         ) : likers.length === 0 ? (
           <div className="mt-16 text-center">
             <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-primary/15 text-primary"><Heart className="h-7 w-7" /></div>
@@ -120,9 +118,16 @@ function LikesPage() {
             <p className="mt-2 text-sm text-muted-foreground">Keep swiping — new likes appear here as they come in.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
-            {likers.map((p) => <LikerCard key={p.id} profile={p} onAct={act} />)}
-          </div>
+          <>
+            {!isPlus && <PlusTeaserBanner count={likers.length} />}
+            <div className="grid grid-cols-2 gap-3">
+              {likers.map((p) =>
+                isPlus
+                  ? <LikerCard key={p.id} profile={p} onAct={act} />
+                  : <BlurredLikerCard key={p.id} profile={p} />
+              )}
+            </div>
+          </>
         )}
       </div>
     </AppShell>
@@ -163,6 +168,57 @@ function LikerCard({ profile, onAct }: { profile: LikerProfile; onAct: (id: stri
         </div>
       </div>
     </div>
+  );
+}
+
+function PlusTeaserBanner({ count }: { count: number }) {
+  return (
+    <div className="mb-4 rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/15 to-transparent p-4 text-center">
+      <div className="mx-auto mb-2 grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground">
+        <Lock className="h-5 w-5" />
+      </div>
+      <h2 className="font-display text-xl font-bold">
+        {count} {count === 1 ? "creator has" : "creators have"} liked you
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Upgrade to Senda Plus to see who they are and match with one tap.
+      </p>
+      <Button asChild className="mt-3 rounded-full px-6">
+        <Link to="/upgrade">Get Senda Plus</Link>
+      </Button>
+    </div>
+  );
+}
+
+function BlurredLikerCard({ profile }: { profile: LikerProfile }) {
+  const url = useProfilePhotoUrl(profile.photos[0]);
+  const navigate = useNavigate();
+
+  return (
+    <button
+      onClick={() => navigate({ to: "/upgrade" })}
+      aria-label="Upgrade to see who liked you"
+      className="swipe-card-shadow relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-muted"
+    >
+      {url ? (
+        <img src={url} alt="" aria-hidden className="h-full w-full scale-110 object-cover blur-2xl" draggable={false} />
+      ) : (
+        <div className="h-full w-full bg-gradient-to-br from-primary/30 to-muted" />
+      )}
+      <div className="absolute inset-0 grid place-items-center bg-black/30">
+        <div className="grid h-10 w-10 place-items-center rounded-full bg-white/20 text-white backdrop-blur">
+          <Lock className="h-5 w-5" />
+        </div>
+      </div>
+      {profile.isSuper && (
+        <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-sky-500 px-2 py-0.5 text-[10px] font-bold text-white shadow">
+          <Star className="h-3 w-3 fill-current" /> SUPER
+        </div>
+      )}
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent p-3 text-center text-[11px] font-semibold text-white">
+        Tap to unlock
+      </div>
+    </button>
   );
 }
 
