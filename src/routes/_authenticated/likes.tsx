@@ -221,16 +221,3 @@ function BlurredLikerCard({ profile }: { profile: LikerProfile }) {
     </button>
   );
 }
-
-function PlusGate() {
-  return (
-    <div className="mt-12 text-center">
-      <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-primary/15 text-primary"><Lock className="h-7 w-7" /></div>
-      <h2 className="font-display text-2xl font-bold">See who liked you</h2>
-      <p className="mt-2 text-sm text-muted-foreground">Skip the guesswork. Upgrade to Senda Plus to see everyone who's already liked you.</p>
-      <Button asChild className="mt-5 rounded-full px-6">
-        <Link to="/upgrade">Get Senda Plus</Link>
-      </Button>
-    </div>
-  );
-}
