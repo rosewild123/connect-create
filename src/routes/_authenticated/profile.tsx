@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock, Gift } from "lucide-react";
-import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOSTS_PREMIUM_MONTHLY, BOOST_DURATION_MIN, BOOST_SINGLE_PRICE_LABEL } from "@/lib/senda";
+import { ShieldCheck, ShieldAlert, LogOut, Pencil, Sparkles, Loader2, Zap, Lock, Gift, Globe } from "lucide-react";
+import { ageFromDob, type Platform, BOOSTS_PLUS_MONTHLY, BOOSTS_PREMIUM_MONTHLY, BOOST_DURATION_MIN, BOOST_SINGLE_PRICE_LABEL, BOOST_PACK_3_PRICE_LABEL, BOOST_PACK_10_PRICE_LABEL } from "@/lib/senda";
 import { BillingCheckout } from "@/components/BillingCheckout";
 
 import { useSubscription } from "@/hooks/useSubscription";
@@ -45,6 +45,7 @@ function ProfilePage() {
     niches: string[]; looking_for: string[]; platforms: Platform[]; photos: string[];
     age_verified: boolean; id_verified: boolean; photo_verified: boolean; experience_years: number | null; completed_collabs: number;
     prompts: Prompt[];
+    passport_city: string | null; passport_country: string | null;
   } | null>(null);
   const photoUrl = useProfilePhotoUrls(profile?.photos)[0] ?? "";
 
@@ -125,6 +126,12 @@ function ProfilePage() {
 
         <div className="mt-4 space-y-3">
           <BoostCard userId={profile.id} />
+          <PassportCard
+            userId={profile.id}
+            city={profile.passport_city}
+            country={profile.passport_country}
+            onSaved={(city, country) => setProfile((p) => (p ? { ...p, passport_city: city, passport_country: country } : p))}
+          />
           <NotificationsToggle />
           <PromptsEditor userId={profile.id} initial={profile.prompts ?? []} />
           {!(profile.age_verified || profile.id_verified) && (
