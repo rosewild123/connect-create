@@ -8,7 +8,7 @@
 export type BillingProviderId = "stripe" | "ccbill";
 
 /** Stable, provider-independent identifiers for the things we sell. */
-export type BillingProduct = "plus" | "premium" | "boost_single";
+export type BillingProduct = "plus" | "premium" | "boost_single" | "boost_pack_3" | "boost_pack_10";
 
 export type CheckoutRequest = {
   product: BillingProduct;
