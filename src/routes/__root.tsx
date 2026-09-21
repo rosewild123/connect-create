@@ -65,6 +65,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Senda — Match. Collab. Create." },
       { name: "description", content: "Senda is where adult creators discover and connect with each other for collabs, shoots, and promos." },
       { name: "author", content: "Senda" },
+      { name: "google-site-verification", content: "Z1cfbg8Gucc-xm92zpXc__JNpo8sPnXdI3db_ieH_I8" },
+
       { name: "theme-color", content: "#1a1a1a" },
       { property: "og:title", content: "Senda — Match. Collab. Create." },
       { property: "og:description", content: "Senda is where adult creators discover and connect with each other for collabs, shoots, and promos." },
