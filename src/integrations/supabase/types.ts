@@ -35,6 +35,27 @@ export type Database = {
         }
         Relationships: []
       }
+      boost_credits: {
+        Row: {
+          created_at: string
+          credits: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       boosts: {
         Row: {
           created_at: string
@@ -199,6 +220,8 @@ export type Database = {
           location_country: string | null
           looking_for: string[]
           niches: string[]
+          passport_city: string | null
+          passport_country: string | null
           photo_verified: boolean
           photo_verified_at: string | null
           photos: string[]
@@ -228,6 +251,8 @@ export type Database = {
           location_country?: string | null
           looking_for?: string[]
           niches?: string[]
+          passport_city?: string | null
+          passport_country?: string | null
           photo_verified?: boolean
           photo_verified_at?: string | null
           photos?: string[]
@@ -257,6 +282,8 @@ export type Database = {
           location_country?: string | null
           looking_for?: string[]
           niches?: string[]
+          passport_city?: string | null
+          passport_country?: string | null
           photo_verified?: boolean
           photo_verified_at?: string | null
           photos?: string[]
@@ -623,6 +650,8 @@ export type Database = {
           location_country: string | null
           looking_for: string[]
           niches: string[]
+          passport_city: string | null
+          passport_country: string | null
           photo_verified: boolean
           photo_verified_at: string | null
           photos: string[]
@@ -667,6 +696,10 @@ export type Database = {
           willing_to_travel: boolean
         }[]
       }
+      grant_boost_credits: {
+        Args: { _credits: number; _user_id: string }
+        Returns: number
+      }
       has_active_subscription: {
         Args: { _environment: string; _user_id: string }
         Returns: boolean
@@ -686,6 +719,7 @@ export type Database = {
           id: string
         }[]
       }
+      my_boost_credits: { Args: never; Returns: number }
       redeem_promo_code: { Args: { _code: string }; Returns: Json }
       set_ambassador: {
         Args: { _is: boolean; _user_id: string }
