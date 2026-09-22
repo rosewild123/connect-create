@@ -133,6 +133,33 @@ function AuthPage() {
       </Link>
 
       <div className="w-full max-w-sm rounded-3xl border border-border bg-card/80 p-8 backdrop-blur">
+        {mode === "confirm" ? (
+          <>
+            <h1 className="font-display text-3xl font-bold">Check your email</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              We've sent a confirmation link to{" "}
+              <span className="text-foreground">{pendingEmail}</span>. Tap it to activate your account, then you're in.
+            </p>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Can't see it? Check your spam folder — it can take a minute to arrive.
+            </p>
+            <Button
+              onClick={handleResend}
+              disabled={loading || resendIn > 0}
+              variant="outline"
+              className="mt-6 w-full rounded-full"
+            >
+              {resendIn > 0 ? `Resend email in ${resendIn}s` : "Resend confirmation email"}
+            </Button>
+            <button
+              onClick={() => { setMode("signin"); setPassword(""); }}
+              className="mt-5 w-full text-center text-sm text-muted-foreground hover:text-foreground"
+            >
+              Back to sign in
+            </button>
+          </>
+        ) : (
+          <>
         <h1 className="font-display text-3xl font-bold">
           {mode === "signin" ? "Welcome back" : mode === "forgot" ? "Reset password" : "Join Senda"}
         </h1>
@@ -191,7 +218,10 @@ function AuthPage() {
         >
           {mode === "signin" ? "New here? Create an account" : mode === "forgot" ? "Back to sign in" : "Already have an account? Sign in"}
         </button>
+          </>
+        )}
       </div>
+
     </main>
   );
 }
