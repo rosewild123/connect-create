@@ -36,19 +36,46 @@ function AuthPage() {
     });
   }, [navigate]);
 
+  async function handleResend() {
+    if (resendIn > 0 || loading) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: pendingEmail,
+        options: { emailRedirectTo: window.location.origin + "/discover" },
+      });
+      if (error) throw error;
+      toast.success("Confirmation email sent again.");
+      setResendIn(60);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not resend the email";
+      toast.error(/after (\d+) seconds/.test(msg) ? "Please wait a moment before requesting another email." : msg);
+      setResendIn(60);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email, password,
           options: { emailRedirectTo: window.location.origin + "/discover" },
         });
         if (error) throw error;
-        toast.success("Account created — check your email if confirmation is required.");
-        navigate({ to: "/onboarding" });
+        if (data.session) {
+          navigate({ to: "/onboarding" });
+        } else {
+          setPendingEmail(email);
+          setMode("confirm");
+          setResendIn(60);
+        }
       } else if (mode === "forgot") {
+
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: window.location.origin + "/reset-password",
         });
