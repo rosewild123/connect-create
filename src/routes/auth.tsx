@@ -97,11 +97,21 @@ function AuthPage() {
         navigate({ to: "/discover" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Authentication failed");
+      const raw = err instanceof Error ? err.message : "Authentication failed";
+      if (/not confirmed/i.test(raw)) {
+        setPendingEmail(email);
+        setMode("confirm");
+        toast.error("Please confirm your email first — check your inbox.");
+      } else if (/after \d+ seconds/i.test(raw) || /rate limit/i.test(raw)) {
+        toast.error("Too many attempts — please wait a minute and try again.");
+      } else {
+        toast.error(raw);
+      }
     } finally {
       setLoading(false);
     }
   }
+
 
   async function handleGoogle() {
     setLoading(true);
