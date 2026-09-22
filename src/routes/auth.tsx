@@ -25,10 +25,12 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot" | "confirm">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [resendIn, setResendIn] = useState(0);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -36,19 +38,53 @@ function AuthPage() {
     });
   }, [navigate]);
 
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const t = setTimeout(() => setResendIn((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendIn]);
+
+
+  async function handleResend() {
+    if (resendIn > 0 || loading) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: pendingEmail,
+        options: { emailRedirectTo: window.location.origin + "/discover" },
+      });
+      if (error) throw error;
+      toast.success("Confirmation email sent again.");
+      setResendIn(60);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not resend the email";
+      toast.error(/after (\d+) seconds/.test(msg) ? "Please wait a moment before requesting another email." : msg);
+      setResendIn(60);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email, password,
           options: { emailRedirectTo: window.location.origin + "/discover" },
         });
         if (error) throw error;
-        toast.success("Account created — check your email if confirmation is required.");
-        navigate({ to: "/onboarding" });
+        if (data.session) {
+          navigate({ to: "/onboarding" });
+        } else {
+          setPendingEmail(email);
+          setMode("confirm");
+          setResendIn(60);
+        }
       } else if (mode === "forgot") {
+
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: window.location.origin + "/reset-password",
         });
@@ -61,11 +97,21 @@ function AuthPage() {
         navigate({ to: "/discover" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Authentication failed");
+      const raw = err instanceof Error ? err.message : "Authentication failed";
+      if (/not confirmed/i.test(raw)) {
+        setPendingEmail(email);
+        setMode("confirm");
+        toast.error("Please confirm your email first — check your inbox.");
+      } else if (/after \d+ seconds/i.test(raw) || /rate limit/i.test(raw)) {
+        toast.error("Too many attempts — please wait a minute and try again.");
+      } else {
+        toast.error(raw);
+      }
     } finally {
       setLoading(false);
     }
   }
+
 
   async function handleGoogle() {
     setLoading(true);
@@ -87,6 +133,33 @@ function AuthPage() {
       </Link>
 
       <div className="w-full max-w-sm rounded-3xl border border-border bg-card/80 p-8 backdrop-blur">
+        {mode === "confirm" ? (
+          <>
+            <h1 className="font-display text-3xl font-bold">Check your email</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              We've sent a confirmation link to{" "}
+              <span className="text-foreground">{pendingEmail}</span>. Tap it to activate your account, then you're in.
+            </p>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Can't see it? Check your spam folder — it can take a minute to arrive.
+            </p>
+            <Button
+              onClick={handleResend}
+              disabled={loading || resendIn > 0}
+              variant="outline"
+              className="mt-6 w-full rounded-full"
+            >
+              {resendIn > 0 ? `Resend email in ${resendIn}s` : "Resend confirmation email"}
+            </Button>
+            <button
+              onClick={() => { setMode("signin"); setPassword(""); }}
+              className="mt-5 w-full text-center text-sm text-muted-foreground hover:text-foreground"
+            >
+              Back to sign in
+            </button>
+          </>
+        ) : (
+          <>
         <h1 className="font-display text-3xl font-bold">
           {mode === "signin" ? "Welcome back" : mode === "forgot" ? "Reset password" : "Join Senda"}
         </h1>
@@ -145,7 +218,10 @@ function AuthPage() {
         >
           {mode === "signin" ? "New here? Create an account" : mode === "forgot" ? "Back to sign in" : "Already have an account? Sign in"}
         </button>
+          </>
+        )}
       </div>
+
     </main>
   );
 }

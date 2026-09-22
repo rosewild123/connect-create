@@ -628,6 +628,7 @@ export type Database = {
       boosted_user_ids: { Args: never; Returns: string[] }
       boosts_this_month: { Args: never; Returns: number }
       claim_referral: { Args: { _code: string }; Returns: Json }
+      effective_plan_tier: { Args: { _user_id: string }; Returns: string }
       gen_referral_code: { Args: never; Returns: string }
       get_hidden_user_ids: { Args: never; Returns: string[] }
       get_my_profile: {
