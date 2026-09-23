@@ -338,7 +338,15 @@ function BoostCard({ userId }: { userId: string }) {
     const { data, error } = await supabase.rpc("activate_boost", { _duration_minutes: BOOST_DURATION_MIN });
     setActivating(false);
     const res = (data ?? {}) as { ok?: boolean; error?: string };
-    if (error || !res.ok) { toast.error(error?.message || res.error || "Failed"); return; }
+    if (error || !res.ok) {
+      const raw = error?.message || res.error || "";
+      toast.error(
+        /permission denied|function/i.test(raw)
+          ? "We couldn't start your boost just now — please try again in a moment."
+          : raw || "We couldn't start your boost — please try again.",
+      );
+      return;
+    }
     toast.success(`Boosted for ${BOOST_DURATION_MIN} minutes ⚡`);
     refresh();
   }
@@ -442,7 +450,17 @@ function PassportCard({ userId, city, country, onSaved }: {
       .update({ passport_city: nextCity, passport_country: nextCountry })
       .eq("id", userId);
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      const raw = error.message || "";
+      toast.error(
+        /Passport requires/i.test(raw)
+          ? "Passport is a Plus and Premium feature."
+          : /permission denied|function/i.test(raw)
+            ? "We couldn't save your passport location just now — please try again in a moment."
+            : raw || "We couldn't save your passport location — please try again.",
+      );
+      return;
+    }
     if (clear) { setDraftCity(""); setDraftCountry(""); }
     onSaved(nextCity, nextCountry);
     toast.success(clear ? "Back to your real location" : "Passport updated 🌍");

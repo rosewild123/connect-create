@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.effective_plan_tier(uuid) FROM anon;
