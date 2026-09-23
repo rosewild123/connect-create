@@ -338,7 +338,15 @@ function BoostCard({ userId }: { userId: string }) {
     const { data, error } = await supabase.rpc("activate_boost", { _duration_minutes: BOOST_DURATION_MIN });
     setActivating(false);
     const res = (data ?? {}) as { ok?: boolean; error?: string };
-    if (error || !res.ok) { toast.error(error?.message || res.error || "Failed"); return; }
+    if (error || !res.ok) {
+      const raw = error?.message || res.error || "";
+      toast.error(
+        /permission denied|function/i.test(raw)
+          ? "We couldn't start your boost just now — please try again in a moment."
+          : raw || "We couldn't start your boost — please try again.",
+      );
+      return;
+    }
     toast.success(`Boosted for ${BOOST_DURATION_MIN} minutes ⚡`);
     refresh();
   }
