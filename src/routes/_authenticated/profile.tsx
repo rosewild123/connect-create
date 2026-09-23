@@ -450,7 +450,17 @@ function PassportCard({ userId, city, country, onSaved }: {
       .update({ passport_city: nextCity, passport_country: nextCountry })
       .eq("id", userId);
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      const raw = error.message || "";
+      toast.error(
+        /Passport requires/i.test(raw)
+          ? "Passport is a Plus and Premium feature."
+          : /permission denied|function/i.test(raw)
+            ? "We couldn't save your passport location just now — please try again in a moment."
+            : raw || "We couldn't save your passport location — please try again.",
+      );
+      return;
+    }
     if (clear) { setDraftCity(""); setDraftCountry(""); }
     onSaved(nextCity, nextCountry);
     toast.success(clear ? "Back to your real location" : "Passport updated 🌍");
